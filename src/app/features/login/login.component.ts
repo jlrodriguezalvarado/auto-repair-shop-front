@@ -17,12 +17,13 @@ export class LoginComponent {
   router = inject(Router);
 
   username = '';
+  password = '';
   loading = signal(false);
 
   onSubmit(): void {
-    if (!this.username) return;
+    if (!this.username || !this.password) return;
     this.loading.set(true);
-    this.auth.login(this.username).subscribe({
+    this.auth.login(this.username, this.password).subscribe({
       next: () => {
         this.router.navigate(['/dashboard']);
       },

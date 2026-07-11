@@ -3,6 +3,7 @@ import { ApiService, PaginatedResponse } from '../../core/api/api.service';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import { Receipt, ReceiptPayment } from '../../core/api/models';
 import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -19,26 +20,39 @@ export class ReceiptsRepository {
   }
 
   create(receipt: Partial<Receipt>): Observable<Receipt> {
-    return this.api.post<Receipt>(ENDPOINTS.receipts.list, receipt);
+    const { services, items, payments, paidAmount, pendingAmount, code, pdfFile, issuedAt, createdAt, updatedAt, ...payload } = receipt as any;
+    return this.api.post<Receipt>(ENDPOINTS.receipts.list, payload);
   }
 
   update(id: number | string, receipt: Partial<Receipt>): Observable<Receipt> {
-    return this.api.put<Receipt>(ENDPOINTS.receipts.detail(id), receipt);
+    const { services, items, payments, paidAmount, pendingAmount, code, pdfFile, issuedAt, createdAt, updatedAt, ...payload } = receipt as any;
+    return this.api.patch<Receipt>(ENDPOINTS.receipts.detail(id), payload);
   }
 
   delete(id: number | string): Observable<any> {
     return this.api.delete<any>(ENDPOINTS.receipts.detail(id));
   }
 
-  addPayment(receiptId: number | string, payment: Partial<ReceiptPayment>): Observable<ReceiptPayment> {
-    return this.api.post<ReceiptPayment>(ENDPOINTS.receipts.payments(receiptId), payment);
+  addPayment(receiptId: number | string, payment: Partial<ReceiptPayment>): Observable<Receipt> {
+    return this.api.post<Receipt>(ENDPOINTS.receipts.addPayment(receiptId), payment);
   }
 
-  getPdf(id: number | string): Observable<{ pdfFile: string }> {
-    return this.api.get<{ pdfFile: string }>(ENDPOINTS.receipts.pdf(id));
+  downloadPdf(id: number | string): Observable<Blob> {
+    return this.api.getBlob(ENDPOINTS.receipts.pdf(id));
   }
 
-  persistPdf(id: number | string): Observable<Receipt> {
-    return this.api.post<Receipt>(ENDPOINTS.receipts.persistPdf(id), {});
+  persistPdf(id: number | string): Observable<{ url?: string }> {
+    return this.api.post<{ url?: string }>(ENDPOINTS.receipts.persistPdf(id), {});
+  }
+
+  openPdf(id: number | string): Observable<void> {
+    return this.downloadPdf(id).pipe(
+      tap(blob => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }),
+      map(() => undefined)
+    );
   }
 }

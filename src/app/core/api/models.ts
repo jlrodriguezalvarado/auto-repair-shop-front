@@ -2,8 +2,11 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  role: 'Administrator' | 'Secretary' | 'Mechanic' | 'Customer';
-  isActive: boolean;
+  firstName?: string;
+  lastName?: string;
+  role: 'ADMIN' | 'SECRETARY' | 'MECHANIC' | 'CUSTOMER';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Company {
@@ -108,7 +111,7 @@ export interface WorkOrderItem {
   quantity: number;
   unitCost: number;
   totalCost: number;
-  providedBy: 'client' | 'workshop';
+  providedBy: 'customer' | 'workshop';
   supplierName?: string;
   purchaseDate?: string;
   notes?: string;

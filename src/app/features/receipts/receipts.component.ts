@@ -196,21 +196,24 @@ export class ReceiptsComponent implements OnInit {
   }
 
   downloadPdf(rec: Receipt): void {
-    this.repository.getPdf(rec.id).subscribe({
-      next: (res) => {
-        window.open(res.pdfFile, '_blank');
+    this.repository.openPdf(rec.id).subscribe({
+      next: () => {
         this.toast.success('Descargando recibo PDF');
-      }
+      },
+      error: () => this.toast.error('Error al descargar PDF')
     });
   }
 
   persistPdf(rec: Receipt): void {
     this.repository.persistPdf(rec.id).subscribe({
-      next: (res) => {
+      next: () => {
         this.toast.success('Archivo PDF respaldado en el servidor');
-        this.selectedReceipt.set(res);
-        this.loadReceipts();
-      }
+        this.repository.get(rec.id).subscribe(refreshed => {
+          this.selectedReceipt.set(refreshed);
+          this.loadReceipts();
+        });
+      },
+      error: () => this.toast.error('Error al guardar PDF')
     });
   }
 

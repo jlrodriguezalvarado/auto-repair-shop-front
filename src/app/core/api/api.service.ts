@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { keysToCamel, keysToSnake } from './case-mapper';
+import { environment } from '../../../environments/environment';
 
 export interface PaginatedResponse<T> {
   count: number;
@@ -16,7 +17,7 @@ export interface PaginatedResponse<T> {
 })
 export class ApiService {
   private http = inject(HttpClient);
-  private baseUrl = '/api';
+  private baseUrl = environment.apiBaseUrl;
 
   get<T>(endpoint: string, params?: any): Observable<T> {
     let httpParams = new HttpParams();
@@ -58,5 +59,21 @@ export class ApiService {
     return this.http.delete<T>(`${this.baseUrl}${endpoint}`).pipe(
       map(response => keysToCamel(response))
     );
+  }
+
+  getBlob(endpoint: string, params?: any): Observable<Blob> {
+    let httpParams = new HttpParams();
+    if (params) {
+      const snakeParams = keysToSnake(params);
+      Object.keys(snakeParams).forEach(key => {
+        if (snakeParams[key] !== undefined && snakeParams[key] !== null) {
+          httpParams = httpParams.set(key, String(snakeParams[key]));
+        }
+      });
+    }
+    return this.http.get(`${this.baseUrl}${endpoint}`, {
+      params: httpParams,
+      responseType: 'blob'
+    });
   }
 }

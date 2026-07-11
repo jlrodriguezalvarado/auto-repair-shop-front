@@ -187,7 +187,7 @@ export class EstimatesComponent implements OnInit {
         error: () => this.toast.error('Error al actualizar presupuesto')
       });
     } else {
-      this.repository.create({ ...this.formModel, status: 'draft', services: [], items: [] }).subscribe({
+      this.repository.create({ ...this.formModel, status: 'draft' }).subscribe({
         next: () => {
           this.toast.success(this.i18n.translate('common.success'));
           this.estimateDialog().close();
@@ -229,21 +229,24 @@ export class EstimatesComponent implements OnInit {
   }
 
   downloadPdf(est: Estimate): void {
-    this.repository.getPdf(est.id).subscribe({
-      next: (res) => {
-        window.open(res.pdfFile, '_blank');
+    this.repository.openPdf(est.id).subscribe({
+      next: () => {
         this.toast.success('PDF descargado bajo demanda');
-      }
+      },
+      error: () => this.toast.error('Error al descargar PDF')
     });
   }
 
   persistPdf(est: Estimate): void {
     this.repository.persistPdf(est.id).subscribe({
-      next: (res) => {
+      next: () => {
         this.toast.success('Archivo de PDF guardado de manera explícita en el servidor');
-        this.selectedEstimate.set(res);
-        this.loadEstimates();
-      }
+        this.repository.get(est.id).subscribe(refreshed => {
+          this.selectedEstimate.set(refreshed);
+          this.loadEstimates();
+        });
+      },
+      error: () => this.toast.error('Error al guardar PDF')
     });
   }
 
@@ -275,28 +278,25 @@ export class EstimatesComponent implements OnInit {
   addServiceSnapshot(): void {
     const est = this.selectedEstimate();
     if (!est) return;
-
     if (!this.serviceFormModel.name || this.serviceFormModel.quantity <= 0) return;
-
-    const list = est.services || [];
-    const itemTotal = this.serviceFormModel.quantity * this.serviceFormModel.price;
-    const newSnap = {
-      name: this.serviceFormModel.name,
+    const catalogService = this.catalogServices().find(s => s.name === this.serviceFormModel.name);
+    if (!catalogService) {
+      this.toast.error('Seleccione un servicio del catálogo');
+      return;
+    }
+    this.repository.addServiceAndRefresh(est.id, {
+      estimate: est.id,
+      service: catalogService.id,
       quantity: this.serviceFormModel.quantity,
-      price: this.serviceFormModel.price,
-      total: itemTotal
-    };
-
-    const updatedServices = [...list, newSnap];
-    const subtotal = updatedServices.reduce((sum, s) => sum + s.total, 0);
-    const taxAmount = parseFloat((subtotal * 0.16).toFixed(2));
-    const total = subtotal - est.discountAmount + taxAmount;
-
-    this.repository.update(est.id, { services: updatedServices, subtotal, taxAmount, total }).subscribe(res => {
-      this.selectedEstimate.set(res);
-      this.loadEstimates();
-      this.toast.success('Servicio añadido al presupuesto');
-      this.serviceDialog().close();
+      unitPrice: this.serviceFormModel.price
+    }).subscribe({
+      next: (res) => {
+        this.selectedEstimate.set(res);
+        this.loadEstimates();
+        this.toast.success('Servicio añadido al presupuesto');
+        this.serviceDialog().close();
+      },
+      error: () => this.toast.error('Error al añadir servicio')
     });
   }
 }

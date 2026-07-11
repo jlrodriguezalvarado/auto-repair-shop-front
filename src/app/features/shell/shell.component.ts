@@ -43,15 +43,15 @@ export class ShellComponent {
 
   get menuItems() {
     const items = [
-      { path: '/dashboard', label: this.i18n.translate('nav.dashboard'), icon: 'dashboard', roles: ['Administrator', 'Secretary', 'Mechanic', 'Customer'] },
-      { path: '/users', label: this.i18n.translate('nav.users'), icon: 'group', roles: ['Administrator'] },
-      { path: '/company', label: this.i18n.translate('nav.company'), icon: 'business', roles: ['Administrator', 'Secretary'] },
-      { path: '/customers', label: this.i18n.translate('nav.customers'), icon: 'person', roles: ['Administrator', 'Secretary'] },
-      { path: '/vehicles', label: this.i18n.translate('nav.vehicles'), icon: 'directions_car', roles: ['Administrator', 'Secretary', 'Mechanic', 'Customer'] },
-      { path: '/service-catalog', label: this.i18n.translate('nav.serviceCatalog'), icon: 'inventory_2', roles: ['Administrator', 'Secretary'] },
-      { path: '/work-orders', label: this.i18n.translate('nav.workOrders'), icon: 'build', roles: ['Administrator', 'Secretary', 'Mechanic', 'Customer'] },
-      { path: '/estimates', label: this.i18n.translate('nav.estimates'), icon: 'request_quote', roles: ['Administrator', 'Secretary', 'Customer'] },
-      { path: '/receipts', label: this.i18n.translate('nav.receipts'), icon: 'receipt_long', roles: ['Administrator', 'Secretary', 'Customer'] },
+      { path: '/dashboard', label: this.i18n.translate('nav.dashboard'), icon: 'dashboard', roles: ['ADMIN', 'SECRETARY', 'MECHANIC', 'CUSTOMER'] },
+      { path: '/users', label: this.i18n.translate('nav.users'), icon: 'group', roles: ['ADMIN'] },
+      { path: '/company', label: this.i18n.translate('nav.company'), icon: 'business', roles: ['ADMIN', 'SECRETARY'] },
+      { path: '/customers', label: this.i18n.translate('nav.customers'), icon: 'person', roles: ['ADMIN', 'SECRETARY'] },
+      { path: '/vehicles', label: this.i18n.translate('nav.vehicles'), icon: 'directions_car', roles: ['ADMIN', 'SECRETARY', 'MECHANIC', 'CUSTOMER'] },
+      { path: '/service-catalog', label: this.i18n.translate('nav.serviceCatalog'), icon: 'inventory_2', roles: ['ADMIN', 'SECRETARY'] },
+      { path: '/work-orders', label: this.i18n.translate('nav.workOrders'), icon: 'build', roles: ['ADMIN', 'SECRETARY', 'MECHANIC', 'CUSTOMER'] },
+      { path: '/estimates', label: this.i18n.translate('nav.estimates'), icon: 'request_quote', roles: ['ADMIN', 'SECRETARY', 'CUSTOMER'] },
+      { path: '/receipts', label: this.i18n.translate('nav.receipts'), icon: 'receipt_long', roles: ['ADMIN', 'SECRETARY', 'CUSTOMER'] },
     ];
     const currentRole = this.auth.user()?.role || '';
     return items.filter(item => item.roles.includes(currentRole));

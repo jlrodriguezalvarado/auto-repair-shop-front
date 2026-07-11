@@ -194,10 +194,10 @@
               @for (s of est.services; track s) {
                 <div class="p-3 bg-surface-variant/20 border rounded-xl flex justify-between items-center text-xs">
                   <div>
-                    <p class="font-bold text-on-surface">{{ s.name }}</p>
-                    <p class="text-[10px] text-on-surface-variant">{{ s.quantity }}x a ${{ s.price | number:'1.2-2' }}</p>
+                    <p class="font-bold text-on-surface">{{ s.nameSnapshot || s.name }}</p>
+                    <p class="text-[10px] text-on-surface-variant">{{ s.quantity }}x a ${{ (s.unitPrice ?? s.price) | number:'1.2-2' }}</p>
                   </div>
-                  <span class="font-bold text-primary">${{ s.total | number:'1.2-2' }}</span>
+                  <span class="font-bold text-primary">${{ (s.totalPrice ?? s.total) | number:'1.2-2' }}</span>
                 </div>
               }
             </div>

@@ -5,10 +5,10 @@ import { keysToSnake, keysToCamel } from './case-mapper';
 import { User, Company, CustomerProfile, Vehicle, ServiceCatalog, WorkOrder, Estimate, Receipt } from './models';
 
 const MOCK_USERS: User[] = [
-  { id: 1, username: 'admin', email: 'admin@taller.com', role: 'Administrator', isActive: true },
-  { id: 2, username: 'sec', email: 'secretary@taller.com', role: 'Secretary', isActive: true },
-  { id: 3, username: 'mech', email: 'mech@taller.com', role: 'Mechanic', isActive: true },
-  { id: 4, username: 'cust', email: 'customer@taller.com', role: 'Customer', isActive: true },
+  { id: 1, username: 'admin', email: 'admin@taller.com', role: 'ADMIN' },
+  { id: 2, username: 'sec', email: 'secretary@taller.com', role: 'SECRETARY' },
+  { id: 3, username: 'mech', email: 'mech@taller.com', role: 'MECHANIC' },
+  { id: 4, username: 'cust', email: 'customer@taller.com', role: 'CUSTOMER' },
 ];
 
 let mockCompany: Company = {
@@ -64,7 +64,7 @@ let mockWorkOrders: WorkOrder[] = [
     ],
     items: [
       { id: 1, workOrder: 1, name: 'Bujes de Meseta', quantity: 2, unitCost: 35, totalCost: 70, providedBy: 'workshop', supplierName: 'Repuestos El Pana', purchaseDate: '2026-01-05', notes: 'Garantía 6 meses.' },
-      { id: 2, workOrder: 1, name: 'Pastillas de Freno delanteras', quantity: 1, unitCost: 50, totalCost: 50, providedBy: 'client', notes: 'Traídas por el cliente.' }
+      { id: 2, workOrder: 1, name: 'Pastillas de Freno delanteras', quantity: 1, unitCost: 50, totalCost: 50, providedBy: 'customer', notes: 'Traídas por el cliente.' }
     ]
   },
   {

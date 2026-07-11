@@ -80,7 +80,7 @@ export class WorkOrdersComponent implements OnInit {
     description: '',
     quantity: 1,
     unitCost: 0,
-    providedBy: 'workshop' as 'client' | 'workshop',
+    providedBy: 'workshop' as 'customer' | 'workshop',
     supplierName: '',
     purchaseDate: '',
     notes: ''
@@ -119,7 +119,7 @@ export class WorkOrdersComponent implements OnInit {
     this.vehiclesRepository.list().subscribe(res => this.vehicles.set(res.results));
     this.servicesRepository.list({ isActive: true }).subscribe(res => this.catalogServices.set(res.results));
     this.usersRepository.list().subscribe(res => {
-      this.mechanics.set(res.results.filter(u => u.role === 'Mechanic'));
+      this.mechanics.set(res.results.filter(u => u.role === 'MECHANIC'));
     });
   }
 
@@ -260,36 +260,20 @@ export class WorkOrdersComponent implements OnInit {
   saveServiceSnapshot(): void {
     const order = this.selectedOrder();
     if (!order) return;
-
     const srv = this.catalogServices().find(s => s.id === this.serviceFormModel.serviceId);
     if (!srv) return;
-
-    const currentServices = order.services || [];
-    const newService: WorkOrderService = {
-      id: currentServices.length + 1,
+    this.repository.addServiceAndRefresh(order.id, {
       workOrder: order.id,
       service: srv.id,
-      nameSnapshot: srv.name,
-      descriptionSnapshot: srv.description,
       quantity: this.serviceFormModel.quantity,
       unitPrice: this.serviceFormModel.unitPrice,
-      totalPrice: this.serviceFormModel.quantity * this.serviceFormModel.unitPrice,
       notes: this.serviceFormModel.notes
-    };
-
-    const updatedList = [...currentServices, newService];
-
-    const servicesTotal = updatedList.reduce((sum, s) => sum + s.totalPrice, 0);
-    const grandTotal = servicesTotal + (order.itemsTotal || 0);
-
-    this.repository.saveServices(order.id, updatedList).subscribe({
-      next: () => {
-        this.repository.update(order.id, { servicesTotal, grandTotal }).subscribe(updatedOrder => {
-          this.selectedOrder.set(updatedOrder);
-          this.loadOrders();
-          this.toast.success('Servicio agregado con éxito');
-          this.serviceDialog().close();
-        });
+    }).subscribe({
+      next: (updatedOrder) => {
+        this.selectedOrder.set(updatedOrder);
+        this.loadOrders();
+        this.toast.success('Servicio agregado con éxito');
+        this.serviceDialog().close();
       },
       error: () => this.toast.error('Error al agregar servicio')
     });
@@ -298,26 +282,18 @@ export class WorkOrdersComponent implements OnInit {
   deleteServiceSnapshot(srvId: number): void {
     const order = this.selectedOrder();
     if (!order) return;
-
     this.confirm.confirm({
       title: 'Eliminar Servicio',
       message: '¿Está seguro de que desea remover este servicio de la orden?'
     }).then(approved => {
       if (approved) {
-        const currentServices = order.services || [];
-        const updatedList = currentServices.filter(s => s.id !== srvId);
-
-        const servicesTotal = updatedList.reduce((sum, s) => sum + s.totalPrice, 0);
-        const grandTotal = servicesTotal + (order.itemsTotal || 0);
-
-        this.repository.saveServices(order.id, updatedList).subscribe({
-          next: () => {
-            this.repository.update(order.id, { servicesTotal, grandTotal }).subscribe(updatedOrder => {
-              this.selectedOrder.set(updatedOrder);
-              this.loadOrders();
-              this.toast.success('Servicio removido');
-            });
-          }
+        this.repository.deleteServiceAndRefresh(order.id, srvId).subscribe({
+          next: (updatedOrder) => {
+            this.selectedOrder.set(updatedOrder);
+            this.loadOrders();
+            this.toast.success('Servicio removido');
+          },
+          error: () => this.toast.error('Error al eliminar servicio')
         });
       }
     });
@@ -340,39 +316,26 @@ export class WorkOrdersComponent implements OnInit {
   saveItemSnapshot(): void {
     const order = this.selectedOrder();
     if (!order) return;
-
     if (!this.itemFormModel.name || this.itemFormModel.quantity <= 0 || this.itemFormModel.unitCost < 0) {
       this.toast.error('Por favor, valide los campos requeridos');
       return;
     }
-
-    const currentItems = order.items || [];
-    const newItem: WorkOrderItem = {
-      id: currentItems.length + 1,
+    this.repository.addItemAndRefresh(order.id, {
       workOrder: order.id,
       name: this.itemFormModel.name,
       description: this.itemFormModel.description,
       quantity: this.itemFormModel.quantity,
       unitCost: this.itemFormModel.unitCost,
-      totalCost: this.itemFormModel.quantity * this.itemFormModel.unitCost,
       providedBy: this.itemFormModel.providedBy,
       supplierName: this.itemFormModel.supplierName,
-      purchaseDate: this.itemFormModel.purchaseDate,
+      purchaseDate: this.itemFormModel.purchaseDate || undefined,
       notes: this.itemFormModel.notes
-    };
-
-    const updatedList = [...currentItems, newItem];
-    const itemsTotal = updatedList.reduce((sum, i) => sum + i.totalCost, 0);
-    const grandTotal = (order.servicesTotal || 0) + itemsTotal;
-
-    this.repository.saveItems(order.id, updatedList).subscribe({
-      next: () => {
-        this.repository.update(order.id, { itemsTotal, grandTotal }).subscribe(updatedOrder => {
-          this.selectedOrder.set(updatedOrder);
-          this.loadOrders();
-          this.toast.success('Artículo agregado con éxito');
-          this.itemDialog().close();
-        });
+    }).subscribe({
+      next: (updatedOrder) => {
+        this.selectedOrder.set(updatedOrder);
+        this.loadOrders();
+        this.toast.success('Artículo agregado con éxito');
+        this.itemDialog().close();
       },
       error: () => this.toast.error('Error al guardar artículo')
     });
@@ -381,26 +344,18 @@ export class WorkOrdersComponent implements OnInit {
   deleteItemSnapshot(itemId: number): void {
     const order = this.selectedOrder();
     if (!order) return;
-
     this.confirm.confirm({
       title: 'Eliminar Artículo',
       message: '¿Está seguro de que desea remover este repuesto/artículo?'
     }).then(approved => {
       if (approved) {
-        const currentItems = order.items || [];
-        const updatedList = currentItems.filter(i => i.id !== itemId);
-
-        const itemsTotal = updatedList.reduce((sum, i) => sum + i.totalCost, 0);
-        const grandTotal = (order.servicesTotal || 0) + itemsTotal;
-
-        this.repository.saveItems(order.id, updatedList).subscribe({
-          next: () => {
-            this.repository.update(order.id, { itemsTotal, grandTotal }).subscribe(updatedOrder => {
-              this.selectedOrder.set(updatedOrder);
-              this.loadOrders();
-              this.toast.success('Artículo removido');
-            });
-          }
+        this.repository.deleteItemAndRefresh(order.id, itemId).subscribe({
+          next: (updatedOrder) => {
+            this.selectedOrder.set(updatedOrder);
+            this.loadOrders();
+            this.toast.success('Artículo removido');
+          },
+          error: () => this.toast.error('Error al eliminar artículo')
         });
       }
     });

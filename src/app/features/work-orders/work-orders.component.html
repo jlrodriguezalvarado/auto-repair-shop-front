@@ -221,7 +221,7 @@
                       <p class="font-bold text-on-surface truncate">{{ item.name }}</p>
                       <p class="text-[10px] text-on-surface-variant">
                         Provisto por:
-                        <span class="font-semibold uppercase">{{ item.providedBy === 'client' ? 'Cliente' : 'Taller' }}</span>
+                        <span class="font-semibold uppercase">{{ item.providedBy === 'customer' ? 'Cliente' : 'Taller' }}</span>
                       </p>
                     </div>
                     <div class="flex items-center gap-2">
@@ -382,7 +382,7 @@
           <label class="text-xs font-bold text-on-surface-variant">Provisto por</label>
           <select [(ngModel)]="itemFormModel.providedBy" class="px-3 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-sm">
             <option value="workshop">Taller (Workshop)</option>
-            <option value="client">Cliente (Client)</option>
+            <option value="customer">Cliente</option>
           </select>
         </div>
 
