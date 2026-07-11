@@ -4,41 +4,51 @@
   </div>
 
   <!-- Content States -->
-  <app-loading *ngIf="loading()"></app-loading>
-  <app-error *ngIf="error()" [message]="error()!" (retry)="loadUsers()"></app-error>
-  <app-empty *ngIf="!loading() && !error() && users().length === 0"></app-empty>
+  @if (loading()) {
+    <app-loading></app-loading>
+  }
+  @if (error()) {
+    <app-error [message]="error()!" (retry)="loadUsers()"></app-error>
+  }
+  @if (!loading() && !error() && users().length === 0) {
+    <app-empty></app-empty>
+  }
 
-  <div *ngIf="!loading() && !error() && users().length > 0" class="card-surface border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm animate-fadeIn">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left text-sm border-collapse">
-        <thead>
-          <tr class="table-header">
-            <th class="p-4">Usuario</th>
-            <th class="p-4">Email</th>
-            <th class="p-4">Rol Asignado</th>
-            <th class="p-4 text-center">Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let u of users()" class="border-b border-outline-variant/5 hover:bg-surface-variant/10 transition-colors">
-            <td class="p-4 font-semibold text-on-surface">{{ u.username }}</td>
-            <td class="p-4 text-on-surface-variant">{{ u.email }}</td>
-            <td class="p-4">
-              <select (change)="changeRole(u, $event)" [value]="u.role" class="px-2.5 py-1.5 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-xs">
-                <option value="Administrator">Administrator</option>
-                <option value="Secretary">Secretary</option>
-                <option value="Mechanic">Mechanic</option>
-                <option value="Customer">Customer</option>
-              </select>
-            </td>
-            <td class="p-4 text-center">
-              <span [ngClass]="u.isActive ? 'badge-primary' : 'badge-error'" class="badge">
-                {{ u.isActive ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  @if (!loading() && !error() && users().length > 0) {
+    <div class="card-surface border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm animate-fadeIn">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr class="table-header">
+              <th class="p-4">Usuario</th>
+              <th class="p-4">Email</th>
+              <th class="p-4">Rol Asignado</th>
+              <th class="p-4 text-center">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of users(); track u) {
+              <tr class="border-b border-outline-variant/5 hover:bg-surface-variant/10 transition-colors">
+                <td class="p-4 font-semibold text-on-surface">{{ u.username }}</td>
+                <td class="p-4 text-on-surface-variant">{{ u.email }}</td>
+                <td class="p-4">
+                  <select (change)="changeRole(u, $event)" [value]="u.role" class="px-2.5 py-1.5 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-xs">
+                    <option value="Administrator">Administrator</option>
+                    <option value="Secretary">Secretary</option>
+                    <option value="Mechanic">Mechanic</option>
+                    <option value="Customer">Customer</option>
+                  </select>
+                </td>
+                <td class="p-4 text-center">
+                  <span [ngClass]="u.isActive ? 'badge-primary' : 'badge-error'" class="badge">
+                    {{ u.isActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+  }
 </div>

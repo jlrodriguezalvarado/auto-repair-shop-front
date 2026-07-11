@@ -33,174 +33,197 @@
           <label class="text-xs font-bold text-on-surface-variant whitespace-nowrap">Cliente:</label>
           <select (change)="loadEstimates()" [(ngModel)]="selectedCustomerFilter" class="w-full md:w-56 px-3 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-sm">
             <option value="all">Todos los clientes</option>
-            <option *ngFor="let c of customers()" [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+            @for (c of customers(); track c) {
+              <option [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+            }
           </select>
         </div>
       </div>
 
       <!-- State views -->
-      <app-loading *ngIf="loading()"></app-loading>
-      <app-error *ngIf="error()" [message]="error()!" (retry)="loadEstimates()"></app-error>
-      <app-empty *ngIf="!loading() && !error() && estimates().length === 0"></app-empty>
+      @if (loading()) {
+        <app-loading></app-loading>
+      }
+      @if (error()) {
+        <app-error [message]="error()!" (retry)="loadEstimates()"></app-error>
+      }
+      @if (!loading() && !error() && estimates().length === 0) {
+        <app-empty></app-empty>
+      }
 
       <!-- Table List -->
-      <div *ngIf="!loading() && !error() && estimates().length > 0" class="card-surface border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm animate-fadeIn">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr class="table-header">
-                <th class="p-4">Código</th>
-                <th class="p-4">Cliente / Vehículo</th>
-                <th class="p-4">Vence el</th>
-                <th class="p-4">Total</th>
-                <th class="p-4 text-center">Estado</th>
-                <th class="p-4 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                *ngFor="let est of estimates()"
-                (click)="viewDetail(est)"
-                [ngClass]="selectedEstimate()?.id === est.id ? 'bg-primary-container/20 border-l-4 border-l-primary' : ''"
-                class="border-b border-outline-variant/5 hover:bg-surface-variant/10 transition-colors cursor-pointer">
-                <td class="p-4 font-extrabold text-primary">{{ est.code }}</td>
-                <td class="p-4">
-                  <p class="font-semibold text-on-surface">{{ getCustomerName(est.customer) }}</p>
-                  <p class="text-xs text-on-surface-variant">{{ getVehiclePlate(est.vehicle) }}</p>
-                </td>
-                <td class="p-4 text-on-surface-variant font-medium">{{ est.validUntil }}</td>
-                <td class="p-4 font-bold text-on-surface">${{ est.total | number:'1.2-2' }}</td>
-                <td class="p-4 text-center">
+      @if (!loading() && !error() && estimates().length > 0) {
+        <div class="card-surface border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm animate-fadeIn">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="table-header">
+                  <th class="p-4">Código</th>
+                  <th class="p-4">Cliente / Vehículo</th>
+                  <th class="p-4">Vence el</th>
+                  <th class="p-4">Total</th>
+                  <th class="p-4 text-center">Estado</th>
+                  <th class="p-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (est of estimates(); track est) {
+                  <tr
+                    (click)="viewDetail(est)"
+                    [ngClass]="selectedEstimate()?.id === est.id ? 'bg-primary-container/20 border-l-4 border-l-primary' : ''"
+                    class="border-b border-outline-variant/5 hover:bg-surface-variant/10 transition-colors cursor-pointer">
+                    <td class="p-4 font-extrabold text-primary">{{ est.code }}</td>
+                    <td class="p-4">
+                      <p class="font-semibold text-on-surface">{{ getCustomerName(est.customer) }}</p>
+                      <p class="text-xs text-on-surface-variant">{{ getVehiclePlate(est.vehicle) }}</p>
+                    </td>
+                    <td class="p-4 text-on-surface-variant font-medium">{{ est.validUntil }}</td>
+                    <td class="p-4 font-bold text-on-surface">${{ est.total | number:'1.2-2' }}</td>
+                    <td class="p-4 text-center">
                   <span [ngClass]="{
                     'badge-secondary': est.status === 'draft',
                     'bg-blue-100 text-blue-800 border border-blue-200': est.status === 'sent',
                     'bg-green-100 text-green-800 border border-green-200': est.status === 'approved',
                     'badge-error': est.status === 'rejected' || est.status === 'cancelled'
                   }" class="badge">
-                    {{ i18n.translate('status.' + est.status) }}
-                  </span>
-                </td>
-                <td class="p-4 text-right flex justify-end gap-1" (click)="$event.stopPropagation()">
-                  <button (click)="openEditModal(est, $event)" class="p-2 text-primary hover:bg-primary-container/20 rounded-lg transition-colors" title="Editar">
-                    <span class="material-symbols-outlined text-xl">edit</span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                        {{ i18n.translate('status.' + est.status) }}
+                      </span>
+                    </td>
+                    <td class="p-4 text-right flex justify-end gap-1" (click)="$event.stopPropagation()">
+                      <button (click)="openEditModal(est, $event)" class="p-2 text-primary hover:bg-primary-container/20 rounded-lg transition-colors" title="Editar">
+                        <span class="material-symbols-outlined text-xl">edit</span>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      }
     </div>
 
     <!-- Detailed Estimate Side Panel -->
-    <div *ngIf="selectedEstimate() as est" class="p-6 card-surface border border-outline-variant/30 rounded-xl space-y-6 shadow-md animate-slideIn">
-      <div class="flex items-center justify-between border-b pb-4">
-        <div>
-          <h3 class="text-xl font-bold flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">receipt_long</span>
-            <span>Cotización {{ est.code }}</span>
-          </h3>
-          <p class="text-xs text-on-surface-variant mt-1">Validez: {{ est.validUntil }}</p>
-        </div>
-        <button (click)="closeDetail()" class="p-1 hover:bg-surface-variant/50 rounded-lg transition-colors">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-
-      <!-- Actions Buttons Bar -->
-      <div class="flex flex-wrap gap-2 pb-4 border-b">
-        <button *ngIf="est.status === 'draft' || est.status === 'sent'" (click)="approveEstimate(est)" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xs flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">done</span>
-          <span>{{ i18n.translate('actions.approve') }}</span>
-        </button>
-        <button *ngIf="est.status === 'draft' || est.status === 'sent'" (click)="rejectEstimate(est)" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">close</span>
-          <span>{{ i18n.translate('actions.reject') }}</span>
-        </button>
-        <button *ngIf="est.status === 'approved'" (click)="createWorkOrderFromEstimate(est)" class="px-3 py-1.5 bg-primary text-on-primary font-bold rounded-lg text-xs flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">build</span>
-          <span>Orden Taller</span>
-        </button>
-
-        <a [href]="getWhatsAppLink(est)" target="_blank" class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg text-xs flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">chat</span>
-          <span>WhatsApp</span>
-        </a>
-      </div>
-
-      <!-- PDF Download/Save explicitly triggers -->
-      <div class="flex gap-2">
-        <button (click)="downloadPdf(est)" class="flex-1 px-3 py-2 border border-outline-variant/30 hover:bg-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-primary">
-          <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
-          <span>{{ i18n.translate('actions.downloadPdf') }}</span>
-        </button>
-        <button (click)="persistPdf(est)" class="flex-1 px-3 py-2 border border-outline-variant/30 hover:bg-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-primary">
-          <span class="material-symbols-outlined text-sm">cloud_upload</span>
-          <span>{{ i18n.translate('actions.savePdf') }}</span>
-        </button>
-      </div>
-
-      <!-- General details -->
-      <div class="space-y-4 text-sm">
-        <div>
-          <p class="text-xs font-bold text-on-surface-variant">Cliente / Vehículo</p>
-          <p class="font-semibold">{{ getCustomerName(est.customer) }} - {{ getVehiclePlate(est.vehicle) }}</p>
-        </div>
-        <div *ngIf="est.notes">
-          <p class="text-xs font-bold text-on-surface-variant">Observaciones</p>
-          <p class="text-xs p-2 border bg-surface-variant/10 rounded-lg italic">"{{ est.notes }}"</p>
-        </div>
-        <div *ngIf="est.pdfFile" class="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-xl text-xs">
-          <span class="material-symbols-outlined text-green-700">verified_user</span>
-          <span class="text-green-800">PDF Guardado en servidor.</span>
-        </div>
-      </div>
-
-      <!-- Services Sub-list inside Details -->
-      <div class="space-y-3 pt-4 border-t">
-        <div class="flex justify-between items-center">
-          <p class="text-sm font-bold text-on-surface-variant">Servicios / Conceptos</p>
-          <button *ngIf="est.status === 'draft'" (click)="openAddServiceModal()" class="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
-            <span class="material-symbols-outlined text-xs">add</span>
-            <span>Añadir</span>
+    @if (selectedEstimate(); as est) {
+      <div class="p-6 card-surface border border-outline-variant/30 rounded-xl space-y-6 shadow-md animate-slideIn">
+        <div class="flex items-center justify-between border-b pb-4">
+          <div>
+            <h3 class="text-xl font-bold flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">receipt_long</span>
+              <span>Cotización {{ est.code }}</span>
+            </h3>
+            <p class="text-xs text-on-surface-variant mt-1">Validez: {{ est.validUntil }}</p>
+          </div>
+          <button (click)="closeDetail()" class="p-1 hover:bg-surface-variant/50 rounded-lg transition-colors">
+            <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-
-        <div *ngIf="!est.services || est.services.length === 0" class="text-xs text-center text-on-surface-variant py-3 bg-surface-variant/10 rounded-xl">
-          Sin conceptos registrados.
+        <!-- Actions Buttons Bar -->
+        <div class="flex flex-wrap gap-2 pb-4 border-b">
+          @if (est.status === 'draft' || est.status === 'sent') {
+            <button (click)="approveEstimate(est)" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xs flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">done</span>
+              <span>{{ i18n.translate('actions.approve') }}</span>
+            </button>
+          }
+          @if (est.status === 'draft' || est.status === 'sent') {
+            <button (click)="rejectEstimate(est)" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">close</span>
+              <span>{{ i18n.translate('actions.reject') }}</span>
+            </button>
+          }
+          @if (est.status === 'approved') {
+            <button (click)="createWorkOrderFromEstimate(est)" class="px-3 py-1.5 bg-primary text-on-primary font-bold rounded-lg text-xs flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">build</span>
+              <span>Orden Taller</span>
+            </button>
+          }
+          <a [href]="getWhatsAppLink(est)" target="_blank" class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg text-xs flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs">chat</span>
+            <span>WhatsApp</span>
+          </a>
         </div>
-
-        <div *ngIf="est.services && est.services.length > 0" class="space-y-2">
-          <div *ngFor="let s of est.services" class="p-3 bg-surface-variant/20 border rounded-xl flex justify-between items-center text-xs">
+        <!-- PDF Download/Save explicitly triggers -->
+        <div class="flex gap-2">
+          <button (click)="downloadPdf(est)" class="flex-1 px-3 py-2 border border-outline-variant/30 hover:bg-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-primary">
+            <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+            <span>{{ i18n.translate('actions.downloadPdf') }}</span>
+          </button>
+          <button (click)="persistPdf(est)" class="flex-1 px-3 py-2 border border-outline-variant/30 hover:bg-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-primary">
+            <span class="material-symbols-outlined text-sm">cloud_upload</span>
+            <span>{{ i18n.translate('actions.savePdf') }}</span>
+          </button>
+        </div>
+        <!-- General details -->
+        <div class="space-y-4 text-sm">
+          <div>
+            <p class="text-xs font-bold text-on-surface-variant">Cliente / Vehículo</p>
+            <p class="font-semibold">{{ getCustomerName(est.customer) }} - {{ getVehiclePlate(est.vehicle) }}</p>
+          </div>
+          @if (est.notes) {
             <div>
-              <p class="font-bold text-on-surface">{{ s.name }}</p>
-              <p class="text-[10px] text-on-surface-variant">{{ s.quantity }}x a ${{ s.price | number:'1.2-2' }}</p>
+              <p class="text-xs font-bold text-on-surface-variant">Observaciones</p>
+              <p class="text-xs p-2 border bg-surface-variant/10 rounded-lg italic">"{{ est.notes }}"</p>
             </div>
-            <span class="font-bold text-primary">${{ s.total | number:'1.2-2' }}</span>
+          }
+          @if (est.pdfFile) {
+            <div class="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded-xl text-xs">
+              <span class="material-symbols-outlined text-green-700">verified_user</span>
+              <span class="text-green-800">PDF Guardado en servidor.</span>
+            </div>
+          }
+        </div>
+        <!-- Services Sub-list inside Details -->
+        <div class="space-y-3 pt-4 border-t">
+          <div class="flex justify-between items-center">
+            <p class="text-sm font-bold text-on-surface-variant">Servicios / Conceptos</p>
+            @if (est.status === 'draft') {
+              <button (click)="openAddServiceModal()" class="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                <span class="material-symbols-outlined text-xs">add</span>
+                <span>Añadir</span>
+              </button>
+            }
+          </div>
+          @if (!est.services || est.services.length === 0) {
+            <div class="text-xs text-center text-on-surface-variant py-3 bg-surface-variant/10 rounded-xl">
+              Sin conceptos registrados.
+            </div>
+          }
+          @if (est.services && est.services.length > 0) {
+            <div class="space-y-2">
+              @for (s of est.services; track s) {
+                <div class="p-3 bg-surface-variant/20 border rounded-xl flex justify-between items-center text-xs">
+                  <div>
+                    <p class="font-bold text-on-surface">{{ s.name }}</p>
+                    <p class="text-[10px] text-on-surface-variant">{{ s.quantity }}x a ${{ s.price | number:'1.2-2' }}</p>
+                  </div>
+                  <span class="font-bold text-primary">${{ s.total | number:'1.2-2' }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <!-- Financial Calculations summary -->
+        <div class="space-y-1.5 pt-4 border-t text-sm font-semibold text-on-surface-variant">
+          <div class="flex justify-between">
+            <span>Subtotal</span>
+            <span>${{ est.subtotal | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-error">
+            <span>Descuento (-)</span>
+            <span>${{ est.discountAmount | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Impuestos (+)</span>
+            <span>${{ est.taxAmount | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-base font-black text-primary border-t pt-2 mt-2">
+            <span>Total</span>
+            <span>${{ est.total | number:'1.2-2' }}</span>
           </div>
         </div>
       </div>
-
-      <!-- Financial Calculations summary -->
-      <div class="space-y-1.5 pt-4 border-t text-sm font-semibold text-on-surface-variant">
-        <div class="flex justify-between">
-          <span>Subtotal</span>
-          <span>${{ est.subtotal | number:'1.2-2' }}</span>
-        </div>
-        <div class="flex justify-between text-error">
-          <span>Descuento (-)</span>
-          <span>${{ est.discountAmount | number:'1.2-2' }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span>Impuestos (+)</span>
-          <span>${{ est.taxAmount | number:'1.2-2' }}</span>
-        </div>
-        <div class="flex justify-between text-base font-black text-primary border-t pt-2 mt-2">
-          <span>Total</span>
-          <span>${{ est.total | number:'1.2-2' }}</span>
-        </div>
-      </div>
-    </div>
+    }
   </div>
 </div>
 
@@ -214,14 +237,18 @@
         <div class="flex flex-col gap-1">
           <label class="text-xs font-bold text-on-surface-variant">Cliente *</label>
           <select [(ngModel)]="formModel.customer" class="px-3 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-sm" required>
-            <option *ngFor="let c of customers()" [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+            @for (c of customers(); track c) {
+              <option [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+            }
           </select>
         </div>
 
         <div class="flex flex-col gap-1">
           <label class="text-xs font-bold text-on-surface-variant">Vehículo *</label>
           <select [(ngModel)]="formModel.vehicle" class="px-3 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-sm" required>
-            <option *ngFor="let v of vehicles()" [value]="v.id">{{ v.brand }} {{ v.model }} ({{ v.plate }})</option>
+            @for (v of vehicles(); track v) {
+              <option [value]="v.id">{{ v.brand }} {{ v.model }} ({{ v.plate }})</option>
+            }
           </select>
         </div>
 
@@ -280,7 +307,9 @@
         <div class="flex flex-col gap-1">
           <label class="text-xs font-bold text-on-surface-variant">Seleccionar Servicio del Catálogo</label>
           <select [(ngModel)]="serviceFormModel.name" (change)="onServiceSelectChange($event)" class="px-3 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-sm">
-            <option *ngFor="let s of catalogServices()" [value]="s.name">{{ s.name }}</option>
+            @for (s of catalogServices(); track s) {
+              <option [value]="s.name">{{ s.name }}</option>
+            }
           </select>
         </div>
 

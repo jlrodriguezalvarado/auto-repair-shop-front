@@ -11,15 +11,16 @@
         </div>
       </div>
       <nav class="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
-        <a
-          *ngFor="let item of menuItems"
-          [routerLink]="item.path"
-          routerLinkActive="text-primary font-bold border-r-4 border-primary bg-surface-container-high"
-          [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
-          class="flex items-center gap-3 px-sm py-md rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-high transition-colors">
-          <span class="material-symbols-outlined">{{ item.icon }}</span>
-          <span class="text-body-md font-body-md">{{ item.label }}</span>
-        </a>
+        @for (item of menuItems; track item) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="text-primary font-bold border-r-4 border-primary bg-surface-container-high"
+            [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+            class="flex items-center gap-3 px-sm py-md rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined">{{ item.icon }}</span>
+            <span class="text-body-md font-body-md">{{ item.label }}</span>
+          </a>
+        }
       </nav>
       <div class="mt-auto pt-lg border-t border-outline-variant/30 flex flex-col gap-md px-sm">
         <div class="flex items-center gap-md">
@@ -48,29 +49,33 @@
       </div>
     </div>
   </aside>
-  <div *ngIf="mobileNavOpen()" class="md:hidden fixed inset-0 z-40 bg-black/40" (click)="toggleMobileNav()"></div>
-  <aside
-    *ngIf="mobileNavOpen()"
-    class="md:hidden fixed left-0 top-0 h-full w-[260px] bg-surface-container shadow-elevated z-50 flex flex-col py-lg px-md">
-    <div class="flex items-center justify-between mb-lg px-sm">
-      <div class="text-title-sm font-bold text-primary">Menú</div>
-      <button (click)="toggleMobileNav()" class="p-1 rounded-full hover:bg-surface-container-high">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </div>
-    <nav class="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
-      <a
-        *ngFor="let item of menuItems"
-        [routerLink]="item.path"
-        routerLinkActive="text-primary font-bold border-r-4 border-primary bg-surface-container-high"
-        [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
-        (click)="toggleMobileNav()"
-        class="flex items-center gap-3 px-sm py-md rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-high transition-colors">
-        <span class="material-symbols-outlined">{{ item.icon }}</span>
-        <span class="text-body-md">{{ item.label }}</span>
-      </a>
-    </nav>
-  </aside>
+  @if (mobileNavOpen()) {
+    <div class="md:hidden fixed inset-0 z-40 bg-black/40" (click)="toggleMobileNav()"></div>
+  }
+  @if (mobileNavOpen()) {
+    <aside
+      class="md:hidden fixed left-0 top-0 h-full w-[260px] bg-surface-container shadow-elevated z-50 flex flex-col py-lg px-md">
+      <div class="flex items-center justify-between mb-lg px-sm">
+        <div class="text-title-sm font-bold text-primary">Menú</div>
+        <button (click)="toggleMobileNav()" class="p-1 rounded-full hover:bg-surface-container-high">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <nav class="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
+        @for (item of menuItems; track item) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="text-primary font-bold border-r-4 border-primary bg-surface-container-high"
+            [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+            (click)="toggleMobileNav()"
+            class="flex items-center gap-3 px-sm py-md rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined">{{ item.icon }}</span>
+            <span class="text-body-md">{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+    </aside>
+  }
   <div class="flex-1 flex flex-col overflow-hidden md:ml-[260px]">
     <header class="flex-shrink-0 h-16 bg-surface-bright shadow-sm z-20 px-gutter flex items-center justify-between border-b border-outline-variant/10">
       <div class="flex items-center gap-md">
@@ -103,15 +108,16 @@
     </main>
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface shadow-nav-mobile border-t border-outline-variant/10">
       <div class="flex justify-around items-center px-4 py-2">
-        <a
-          *ngFor="let item of mobileNavItems"
-          [routerLink]="item.path"
-          routerLinkActive="bg-secondary-container text-on-secondary-container rounded-xl scale-95"
-          [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
-          class="flex flex-col items-center justify-center text-on-surface-variant py-1 px-3 transition-transform">
-          <span class="material-symbols-outlined">{{ item.icon }}</span>
-          <span class="text-label-sm font-label-sm">{{ item.label }}</span>
-        </a>
+        @for (item of mobileNavItems; track item) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="bg-secondary-container text-on-secondary-container rounded-xl scale-95"
+            [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+            class="flex flex-col items-center justify-center text-on-surface-variant py-1 px-3 transition-transform">
+            <span class="material-symbols-outlined">{{ item.icon }}</span>
+            <span class="text-label-sm font-label-sm">{{ item.label }}</span>
+          </a>
+        }
         <button
           (click)="toggleMobileNav()"
           [class.bg-secondary-container]="isMobileNavMoreActive"

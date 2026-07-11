@@ -34,22 +34,28 @@
       </a>
     </div>
   </div>
-  <div *ngIf="selectedPeriod() === 'custom'" class="card-surface p-md flex flex-wrap gap-md items-end">
-    <div class="flex flex-col gap-xs">
-      <label class="font-label-sm text-label-sm text-on-surface-variant">Fecha Inicio</label>
-      <input type="date" [(ngModel)]="customStartDate" class="px-md py-xs border border-outline-variant rounded-lg text-body-md bg-white focus:ring-1 focus:ring-primary focus:border-primary outline-none">
+  @if (selectedPeriod() === 'custom') {
+    <div class="card-surface p-md flex flex-wrap gap-md items-end">
+      <div class="flex flex-col gap-xs">
+        <label class="font-label-sm text-label-sm text-on-surface-variant">Fecha Inicio</label>
+        <input type="date" [(ngModel)]="customStartDate" class="px-md py-xs border border-outline-variant rounded-lg text-body-md bg-white focus:ring-1 focus:ring-primary focus:border-primary outline-none">
+      </div>
+      <div class="flex flex-col gap-xs">
+        <label class="font-label-sm text-label-sm text-on-surface-variant">Fecha Fin</label>
+        <input type="date" [(ngModel)]="customEndDate" class="px-md py-xs border border-outline-variant rounded-lg text-body-md bg-white focus:ring-1 focus:ring-primary focus:border-primary outline-none">
+      </div>
+      <button (click)="onCustomRangeSubmit()" class="btn-primary px-md py-xs text-label-sm">
+        {{ i18n.translate('actions.filter') }}
+      </button>
     </div>
-    <div class="flex flex-col gap-xs">
-      <label class="font-label-sm text-label-sm text-on-surface-variant">Fecha Fin</label>
-      <input type="date" [(ngModel)]="customEndDate" class="px-md py-xs border border-outline-variant rounded-lg text-body-md bg-white focus:ring-1 focus:ring-primary focus:border-primary outline-none">
-    </div>
-    <button (click)="onCustomRangeSubmit()" class="btn-primary px-md py-xs text-label-sm">
-      {{ i18n.translate('actions.filter') }}
-    </button>
-  </div>
-  <app-loading *ngIf="loading()"></app-loading>
-  <app-error *ngIf="error()" [message]="error()!" (retry)="loadSummary()"></app-error>
-  <ng-container *ngIf="!loading() && !error() && summary() as s">
+  }
+  @if (loading()) {
+    <app-loading></app-loading>
+  }
+  @if (error()) {
+    <app-error [message]="error()!" (retry)="loadSummary()"></app-error>
+  }
+  @if (!loading() && !error() && summary(); as s) {
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-md">
       <div class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between">
         <div class="flex justify-between items-start">
@@ -67,9 +73,11 @@
           <div class="bg-secondary-container/10 p-xs rounded-lg">
             <span class="material-symbols-outlined text-secondary">receipt_long</span>
           </div>
-          <div *ngIf="s.pendingReceiptsCount > 0" class="flex items-center text-error text-[10px] font-bold">
-            <span class="material-symbols-outlined text-[14px]">warning</span>
-          </div>
+          @if (s.pendingReceiptsCount > 0) {
+            <div class="flex items-center text-error text-[10px] font-bold">
+              <span class="material-symbols-outlined text-[14px]">warning</span>
+            </div>
+          }
         </div>
         <div class="mt-md">
           <p class="text-label-sm font-label-sm text-on-surface-variant">{{ i18n.translate('dashboard.pendingReceipts') }}</p>
@@ -125,29 +133,37 @@
       <div class="lg:col-span-4 card-surface p-lg">
         <h3 class="text-title-sm font-bold mb-md text-primary">Órdenes por estado</h3>
         <div class="space-y-2">
-          <div *ngFor="let item of s.ordersByStatus" class="flex items-center justify-between text-label-sm">
-            <div class="flex items-center gap-sm">
-              <div class="w-3 h-3 rounded-full bg-primary"></div>
-              <span>{{ i18n.translate('status.' + item.status) }}</span>
+          @for (item of s.ordersByStatus; track item) {
+            <div class="flex items-center justify-between text-label-sm">
+              <div class="flex items-center gap-sm">
+                <div class="w-3 h-3 rounded-full bg-primary"></div>
+                <span>{{ i18n.translate('status.' + item.status) }}</span>
+              </div>
+              <span class="font-bold">{{ item.count }}</span>
             </div>
-            <span class="font-bold">{{ item.count }}</span>
-          </div>
-          <div *ngIf="s.ordersByStatus.length === 0" class="text-label-sm text-on-surface-variant text-center py-md">Sin datos</div>
+          }
+          @if (s.ordersByStatus.length === 0) {
+            <div class="text-label-sm text-on-surface-variant text-center py-md">Sin datos</div>
+          }
         </div>
       </div>
       <div class="lg:col-span-4 card-surface p-lg">
         <h3 class="text-title-sm font-bold mb-md text-primary">{{ i18n.translate('dashboard.topServices') }}</h3>
         <div class="space-y-lg">
-          <div *ngFor="let srv of s.topServices" class="space-y-xs">
-            <div class="flex justify-between text-label-sm">
-              <span class="font-medium">{{ srv.name }}</span>
-              <span class="text-on-surface-variant">{{ srv.count }} veces</span>
+          @for (srv of s.topServices; track srv) {
+            <div class="space-y-xs">
+              <div class="flex justify-between text-label-sm">
+                <span class="font-medium">{{ srv.name }}</span>
+                <span class="text-on-surface-variant">{{ srv.count }} veces</span>
+              </div>
+              <div class="w-full bg-surface-container rounded-full h-2">
+                <div class="bg-primary h-2 rounded-full" [style.width.%]="getServiceBarWidth(srv.count, s.topServices)"></div>
+              </div>
             </div>
-            <div class="w-full bg-surface-container rounded-full h-2">
-              <div class="bg-primary h-2 rounded-full" [style.width.%]="getServiceBarWidth(srv.count, s.topServices)"></div>
-            </div>
-          </div>
-          <div *ngIf="s.topServices.length === 0" class="text-label-sm text-on-surface-variant text-center py-md">Sin datos</div>
+          }
+          @if (s.topServices.length === 0) {
+            <div class="text-label-sm text-on-surface-variant text-center py-md">Sin datos</div>
+          }
         </div>
       </div>
       <div class="lg:col-span-4 card-surface p-lg">
@@ -156,19 +172,23 @@
           <a routerLink="/receipts" class="text-primary text-[10px] font-bold underline">Ver todos</a>
         </div>
         <div class="space-y-md">
-          <div *ngFor="let pay of s.recentPayments" class="flex items-center justify-between pb-sm border-b border-outline-variant/20">
-            <div class="flex items-center gap-sm">
-              <div class="w-8 h-8 rounded-full bg-tertiary-fixed/10 flex items-center justify-center">
-                <span class="material-symbols-outlined text-[18px] text-on-tertiary-container">attach_money</span>
+          @for (pay of s.recentPayments; track pay) {
+            <div class="flex items-center justify-between pb-sm border-b border-outline-variant/20">
+              <div class="flex items-center gap-sm">
+                <div class="w-8 h-8 rounded-full bg-tertiary-fixed/10 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[18px] text-on-tertiary-container">attach_money</span>
+                </div>
+                <div>
+                  <p class="text-label-sm font-bold">{{ pay.customerName }}</p>
+                  <p class="text-[10px] text-on-surface-variant">{{ pay.date }}</p>
+                </div>
               </div>
-              <div>
-                <p class="text-label-sm font-bold">{{ pay.customerName }}</p>
-                <p class="text-[10px] text-on-surface-variant">{{ pay.date }}</p>
-              </div>
+              <p class="text-label-sm font-bold text-on-tertiary-container">+${{ pay.amount | number:'1.0-0' }}</p>
             </div>
-            <p class="text-label-sm font-bold text-on-tertiary-container">+${{ pay.amount | number:'1.0-0' }}</p>
-          </div>
-          <div *ngIf="s.recentPayments.length === 0" class="text-label-sm text-on-surface-variant text-center py-md">Sin pagos recientes</div>
+          }
+          @if (s.recentPayments.length === 0) {
+            <div class="text-label-sm text-on-surface-variant text-center py-md">Sin pagos recientes</div>
+          }
         </div>
       </div>
     </div>
@@ -185,16 +205,20 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-outline-variant/20">
-            <tr *ngFor="let debtor of s.debtors" class="hover:bg-surface-container/30 transition-colors">
-              <td class="px-lg py-md text-body-md">{{ debtor.name }}</td>
-              <td class="px-lg py-md text-right font-bold text-error">${{ debtor.debt | number:'1.2-2' }}</td>
-            </tr>
-            <tr *ngIf="s.debtors.length === 0">
-              <td colspan="2" class="px-lg py-md text-center text-on-surface-variant">Sin clientes con deuda.</td>
-            </tr>
+            @for (debtor of s.debtors; track debtor) {
+              <tr class="hover:bg-surface-container/30 transition-colors">
+                <td class="px-lg py-md text-body-md">{{ debtor.name }}</td>
+                <td class="px-lg py-md text-right font-bold text-error">${{ debtor.debt | number:'1.2-2' }}</td>
+              </tr>
+            }
+            @if (s.debtors.length === 0) {
+              <tr>
+                <td colspan="2" class="px-lg py-md text-center text-on-surface-variant">Sin clientes con deuda.</td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
     </section>
-  </ng-container>
+  }
 </div>
