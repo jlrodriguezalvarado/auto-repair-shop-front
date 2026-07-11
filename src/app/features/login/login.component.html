@@ -1,33 +1,53 @@
-<div class="flex items-center justify-center min-h-screen bg-md-background p-4">
-  <div class="bg-md-surface p-8 rounded-2xl shadow-2xl border border-md-outline/15 max-w-md w-full flex flex-col gap-6 animate-fadeIn">
-    <div class="flex flex-col items-center gap-2">
-      <span class="material-symbols-outlined text-md-primary text-6xl">build_circle</span>
-      <h1 class="text-3xl font-extrabold tracking-tight">App Taller Mecánico</h1>
-      <p class="text-sm text-md-on-surface-variant text-center">Inicie sesión con un nombre de usuario de prueba (p. ej. admin, sec, mech, cust)</p>
-    </div>
-
-    <form (submit)="onSubmit()" class="flex flex-col gap-4">
-      <div class="flex flex-col gap-1.5">
-        <label for="username" class="text-sm font-bold text-md-on-surface-variant">Usuario</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          [(ngModel)]="username"
-          placeholder="Ingrese su usuario..."
-          class="px-4 py-3 bg-md-surface border border-md-outline/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-md-primary text-base transition-all"
-          required>
-        </div>
-
-        <button
-          type="submit"
-          [disabled]="loading() || !username"
-          class="w-full py-3 px-4 bg-md-primary hover:bg-md-primary/95 text-md-on-primary font-bold rounded-xl transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base">
-          @if (loading()) {
-            <span class="animate-spin rounded-full h-5 w-5 border-2 border-md-on-primary border-t-transparent"></span>
-          }
-          <span>Iniciar Sesión</span>
-        </button>
-      </form>
-    </div>
+<div class="flex items-center justify-center min-h-screen p-md bg-[#f5f7f9] relative overflow-hidden">
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none opacity-20">
+    <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary-container blur-[120px]"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-secondary-container blur-[100px] opacity-40"></div>
   </div>
+  <main class="w-full max-w-[440px] flex flex-col items-center">
+    <header class="mb-xl text-center flex flex-col items-center">
+      <div class="mb-sm flex items-center justify-center bg-primary-container rounded-xl w-12 h-12">
+        <span class="material-symbols-outlined text-white text-[28px]">build</span>
+      </div>
+      <h1 class="font-headline-md text-headline-md text-primary tracking-tight">App Taller Mecánico</h1>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-xs opacity-80">Gestión de Precisión Industrial</p>
+    </header>
+    <section class="w-full bg-white rounded-xl p-lg md:p-xl border border-surface-container shadow-card">
+      <div class="mb-lg">
+        <h2 class="font-headline-md text-headline-md text-on-surface">Iniciar sesión</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Usa un usuario de prueba: admin, sec, mech o cust</p>
+      </div>
+      <form (submit)="onSubmit()" class="space-y-lg">
+        <div class="flex flex-col gap-xs">
+          <label for="username" class="font-label-sm text-label-sm text-on-surface-variant">Usuario</label>
+          <div class="relative flex items-center input-focus-effect border border-outline-variant rounded-lg transition-all duration-200 bg-white">
+            <span class="material-symbols-outlined absolute left-md text-outline">person</span>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              [(ngModel)]="username"
+              placeholder="admin, sec, mech, cust..."
+              class="w-full bg-transparent border-none focus:ring-0 py-3 pl-12 pr-md font-body-md text-body-md text-on-surface placeholder:text-outline opacity-90 outline-none"
+              required>
+          </div>
+        </div>
+        <div class="pt-sm">
+          <button
+            type="submit"
+            [disabled]="loading() || !username"
+            class="w-full bg-secondary-container text-on-secondary-container font-headline-md text-title-sm py-4 rounded-xl shadow-sm hover:brightness-95 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-sm group disabled:opacity-50 disabled:cursor-not-allowed">
+            <span *ngIf="loading()" class="material-symbols-outlined animate-spin">sync</span>
+            <span *ngIf="!loading()">Entrar</span>
+            <span *ngIf="!loading()" class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+          </button>
+        </div>
+      </form>
+    </section>
+    <footer class="mt-xl text-center px-lg">
+      <div class="flex items-center justify-center gap-sm mb-xs text-on-surface-variant opacity-60">
+        <span class="material-symbols-outlined text-[18px]">security</span>
+        <p class="font-label-sm text-label-sm">Conexión cifrada y segura de extremo a extremo.</p>
+      </div>
+    </footer>
+  </main>
+</div>

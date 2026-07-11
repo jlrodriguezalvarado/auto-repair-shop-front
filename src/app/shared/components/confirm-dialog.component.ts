@@ -1,5 +1,4 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-
 import { ConfirmService } from '../services/confirm.service';
 
 @Component({
@@ -9,30 +8,28 @@ import { ConfirmService } from '../services/confirm.service';
   template: `
     @if (confirmService.dialog(); as d) {
       <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="confirmService.reject()"></div>
-        <!-- Card -->
-        <div class="relative bg-md-surface text-md-on-surface rounded-2xl max-w-md w-full p-6 shadow-2xl border border-md-outline/15 flex flex-col gap-4 animate-scaleUp">
+        <div class="relative bg-surface-container-lowest text-on-surface rounded-2xl max-w-md w-full p-6 shadow-2xl border border-outline-variant/15 flex flex-col gap-4 animate-scaleUp">
           <h3 class="text-xl font-bold">{{ d.title }}</h3>
-          <p class="text-md-on-surface-variant text-sm">{{ d.message }}</p>
+          <p class="text-on-surface-variant text-sm">{{ d.message }}</p>
           <div class="flex justify-end gap-3 mt-2">
             <button
               type="button"
               (click)="confirmService.reject()"
-              class="px-4 py-2 text-sm font-semibold hover:bg-md-surface-variant/50 rounded-lg transition-colors text-md-primary">
+              class="px-md py-xs text-label-sm font-semibold hover:bg-surface-container-high rounded-lg transition-colors text-primary">
               {{ d.cancelText || 'Cancelar' }}
             </button>
             <button
               type="button"
               (click)="confirmService.approve()"
-              class="px-4 py-2 text-sm font-semibold bg-md-primary hover:bg-md-primary/95 text-md-on-primary rounded-lg transition-colors">
+              class="px-md py-xs text-label-sm font-semibold btn-primary">
               {{ d.confirmText || 'Confirmar' }}
             </button>
           </div>
         </div>
       </div>
     }
-    `,
+  `,
   changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     @keyframes scaleUp {

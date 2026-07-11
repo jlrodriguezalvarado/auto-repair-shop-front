@@ -1,75 +1,74 @@
 <div class="space-y-6 max-w-4xl mx-auto">
   <div>
-    <h2 class="text-3xl font-bold tracking-tight">{{ i18n.translate('nav.company') }}</h2>
-    <p class="text-sm text-md-on-surface-variant">Configure los detalles de facturación e identidad del taller</p>
+    <p class="text-body-md text-on-surface-variant">Configure los detalles de facturación e identidad del taller</p>
   </div>
 
-  @if (loading()) {
-    <app-loading></app-loading>
-  }
-  @if (error()) {
-    <app-error [message]="error()!" (retry)="loadCompany()"></app-error>
-  }
+  <app-loading *ngIf="loading()"></app-loading>
+  <app-error *ngIf="error()" [message]="error()!" (retry)="loadCompany()"></app-error>
 
-  @if (!loading() && !error() && company(); as c) {
-    <form (submit)="onSubmit()" class="bg-md-surface border border-md-outline/10 p-6 md:p-8 rounded-3xl space-y-6 shadow-sm animate-fadeIn">
-      <!-- Logo & Title Section -->
-      <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-md-outline/10">
-        <img [src]="c.logo || 'assets/default-logo.png'" alt="Company Logo" class="h-24 w-24 object-cover rounded-2xl border border-md-outline/20">
-        <div class="flex-1 space-y-2 text-center sm:text-left">
-          <h3 class="text-xl font-bold text-md-on-surface">{{ c.name || 'Sin nombre' }}</h3>
-          <p class="text-xs text-md-on-surface-variant">Registrado el: {{ c.createdAt | date:'short' }}</p>
-        </div>
+  <form *ngIf="!loading() && !error() && company() as c" (submit)="onSubmit()" class="card-surface border border-outline-variant/30 p-6 md:p-8 rounded-xl space-y-6 shadow-sm animate-fadeIn">
+    <!-- Logo & Title Section -->
+    <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-outline-variant/10">
+      <img [src]="c.logo || 'assets/default-logo.png'" alt="Company Logo" class="h-24 w-24 object-cover rounded-xl border border-outline-variant/20">
+      <div class="flex-1 space-y-2 text-center sm:text-left">
+        <h3 class="text-xl font-bold text-on-surface">{{ c.name || 'Sin nombre' }}</h3>
+        <p class="text-xs text-on-surface-variant">Registrado el: {{ c.createdAt | date:'short' }}</p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Name -->
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-bold text-md-on-surface-variant">Nombre de la Empresa</label>
-          <input type="text" [(ngModel)]="c.name" name="name" required class="px-4 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-2 focus:ring-md-primary focus:outline-none">
-        </div>
-        <!-- Tax ID (RIF) -->
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-bold text-md-on-surface-variant">RIF / Tax ID</label>
-          <input type="text" [(ngModel)]="c.taxId" name="taxId" required class="px-4 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-2 focus:ring-md-primary focus:outline-none">
-        </div>
-        <!-- Email -->
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-bold text-md-on-surface-variant">Correo Electrónico</label>
-          <input type="email" [(ngModel)]="c.email" name="email" required class="px-4 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-2 focus:ring-md-primary focus:outline-none">
-        </div>
-        <!-- Phone -->
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-bold text-md-on-surface-variant">Teléfono Principal</label>
-          <input type="text" [(ngModel)]="c.phone" name="phone" required class="px-4 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-2 focus:ring-md-primary focus:outline-none">
-        </div>
-        <!-- Secondary Phone -->
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-bold text-md-on-surface-variant">Teléfono Secundario (Opcional)</label>
-          <input type="text" [(ngModel)]="c.secondaryPhone" name="secondaryPhone" class="px-4 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-2 focus:ring-md-primary focus:outline-none">
-        </div>
-        <!-- Logo URL (Mock upload) -->
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-bold text-md-on-surface-variant">URL del Logo (Mock)</label>
-          <input type="text" [(ngModel)]="c.logo" name="logo" class="px-4 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-2 focus:ring-md-primary focus:outline-none">
-        </div>
-        <!-- Address -->
-        <div class="flex flex-col gap-1 md:col-span-2">
-          <label class="text-sm font-bold text-md-on-surface-variant">Dirección Completa</label>
-          <textarea rows="3" [(ngModel)]="c.address" name="address" required class="px-4 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-2 focus:ring-md-primary focus:outline-none"></textarea>
-        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Name -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-bold text-on-surface-variant">Nombre de la Empresa</label>
+        <input type="text" [(ngModel)]="c.name" name="name" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
       </div>
-      <!-- Actions -->
-      <div class="flex justify-end pt-4 border-t border-md-outline/10">
-        <button
-          type="submit"
-          [disabled]="saving()"
-          class="flex items-center gap-2 px-6 py-3 bg-md-primary hover:bg-md-primary/95 text-md-on-primary font-bold rounded-xl shadow-md transition-colors disabled:opacity-50">
-          @if (saving()) {
-            <span class="animate-spin rounded-full h-4 w-4 border-2 border-md-on-primary border-t-transparent"></span>
-          }
-          <span>{{ i18n.translate('actions.save') }}</span>
-        </button>
+
+      <!-- Tax ID (RIF) -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-bold text-on-surface-variant">RIF / Tax ID</label>
+        <input type="text" [(ngModel)]="c.taxId" name="taxId" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
       </div>
-    </form>
-  }
+
+      <!-- Email -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-bold text-on-surface-variant">Correo Electrónico</label>
+        <input type="email" [(ngModel)]="c.email" name="email" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+      </div>
+
+      <!-- Phone -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-bold text-on-surface-variant">Teléfono Principal</label>
+        <input type="text" [(ngModel)]="c.phone" name="phone" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+      </div>
+
+      <!-- Secondary Phone -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-bold text-on-surface-variant">Teléfono Secundario (Opcional)</label>
+        <input type="text" [(ngModel)]="c.secondaryPhone" name="secondaryPhone" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+      </div>
+
+      <!-- Logo URL (Mock upload) -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-bold text-on-surface-variant">URL del Logo (Mock)</label>
+        <input type="text" [(ngModel)]="c.logo" name="logo" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+      </div>
+
+      <!-- Address -->
+      <div class="flex flex-col gap-1 md:col-span-2">
+        <label class="text-sm font-bold text-on-surface-variant">Dirección Completa</label>
+        <textarea rows="3" [(ngModel)]="c.address" name="address" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"></textarea>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end pt-4 border-t border-outline-variant/10">
+      <button
+        type="submit"
+        [disabled]="saving()"
+        class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-on-primary font-bold rounded-xl shadow-md transition-colors disabled:opacity-50">
+        <span *ngIf="saving()" class="animate-spin rounded-full h-4 w-4 border-2 border-on-primary border-t-transparent"></span>
+        <span>{{ i18n.translate('actions.save') }}</span>
+      </button>
+    </div>
+  </form>
 </div>
