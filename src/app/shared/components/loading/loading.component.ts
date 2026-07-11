@@ -1,4 +1,4 @@
-import { Component, input, inject } from '@angular/core';
+import { Component, input, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { I18nService } from '../../../core/services/i18n.service';
 
@@ -7,6 +7,7 @@ import { I18nService } from '../../../core/services/i18n.service';
   standalone: true,
   imports: [],
   templateUrl: './loading.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./loading.component.scss']
 })
 export class LoadingComponent {

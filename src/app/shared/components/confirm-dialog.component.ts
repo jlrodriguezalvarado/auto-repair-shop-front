@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { ConfirmService } from '../services/confirm.service';
 
@@ -33,6 +33,7 @@ import { ConfirmService } from '../services/confirm.service';
       </div>
     }
     `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     @keyframes scaleUp {
       from { transform: scale(0.95); opacity: 0; }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastContainerComponent } from './shared/components/toast-container.component';
 import { ConfirmDialogComponent } from './shared/components/confirm-dialog.component';
@@ -8,6 +8,7 @@ import { ConfirmDialogComponent } from './shared/components/confirm-dialog.compo
   standalone: true,
   imports: [RouterOutlet, ToastContainerComponent, ConfirmDialogComponent],
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {

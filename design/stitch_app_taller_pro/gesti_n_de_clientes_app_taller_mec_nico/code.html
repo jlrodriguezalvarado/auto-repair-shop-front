@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clientes - App Taller Mecánico</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-surface": "#191c1e",
+                        "on-tertiary-container": "#10b981",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8f9fb",
+                        "surface-container-low": "#f2f4f6",
+                        "primary-fixed-dim": "#a2cbed",
+                        "secondary-fixed": "#ffdeac",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary": "#002a1a",
+                        "inverse-primary": "#a2cbed",
+                        "background": "#f8f9fb",
+                        "surface-bright": "#f8f9fb",
+                        "surface-tint": "#396280",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#6ffbbe",
+                        "secondary-fixed-dim": "#ffba38",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-secondary-container": "#6a4800",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-container": "#eceef0",
+                        "primary": "#00273c",
+                        "on-primary-container": "#7fa8c8",
+                        "surface-dim": "#d8dadc",
+                        "tertiary-container": "#00422b",
+                        "on-primary-fixed": "#001e2f",
+                        "outline-variant": "#c2c7ce",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#281900",
+                        "on-primary": "#ffffff",
+                        "outline": "#72787e",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-container": "#feb300",
+                        "on-secondary-fixed-variant": "#604100",
+                        "secondary": "#7e5700",
+                        "on-background": "#191c1e",
+                        "inverse-surface": "#2d3133",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#cae6ff",
+                        "on-primary-fixed-variant": "#1e4b67",
+                        "on-surface-variant": "#42474d",
+                        "primary-container": "#0b3d59",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F5F7F9; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e0e3e5; border-radius: 10px; }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-[260px] hidden md:flex flex-col bg-surface dark:bg-surface-dim shadow-sm z-50">
+<div class="flex flex-col h-full py-lg px-md">
+<div class="flex items-center gap-sm mb-xl px-sm">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
+<div>
+<h1 class="text-title-sm font-title-sm font-bold text-primary dark:text-primary-fixed-dim leading-none">App Taller Mecánico</h1>
+<p class="text-[10px] uppercase tracking-widest text-outline mt-1 font-bold">Precision Workshop Mgmt</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
+<!-- Dashboard -->
+<a class="flex items-center gap-md px-md py-3 rounded-xl transition-colors text-on-surface-variant opacity-70 hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-body-md font-body-md">Dashboard</span>
+</a>
+<!-- Users -->
+<a class="flex items-center gap-md px-md py-3 rounded-xl transition-colors text-on-surface-variant opacity-70 hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-body-md font-body-md">Users</span>
+</a>
+<!-- Company -->
+<a class="flex items-center gap-md px-md py-3 rounded-xl transition-colors text-on-surface-variant opacity-70 hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" data-icon="business">business</span>
+<span class="text-body-md font-body-md">Company</span>
+</a>
+<!-- Clients (ACTIVE) -->
+<a class="flex items-center gap-md px-md py-3 rounded-xl text-primary dark:text-primary-fixed-dim font-bold border-r-4 border-primary dark:border-primary-fixed-dim bg-surface-container-high transition-transform duration-150 active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-body-md font-body-md">Clients</span>
+</a>
+<!-- Vehicles -->
+<a class="flex items-center gap-md px-md py-3 rounded-xl transition-colors text-on-surface-variant opacity-70 hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" data-icon="directions_car">directions_car</span>
+<span class="text-body-md font-body-md">Vehicles</span>
+</a>
+<!-- Services Catalog -->
+<a class="flex items-center gap-md px-md py-3 rounded-xl transition-colors text-on-surface-variant opacity-70 hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-body-md font-body-md">Services Catalog</span>
+</a>
+<!-- Work Orders -->
+<a class="flex items-center gap-md px-md py-3 rounded-xl transition-colors text-on-surface-variant opacity-70 hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+<span class="text-body-md font-body-md">Work Orders</span>
+</a>
+<!-- Budgets -->
+<a class="flex items-center gap-md px-md py-3 rounded-xl transition-colors text-on-surface-variant opacity-70 hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" data-icon="request_quote">request_quote</span>
+<span class="text-body-md font-body-md">Budgets</span>
+</a>
+<!-- Receipts -->
+<a class="flex items-center gap-md px-md py-3 rounded-xl transition-colors text-on-surface-variant opacity-70 hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="text-body-md font-body-md">Receipts</span>
+</a>
+</nav>
+<div class="mt-auto pt-lg border-t border-outline-variant/30 flex items-center gap-md px-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up professional portrait of a mechanical workshop manager in a clean branded shirt, high-end corporate photography style with soft industrial background blur, natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0IvypX169wtnWGldfn0SJLOTZbaLSskqGOJBFwQL2NegLkU551y01xO30F4kuiVpy7Azff0N7b08KvfQ4hy6O_78yrbFmPbPTXwNCMpA1f-Yb0DXxr0XeNVkYiz8gbU3kdFf4HiTaZ9Rv_zIWoNiz-3ph7goZ5w55ZrDsEDhrtl3xIyyFIXKP3ng7aNoxC0LLAu8lmKPy6G39i_PaGaZAzEuwuTqDW4BBgDvnxlEne_3XKy-wz5NAJxtOSW09FxUmBNf4RfwNDMc"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-label-sm font-bold truncate">Admin Taller</p>
+<p class="text-[10px] text-outline truncate">admin@taller.pro</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-gutter h-16 md:pl-[284px] bg-surface-bright dark:bg-surface-container-low shadow-sm sticky top-0 z-40">
+<div class="flex items-center gap-md">
+<button class="md:hidden p-2 text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim">Clientes</h2>
+</div>
+<div class="flex items-center gap-lg">
+<div class="hidden lg:flex items-center bg-surface-container rounded-full px-md py-1.5 w-64 border border-outline-variant/50 focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-outline text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full ml-2" placeholder="Global search..." type="text"/>
+</div>
+<div class="flex items-center gap-sm">
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-all active:scale-95 text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-all active:scale-95 text-on-surface-variant">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="md:ml-[260px] min-h-[calc(100vh-64px)] p-lg lg:p-xl flex flex-col gap-lg">
+<!-- Header Actions Area -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div class="flex-1">
+<h3 class="text-display-lg font-display-lg text-primary">Gestión de Clientes</h3>
+<p class="text-on-surface-variant mt-1">Administra tu base de datos de clientes y sus vehículos registrados.</p>
+</div>
+<div>
+<button class="bg-secondary-container text-on-secondary-container hover:bg-secondary transition-all hover:text-on-secondary px-lg py-3 rounded-xl flex items-center gap-sm font-bold shadow-md active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_add</span>
+                    Nuevo cliente
+                </button>
+</div>
+</section>
+<!-- Search & Filter Controls -->
+<div class="bg-white rounded-2xl p-md shadow-sm border border-outline-variant/20 flex flex-wrap items-center gap-md">
+<div class="flex-1 min-w-[300px]">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">person_search</span>
+<input class="w-full pl-xl pr-md py-3 rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none text-body-md transition-all" placeholder="Buscar por nombre, teléfono o email..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center bg-surface-container-low p-1 rounded-xl border border-outline-variant/30">
+<button class="px-md py-2 rounded-lg bg-white shadow-sm text-primary font-bold text-label-sm">Todos</button>
+<button class="px-md py-2 rounded-lg text-on-surface-variant hover:text-primary transition-colors text-label-sm">Activos</button>
+<button class="px-md py-2 rounded-lg text-on-surface-variant hover:text-primary transition-colors text-label-sm">Inactivos</button>
+</div>
+<button class="p-3 rounded-xl border border-outline-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Main Workspace: Table + Detail Preview -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg h-full">
+<!-- Data Table Column -->
+<div class="lg:col-span-8 bg-white rounded-3xl shadow-sm border border-outline-variant/20 overflow-hidden flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-lg py-md text-label-caps text-outline border-b border-outline-variant/30">Cliente</th>
+<th class="px-lg py-md text-label-caps text-outline border-b border-outline-variant/30">Contacto</th>
+<th class="px-lg py-md text-label-caps text-outline border-b border-outline-variant/30">Vehículos</th>
+<th class="px-lg py-md text-label-caps text-outline border-b border-outline-variant/30">Estado</th>
+<th class="px-lg py-md text-label-caps text-outline border-b border-outline-variant/30 text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary font-bold">RM</div>
+<div>
+<p class="text-body-md font-bold text-primary">Ricardo Mendoza</p>
+<p class="text-label-sm text-outline">ID: CLI-9042</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<p class="text-body-md text-on-surface">+52 55 1234 5678</p>
+<p class="text-label-sm text-on-surface-variant">r.mendoza@email.com</p>
+</td>
+<td class="px-lg py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px] text-outline">directions_car</span>
+<span class="text-body-md font-medium">3</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="px-sm py-1 rounded-full bg-on-tertiary-container/10 text-on-tertiary-container text-label-sm font-bold border border-on-tertiary-container/20">Activo</span>
+</td>
+<td class="px-lg py-md text-right">
+<div class="flex items-center justify-end gap-sm">
+<button class="p-2 rounded-lg hover:bg-surface-container-high transition-colors" title="Ver Detalle">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-surface-container-high transition-colors" title="Editar">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-error-container/20 hover:text-error transition-colors" title="Desactivar">
+<span class="material-symbols-outlined text-[20px]">person_off</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group bg-surface-container-low/20">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-secondary-container/10 flex items-center justify-center text-secondary font-bold">AG</div>
+<div>
+<p class="text-body-md font-bold text-primary">Andrea García</p>
+<p class="text-label-sm text-outline">ID: CLI-9051</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<p class="text-body-md text-on-surface">+52 55 9876 5432</p>
+<p class="text-label-sm text-on-surface-variant">andrea.g@corporativo.mx</p>
+</td>
+<td class="px-lg py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px] text-outline">directions_car</span>
+<span class="text-body-md font-medium">1</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="px-sm py-1 rounded-full bg-on-tertiary-container/10 text-on-tertiary-container text-label-sm font-bold border border-on-tertiary-container/20">Activo</span>
+</td>
+<td class="px-lg py-md text-right">
+<div class="flex items-center justify-end gap-sm">
+<button class="p-2 rounded-lg hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+<button class="p-2 rounded-lg hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-2 rounded-lg hover:bg-error-container/20 hover:text-error transition-colors"><span class="material-symbols-outlined text-[20px]">person_off</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors cursor-pointer group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-outline-variant/20 flex items-center justify-center text-outline font-bold">HS</div>
+<div>
+<p class="text-body-md font-bold text-primary">Hugo Sánchez</p>
+<p class="text-label-sm text-outline">ID: CLI-8920</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<p class="text-body-md text-on-surface">+52 55 5544 3322</p>
+<p class="text-label-sm text-on-surface-variant">h.sanchez@servicios.com</p>
+</td>
+<td class="px-lg py-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px] text-outline">directions_car</span>
+<span class="text-body-md font-medium">5</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="px-sm py-1 rounded-full bg-outline-variant/20 text-outline text-label-sm font-bold border border-outline-variant/30">Inactivo</span>
+</td>
+<td class="px-lg py-md text-right">
+<div class="flex items-center justify-end gap-sm">
+<button class="p-2 rounded-lg hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+<button class="p-2 rounded-lg hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-2 rounded-lg hover:bg-tertiary-fixed/20 hover:text-on-tertiary-fixed-variant transition-colors"><span class="material-symbols-outlined text-[20px]">person_check</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="mt-auto p-lg border-t border-outline-variant/30 flex items-center justify-between">
+<p class="text-label-sm text-on-surface-variant">Mostrando 1 a 10 de 124 clientes</p>
+<div class="flex items-center gap-xs">
+<button class="p-2 rounded-lg border border-outline-variant hover:bg-surface-container transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-lg bg-primary text-white font-bold text-label-sm">1</button>
+<button class="w-10 h-10 rounded-lg border border-outline-variant hover:bg-surface-container transition-colors font-bold text-label-sm">2</button>
+<button class="w-10 h-10 rounded-lg border border-outline-variant hover:bg-surface-container transition-colors font-bold text-label-sm">3</button>
+<button class="p-2 rounded-lg border border-outline-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty Detail State / Sidebar Preview -->
+<div class="lg:col-span-4 flex flex-col gap-lg">
+<div class="bg-white rounded-3xl p-xl shadow-sm border border-outline-variant/20 flex flex-col items-center justify-center text-center h-full min-h-[400px] glass-panel">
+<div class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center mb-lg relative">
+<span class="material-symbols-outlined text-outline text-4xl">contact_page</span>
+<div class="absolute -bottom-1 -right-1 bg-primary w-8 h-8 rounded-full border-4 border-white flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[16px]">info</span>
+</div>
+</div>
+<h4 class="text-headline-md font-headline-md text-primary">Selecciona un cliente</h4>
+<p class="text-body-md text-on-surface-variant mt-2 max-w-[240px]">
+                        Haz clic en un cliente de la lista para ver su historial, vehículos y facturación pendiente.
+                    </p>
+<div class="mt-xl w-full grid grid-cols-2 gap-md">
+<div class="p-md rounded-2xl bg-surface-container-low border border-outline-variant/20">
+<p class="text-label-caps text-outline text-[10px]">TOTAL CLIENTES</p>
+<p class="text-headline-md font-bold text-primary mt-1">1,248</p>
+</div>
+<div class="p-md rounded-2xl bg-surface-container-low border border-outline-variant/20">
+<p class="text-label-caps text-outline text-[10px]">NUEVOS (MES)</p>
+<p class="text-headline-md font-bold text-tertiary-container mt-1">+14</p>
+</div>
+</div>
+</div>
+<!-- Small Contextual Card -->
+<div class="relative overflow-hidden rounded-3xl bg-primary-container p-lg text-on-primary-container shadow-lg h-32">
+<div class="relative z-10">
+<p class="text-label-caps opacity-70">Próxima Revisión Masiva</p>
+<h5 class="text-title-sm font-bold mt-1">Campaña de Invierno 2024</h5>
+<p class="text-label-sm mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                            15 de Noviembre
+                        </p>
+</div>
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl opacity-10 rotate-12">campaign</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Navigation -->
+<nav class="fixed bottom-0 w-full z-50 md:hidden bg-surface dark:bg-surface-container-low shadow-lg">
+<div class="flex justify-around items-center px-4 py-2 pb-safe w-full">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-label-sm font-label-sm">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">directions_car</span>
+<span class="text-label-sm font-label-sm">Vehicles</span>
+</a>
+<div class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl py-1 px-3 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-label-sm font-label-sm">Clients</span>
+</div>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">build</span>
+<span class="text-label-sm font-label-sm">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-label-sm font-label-sm">More</span>
+</a>
+</div>
+</nav>
+<script>
+        // Micro-interaction for table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', () => {
+                // Remove active class from all rows
+                document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('bg-primary-container/5', 'ring-2', 'ring-inset', 'ring-primary/20'));
+                // Add active class to clicked row
+                row.classList.add('bg-primary-container/5', 'ring-2', 'ring-inset', 'ring-primary/20');
+            });
+        });
+
+        // Search highlight effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.parentElement.classList.add('ring-2', 'ring-primary/10');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.parentElement.classList.remove('ring-2', 'ring-primary/10');
+        });
+    </script>
+</body></html>

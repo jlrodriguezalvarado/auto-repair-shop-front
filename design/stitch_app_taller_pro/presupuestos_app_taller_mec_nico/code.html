@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Budgets - App Taller Mecánico</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#005236",
+                    "on-surface": "#191c1e",
+                    "on-tertiary-container": "#10b981",
+                    "error-container": "#ffdad6",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8f9fb",
+                    "surface-container-low": "#f2f4f6",
+                    "primary-fixed-dim": "#a2cbed",
+                    "secondary-fixed": "#ffdeac",
+                    "surface-container-highest": "#e0e3e5",
+                    "tertiary": "#002a1a",
+                    "inverse-primary": "#a2cbed",
+                    "background": "#f8f9fb",
+                    "surface-bright": "#f8f9fb",
+                    "surface-tint": "#396280",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed": "#6ffbbe",
+                    "secondary-fixed-dim": "#ffba38",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-secondary-container": "#6a4800",
+                    "on-tertiary-fixed": "#002113",
+                    "surface-container": "#eceef0",
+                    "primary": "#00273c",
+                    "on-primary-container": "#7fa8c8",
+                    "surface-dim": "#d8dadc",
+                    "tertiary-container": "#00422b",
+                    "on-primary-fixed": "#001e2f",
+                    "outline-variant": "#c2c7ce",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed": "#281900",
+                    "on-primary": "#ffffff",
+                    "outline": "#72787e",
+                    "surface-variant": "#e0e3e5",
+                    "surface-container-high": "#e6e8ea",
+                    "secondary-container": "#feb300",
+                    "on-secondary-fixed-variant": "#604100",
+                    "secondary": "#7e5700",
+                    "on-background": "#191c1e",
+                    "inverse-surface": "#2d3133",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-error-container": "#93000a",
+                    "primary-fixed": "#cae6ff",
+                    "on-primary-fixed-variant": "#1e4b67",
+                    "on-surface-variant": "#42474d",
+                    "primary-container": "#0b3d59",
+                    "error": "#ba1a1a",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "gutter": "16px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "md": "16px",
+                    "xl": "40px",
+                    "sm": "8px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "title-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-caps": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "title-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F5F7F9; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); border: 1px solid rgba(226, 232, 240, 0.5); }
+        .custom-shadow { shadow-sm: 0px 2px 4px rgba(11, 61, 89, 0.05); }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-secondary-container">
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-0 h-full w-[260px] hidden md:flex flex-col bg-surface-container dark:bg-surface-container-low shadow-sm z-50">
+<div class="flex flex-col h-full py-lg px-md">
+<div class="mb-xl px-2">
+<h1 class="text-title-sm font-title-sm font-bold text-primary dark:text-primary-fixed-dim">App Taller Mecánico</h1>
+<p class="text-label-sm font-label-sm opacity-60">Precision Workshop Mgmt</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Nav Items from JSON -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-body-md font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-body-md font-body-md">Users</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined">business</span>
+<span class="text-body-md font-body-md">Company</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-body-md font-body-md">Clients</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined">directions_car</span>
+<span class="text-body-md font-body-md">Vehicles</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-body-md font-body-md">Services Catalog</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined">build</span>
+<span class="text-body-md font-body-md">Work Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary dark:text-primary-fixed-dim font-bold border-r-4 border-primary dark:border-primary-fixed-dim bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">request_quote</span>
+<span class="text-body-md font-body-md">Budgets</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-on-surface-variant opacity-70 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-body-md font-body-md">Receipts</span>
+</a>
+</nav>
+<div class="mt-auto p-4 bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border-2 border-on-primary-container/20 object-cover" data-alt="A professional headshot of a master mechanic in a clean workshop setting, wearing a dark navy branded uniform. The lighting is focused and professional, highlighting a sense of expertise and industrial reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhIZKkM1A29aKch1T4FCNzUiLGkwEdYZ--R4XSpLGqFvrbXW-03zpZSGKYgglum0_olPI9IwXXCcVO7B0DuwE7Byb_kqT0VUc-MFNn5bAcLpTYJreWi4oyJyT5B9R0_o-FPOxsPkpLvvJmpeG0rJOuFxald5KwzK-17bciFDTaXvrZ9v9-vd-qsX58SKzLWxhKPOIn8IAF0fYaNdb77wS3-DHEeqyYDOnkx4MSgsxrlZRUQmGAROA6C4UelElVT6E4xC9AvIOk8Qo"/>
+<div>
+<p class="text-label-sm font-bold">Admin Tech</p>
+<p class="text-[10px] opacity-80">Shift Lead</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:pl-[260px] min-h-screen flex flex-col">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-gutter h-16 bg-surface-bright dark:bg-surface-container-low shadow-sm sticky top-0 z-40">
+<div class="flex items-center gap-md">
+<button class="md:hidden p-2 text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="text-headline-md font-headline-md font-bold text-primary">Presupuestos</h2>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden sm:flex items-center bg-surface-container px-3 py-1.5 rounded-full border border-outline-variant/30">
+<span class="material-symbols-outlined text-sm opacity-60 mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-64 p-0" placeholder="Buscar por código o cliente..." type="text"/>
+</div>
+<div class="flex gap-1">
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-gutter flex flex-col gap-lg max-w-container-max mx-auto w-full">
+<!-- Summary Stats (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-md">
+<div class="glass-card p-md rounded-xl flex flex-col gap-xs shadow-sm">
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-outline">Total Pendientes</span>
+<div class="flex items-end justify-between">
+<span class="text-display-lg font-display-lg text-primary">14</span>
+<span class="text-label-sm font-bold text-secondary bg-secondary-container/20 px-2 py-0.5 rounded">8 hoy</span>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl flex flex-col gap-xs shadow-sm">
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-outline">Aprobados Mes</span>
+<div class="flex items-end justify-between">
+<span class="text-display-lg font-display-lg text-on-tertiary-container">32</span>
+<span class="text-label-sm font-bold text-on-tertiary-fixed-variant bg-tertiary-fixed/20 px-2 py-0.5 rounded">+12%</span>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl flex flex-col gap-xs shadow-sm">
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-outline">Valor Estimado</span>
+<div class="flex items-end justify-between">
+<span class="text-display-lg font-display-lg text-primary">€12.4k</span>
+<span class="material-symbols-outlined text-outline">trending_up</span>
+</div>
+</div>
+<!-- Action Card -->
+<div class="bg-secondary-container p-md rounded-xl flex flex-col justify-between shadow-md group cursor-pointer active:scale-95 transition-transform">
+<div class="flex justify-between items-start">
+<span class="text-label-sm font-bold text-on-secondary-container uppercase">Nuevo Presupuesto</span>
+<span class="material-symbols-outlined text-on-secondary-container">add_circle</span>
+</div>
+<p class="text-on-secondary-container text-body-md mt-2">Genera una cotización rápida para un cliente nuevo o existente.</p>
+</div>
+</div>
+<!-- Budgets Filter & Table Card -->
+<div class="bg-surface shadow-sm rounded-xl overflow-hidden border border-outline-variant/30">
+<!-- Toolbar -->
+<div class="px-md py-4 border-b border-outline-variant/20 flex flex-col sm:flex-row justify-between items-center gap-md bg-white">
+<div class="flex gap-2">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg text-label-sm font-bold flex items-center gap-2 hover:bg-primary/90 transition-all">
+<span class="material-symbols-outlined text-sm">tune</span>
+                            Todos los estados
+                        </button>
+<button class="bg-surface-container text-on-surface-variant px-4 py-2 rounded-lg text-label-sm font-medium hover:bg-surface-container-high transition-all">
+                            Vencidos
+                        </button>
+</div>
+<div class="flex items-center gap-sm">
+<span class="text-label-sm text-outline">Exportar:</span>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">picture_as_pdf</span></button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">table_view</span></button>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant/30">
+<th class="px-md py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Código</th>
+<th class="px-md py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Cliente</th>
+<th class="px-md py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Vehículo</th>
+<th class="px-md py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Estado</th>
+<th class="px-md py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Total</th>
+<th class="px-md py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Vencimiento</th>
+<th class="px-md py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Approved Budget -->
+<tr class="hover:bg-surface-container-low/50 transition-colors bg-green-50/20">
+<td class="px-md py-4 font-mono text-primary font-bold">#PR-2024-001</td>
+<td class="px-md py-4">
+<div class="flex flex-col">
+<span class="text-body-md font-bold text-on-surface">Carlos Mendoza</span>
+<span class="text-label-sm text-outline">c.mendoza@email.com</span>
+</div>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-lg">directions_car</span>
+<span class="text-body-md">Toyota Corolla (2022)</span>
+</div>
+</td>
+<td class="px-md py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-on-tertiary-container/10 text-on-tertiary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container mr-1.5"></span>
+                                        Aprobado
+                                    </span>
+</td>
+<td class="px-md py-4 text-body-md font-bold">€1,240.00</td>
+<td class="px-md py-4 text-label-sm text-outline">12 Oct 2024</td>
+<td class="px-md py-4 text-right">
+<button class="p-1 hover:bg-surface-container-highest rounded text-outline hover:text-primary transition-all">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Sent Budget -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-md py-4 font-mono text-primary font-bold">#PR-2024-002</td>
+<td class="px-md py-4">
+<div class="flex flex-col">
+<span class="text-body-md font-bold text-on-surface">Lucia Fernandez</span>
+<span class="text-label-sm text-outline">lucia.f@company.es</span>
+</div>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-lg">directions_car</span>
+<span class="text-body-md">Ford Fiesta (2018)</span>
+</div>
+</td>
+<td class="px-md py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-secondary-container/10 text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary mr-1.5"></span>
+                                        Enviado
+                                    </span>
+</td>
+<td class="px-md py-4 text-body-md font-bold">€450.50</td>
+<td class="px-md py-4 text-label-sm text-outline">15 Oct 2024</td>
+<td class="px-md py-4 text-right">
+<button class="p-1 hover:bg-surface-container-highest rounded text-outline hover:text-primary transition-all">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<!-- Draft Budget -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-md py-4 font-mono text-primary font-bold">#PR-2024-003</td>
+<td class="px-md py-4">
+<div class="flex flex-col">
+<span class="text-body-md font-bold text-on-surface">Taller Logistica SL</span>
+<span class="text-label-sm text-outline">admin@logisticasl.com</span>
+</div>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-lg">door_front</span>
+<span class="text-body-md">Iveco Daily (2020)</span>
+</div>
+</td>
+<td class="px-md py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-outline-variant/20 text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline mr-1.5"></span>
+                                        Borrador
+                                    </span>
+</td>
+<td class="px-md py-4 text-body-md font-bold">€2,890.00</td>
+<td class="px-md py-4 text-label-sm text-outline">20 Oct 2024</td>
+<td class="px-md py-4 text-right">
+<button class="p-1 hover:bg-surface-container-highest rounded text-outline hover:text-primary transition-all">
+<span class="material-symbols-outlined">send</span>
+</button>
+</td>
+</tr>
+<!-- Rejected Budget -->
+<tr class="hover:bg-surface-container-low/50 transition-colors bg-red-50/10">
+<td class="px-md py-4 font-mono text-primary font-bold">#PR-2024-004</td>
+<td class="px-md py-4">
+<div class="flex flex-col">
+<span class="text-body-md font-bold text-on-surface">Marcos Ruiz</span>
+<span class="text-label-sm text-outline">m.ruiz@gmail.com</span>
+</div>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-lg">directions_car</span>
+<span class="text-body-md">Seat Ibiza (2015)</span>
+</div>
+</td>
+<td class="px-md py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-error-container text-on-error-container">
+<span class="w-1.5 h-1.5 rounded-full bg-error mr-1.5"></span>
+                                        Rechazado
+                                    </span>
+</td>
+<td class="px-md py-4 text-body-md font-bold">€180.00</td>
+<td class="px-md py-4 text-label-sm text-outline">05 Oct 2024</td>
+<td class="px-md py-4 text-right">
+<button class="p-1 hover:bg-surface-container-highest rounded text-outline hover:text-primary transition-all">
+<span class="material-symbols-outlined">history</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-md py-4 border-t border-outline-variant/20 flex items-center justify-between bg-surface-container-lowest">
+<span class="text-label-sm text-on-surface-variant">Mostrando 1-4 de 42 presupuestos</span>
+<div class="flex gap-2">
+<button class="p-1 border border-outline-variant/30 rounded hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="px-3 py-1 bg-primary text-on-primary rounded text-label-sm font-bold">1</button>
+<button class="px-3 py-1 border border-outline-variant/30 rounded text-label-sm hover:bg-surface-container">2</button>
+<button class="px-3 py-1 border border-outline-variant/30 rounded text-label-sm hover:bg-surface-container">3</button>
+<button class="p-1 border border-outline-variant/30 rounded hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Contextual Info -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xl">
+<div class="glass-card p-lg rounded-xl border-l-4 border-secondary shadow-sm">
+<div class="flex items-center gap-3 mb-md text-secondary">
+<span class="material-symbols-outlined">warning</span>
+<h3 class="text-title-sm font-bold">Próximos a Vencer</h3>
+</div>
+<ul class="space-y-3">
+<li class="flex justify-between items-center text-body-md border-b border-outline-variant/10 pb-2">
+<span>#PR-2024-002 - Lucia Fernandez</span>
+<span class="text-error font-bold">Expira en 2 días</span>
+</li>
+<li class="flex justify-between items-center text-body-md border-b border-outline-variant/10 pb-2">
+<span>#PR-2024-009 - Roberto Gomez</span>
+<span class="text-error font-bold">Expira mañana</span>
+</li>
+</ul>
+</div>
+<div class="glass-card p-lg rounded-xl border-l-4 border-on-tertiary-container shadow-sm">
+<div class="flex items-center gap-3 mb-md text-on-tertiary-container">
+<span class="material-symbols-outlined">inventory</span>
+<h3 class="text-title-sm font-bold">Stock para Aprobados</h3>
+</div>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-label-sm mb-1">
+<span>Piezas p/ Toyota Corolla (#001)</span>
+<span class="font-bold">90% reservado</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full">
+<div class="bg-on-tertiary-container h-full rounded-full w-[90%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-label-sm mb-1">
+<span>Insumos Grales.</span>
+<span class="font-bold text-secondary">45% stock bajo</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full">
+<div class="bg-secondary h-full rounded-full w-[45%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="fixed bottom-0 w-full z-50 md:hidden bg-surface dark:bg-surface-container-low shadow-[0_-2px_10px_rgba(0,0,0,0.05)] border-t border-outline-variant/20">
+<div class="flex justify-around items-center px-4 py-2 pb-safe w-full">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-label-sm font-label-sm">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3" href="#">
+<span class="material-symbols-outlined">directions_car</span>
+<span class="text-label-sm font-label-sm">Vehicles</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3" href="#">
+<span class="material-symbols-outlined">build</span>
+<span class="text-label-sm font-label-sm">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl py-1 px-3 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">request_quote</span>
+<span class="text-label-sm font-label-sm">Presu</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-label-sm font-label-sm">More</span>
+</a>
+</div>
+</nav>
+<!-- Floating Action Button for Mobile -->
+<button class="fixed right-6 bottom-20 md:hidden w-14 h-14 bg-secondary-container text-on-secondary-container rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', () => {
+                row.classList.add('scale-[0.99]');
+                setTimeout(() => row.classList.remove('scale-[0.99]'), 100);
+            });
+        });
+
+        // Search Bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        if(searchInput) {
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.classList.add('border-primary');
+                searchInput.parentElement.classList.remove('border-outline-variant/30');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.classList.remove('border-primary');
+                searchInput.parentElement.classList.add('border-outline-variant/30');
+            });
+        }
+    </script>
+</body></html>

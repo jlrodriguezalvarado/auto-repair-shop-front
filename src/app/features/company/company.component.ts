@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CompanyRepository } from './company.repository';
@@ -13,6 +13,7 @@ import { ErrorComponent } from '../../shared/components/error/error.component';
   standalone: true,
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent],
   templateUrl: './company.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./company.component.scss']
 })
 export class CompanyComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DashboardRepository } from './dashboard.repository';
@@ -12,6 +12,7 @@ import { ErrorComponent } from '../../shared/components/error/error.component';
   standalone: true,
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent],
   templateUrl: './dashboard.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {

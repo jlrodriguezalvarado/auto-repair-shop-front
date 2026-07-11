@@ -1,4 +1,4 @@
-import { Component, input, Output, inject, EventEmitter } from '@angular/core';
+import { Component, input, Output, inject, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 
 import { I18nService } from '../../../core/services/i18n.service';
 
@@ -7,6 +7,7 @@ import { I18nService } from '../../../core/services/i18n.service';
   standalone: true,
   imports: [],
   templateUrl: './error.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./error.component.scss']
 })
 export class ErrorComponent {

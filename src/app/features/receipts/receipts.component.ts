@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, viewChild } from '@angular/core';
+import { Component, inject, signal, OnInit, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReceiptsRepository } from './receipts.repository';
@@ -20,6 +20,7 @@ import { DialogFormDirective } from '../../shared/directives/dialog-form.directi
   standalone: true,
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent, EmptyComponent, DialogFormDirective],
   templateUrl: './receipts.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./receipts.component.scss']
 })
 export class ReceiptsComponent implements OnInit {

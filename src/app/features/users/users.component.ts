@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsersRepository } from './users.repository';
@@ -14,6 +14,7 @@ import { EmptyComponent } from '../../shared/components/empty/empty.component';
   standalone: true,
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent, EmptyComponent],
   templateUrl: './users.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./users.component.scss']
 })
 export class UsersComponent implements OnInit {
