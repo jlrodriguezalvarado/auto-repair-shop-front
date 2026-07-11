@@ -1,11 +1,11 @@
 import { Component, input, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { I18nService } from '../../../core/services/i18n.service';
 
 @Component({
   selector: 'app-empty',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './empty.component.html',
   styleUrls: ['./empty.component.scss']
 })

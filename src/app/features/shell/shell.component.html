@@ -10,15 +10,16 @@
 
     <!-- Navigation List -->
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-      <a
-        *ngFor="let item of menuItems"
-        [routerLink]="item.path"
-        routerLinkActive="bg-md-primary-container text-md-on-primary-container"
-        [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
-        class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-md-on-surface-variant hover:bg-md-surface-variant/40 transition-colors">
-        <span class="material-symbols-outlined">{{ item.icon }}</span>
-        <span>{{ item.label }}</span>
-      </a>
+      @for (item of menuItems; track item) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="bg-md-primary-container text-md-on-primary-container"
+          [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+          class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-md-on-surface-variant hover:bg-md-surface-variant/40 transition-colors">
+          <span class="material-symbols-outlined">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
     </nav>
 
     <!-- User Section -->
@@ -79,15 +80,16 @@
 
     <!-- Bottom Nav Mobile -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-md-surface border-t border-md-outline/10 flex items-center justify-around z-40">
-      <a
-        *ngFor="let item of menuItems.slice(0, 5)"
-        [routerLink]="item.path"
-        routerLinkActive="text-md-primary"
-        [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
-        class="flex flex-col items-center justify-center text-md-on-surface-variant hover:text-md-primary transition-colors">
-        <span class="material-symbols-outlined text-2xl">{{ item.icon }}</span>
-        <span class="text-[10px] font-medium leading-none mt-1">{{ item.label }}</span>
-      </a>
+      @for (item of menuItems.slice(0, 5); track item) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="text-md-primary"
+          [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+          class="flex flex-col items-center justify-center text-md-on-surface-variant hover:text-md-primary transition-colors">
+          <span class="material-symbols-outlined text-2xl">{{ item.icon }}</span>
+          <span class="text-[10px] font-medium leading-none mt-1">{{ item.label }}</span>
+        </a>
+      }
     </nav>
   </div>
 </div>

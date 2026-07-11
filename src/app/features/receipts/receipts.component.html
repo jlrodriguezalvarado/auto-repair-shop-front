@@ -33,163 +33,178 @@
           <label class="text-xs font-bold text-md-on-surface-variant whitespace-nowrap">Cliente:</label>
           <select (change)="loadReceipts()" [(ngModel)]="selectedCustomerFilter" class="w-full md:w-56 px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl text-sm">
             <option value="all">Todos los clientes</option>
-            <option *ngFor="let c of customers()" [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+            @for (c of customers(); track c) {
+              <option [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+            }
           </select>
         </div>
       </div>
 
       <!-- State views -->
-      <app-loading *ngIf="loading()"></app-loading>
-      <app-error *ngIf="error()" [message]="error()!" (retry)="loadReceipts()"></app-error>
-      <app-empty *ngIf="!loading() && !error() && receipts().length === 0"></app-empty>
+      @if (loading()) {
+        <app-loading></app-loading>
+      }
+      @if (error()) {
+        <app-error [message]="error()!" (retry)="loadReceipts()"></app-error>
+      }
+      @if (!loading() && !error() && receipts().length === 0) {
+        <app-empty></app-empty>
+      }
 
       <!-- Table List -->
-      <div *ngIf="!loading() && !error() && receipts().length > 0" class="bg-md-surface border border-md-outline/10 rounded-3xl overflow-hidden shadow-sm animate-fadeIn">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr class="bg-md-surface-variant/20 border-b border-md-outline/15 text-md-on-surface-variant font-bold">
-                <th class="p-4">Recibo</th>
-                <th class="p-4">Cliente / Vehículo</th>
-                <th class="p-4">Total</th>
-                <th class="p-4">Abonado</th>
-                <th class="p-4">Pendiente</th>
-                <th class="p-4 text-center">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                *ngFor="let rec of receipts()"
-                (click)="viewDetail(rec)"
-                [ngClass]="selectedReceipt()?.id === rec.id ? 'bg-md-primary-container/20 border-l-4 border-l-md-primary' : ''"
-                class="border-b border-md-outline/5 hover:bg-md-surface-variant/10 transition-colors cursor-pointer">
-                <td class="p-4 font-extrabold text-md-primary">{{ rec.code }}</td>
-                <td class="p-4">
-                  <p class="font-semibold text-md-on-surface">{{ getCustomerName(rec.customer) }}</p>
-                  <p class="text-xs text-md-on-surface-variant">{{ getVehiclePlate(rec.vehicle) }}</p>
-                </td>
-                <td class="p-4 font-bold text-md-on-surface">${{ rec.total | number:'1.2-2' }}</td>
-                <td class="p-4 text-green-600 font-semibold">${{ rec.paidAmount | number:'1.2-2' }}</td>
-                <td class="p-4 text-md-error font-semibold">${{ rec.pendingAmount | number:'1.2-2' }}</td>
-                <td class="p-4 text-center">
+      @if (!loading() && !error() && receipts().length > 0) {
+        <div class="bg-md-surface border border-md-outline/10 rounded-3xl overflow-hidden shadow-sm animate-fadeIn">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="bg-md-surface-variant/20 border-b border-md-outline/15 text-md-on-surface-variant font-bold">
+                  <th class="p-4">Recibo</th>
+                  <th class="p-4">Cliente / Vehículo</th>
+                  <th class="p-4">Total</th>
+                  <th class="p-4">Abonado</th>
+                  <th class="p-4">Pendiente</th>
+                  <th class="p-4 text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rec of receipts(); track rec) {
+                  <tr
+                    (click)="viewDetail(rec)"
+                    [ngClass]="selectedReceipt()?.id === rec.id ? 'bg-md-primary-container/20 border-l-4 border-l-md-primary' : ''"
+                    class="border-b border-md-outline/5 hover:bg-md-surface-variant/10 transition-colors cursor-pointer">
+                    <td class="p-4 font-extrabold text-md-primary">{{ rec.code }}</td>
+                    <td class="p-4">
+                      <p class="font-semibold text-md-on-surface">{{ getCustomerName(rec.customer) }}</p>
+                      <p class="text-xs text-md-on-surface-variant">{{ getVehiclePlate(rec.vehicle) }}</p>
+                    </td>
+                    <td class="p-4 font-bold text-md-on-surface">${{ rec.total | number:'1.2-2' }}</td>
+                    <td class="p-4 text-green-600 font-semibold">${{ rec.paidAmount | number:'1.2-2' }}</td>
+                    <td class="p-4 text-md-error font-semibold">${{ rec.pendingAmount | number:'1.2-2' }}</td>
+                    <td class="p-4 text-center">
                   <span [ngClass]="{
                     'badge-error': rec.status === 'unpaid',
                     'badge-secondary': rec.status === 'partial',
                     'bg-green-100 text-green-800 border border-green-200': rec.status === 'paid',
                     'badge-surface': rec.status === 'overdue' || rec.status === 'cancelled'
                   }" class="badge">
-                    {{ i18n.translate('status.' + rec.status) }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                        {{ i18n.translate('status.' + rec.status) }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      }
     </div>
 
     <!-- Detailed Receipt Side Panel -->
-    <div *ngIf="selectedReceipt() as rec" class="p-6 bg-md-surface border border-md-outline/10 rounded-3xl space-y-6 shadow-md animate-slideIn">
-      <div class="flex items-center justify-between border-b pb-4">
-        <div>
-          <h3 class="text-xl font-bold flex items-center gap-2">
-            <span class="material-symbols-outlined text-md-primary">payments</span>
-            <span>Detalle {{ rec.code }}</span>
-          </h3>
-          <p class="text-xs text-md-on-surface-variant mt-1">Emitido el: {{ rec.issuedAt | date:'medium' }}</p>
+    @if (selectedReceipt(); as rec) {
+      <div class="p-6 bg-md-surface border border-md-outline/10 rounded-3xl space-y-6 shadow-md animate-slideIn">
+        <div class="flex items-center justify-between border-b pb-4">
+          <div>
+            <h3 class="text-xl font-bold flex items-center gap-2">
+              <span class="material-symbols-outlined text-md-primary">payments</span>
+              <span>Detalle {{ rec.code }}</span>
+            </h3>
+            <p class="text-xs text-md-on-surface-variant mt-1">Emitido el: {{ rec.issuedAt | date:'medium' }}</p>
+          </div>
+          <button (click)="closeDetail()" class="p-1 hover:bg-md-surface-variant/50 rounded-lg transition-colors">
+            <span class="material-symbols-outlined">close</span>
+          </button>
         </div>
-        <button (click)="closeDetail()" class="p-1 hover:bg-md-surface-variant/50 rounded-lg transition-colors">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex flex-wrap gap-2 pb-4 border-b">
-        <button *ngIf="rec.pendingAmount > 0" (click)="openPaymentModal()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xs flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs font-bold">add_card</span>
-          <span>Abonar Pago</span>
-        </button>
-
-        <a [href]="getWhatsAppLink(rec)" target="_blank" class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg text-xs flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">chat</span>
-          <span>Notificar</span>
-        </a>
-      </div>
-
-      <!-- PDF Download/Save explicitly triggers -->
-      <div class="flex gap-2">
-        <button (click)="downloadPdf(rec)" class="flex-1 px-3 py-2 border border-md-outline/30 hover:bg-md-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-md-primary">
-          <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
-          <span>{{ i18n.translate('actions.downloadPdf') }}</span>
-        </button>
-        <button (click)="persistPdf(rec)" class="flex-1 px-3 py-2 border border-md-outline/30 hover:bg-md-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-md-primary">
-          <span class="material-symbols-outlined text-sm">cloud_upload</span>
-          <span>{{ i18n.translate('actions.savePdf') }}</span>
-        </button>
-      </div>
-
-      <!-- General Info -->
-      <div class="space-y-4 text-sm">
-        <div>
-          <p class="text-xs font-bold text-md-on-surface-variant">Cliente / Vehículo</p>
-          <p class="font-semibold">{{ getCustomerName(rec.customer) }} - {{ getVehiclePlate(rec.vehicle) }}</p>
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-2 pb-4 border-b">
+          @if (rec.pendingAmount > 0) {
+            <button (click)="openPaymentModal()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xs flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs font-bold">add_card</span>
+              <span>Abonar Pago</span>
+            </button>
+          }
+          <a [href]="getWhatsAppLink(rec)" target="_blank" class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg text-xs flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs">chat</span>
+            <span>Notificar</span>
+          </a>
         </div>
-        <div *ngIf="rec.notes">
-          <p class="text-xs font-bold text-md-on-surface-variant">Observaciones</p>
-          <p class="text-xs p-2 border bg-md-surface-variant/10 rounded-lg italic">"{{ rec.notes }}"</p>
+        <!-- PDF Download/Save explicitly triggers -->
+        <div class="flex gap-2">
+          <button (click)="downloadPdf(rec)" class="flex-1 px-3 py-2 border border-md-outline/30 hover:bg-md-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-md-primary">
+            <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+            <span>{{ i18n.translate('actions.downloadPdf') }}</span>
+          </button>
+          <button (click)="persistPdf(rec)" class="flex-1 px-3 py-2 border border-md-outline/30 hover:bg-md-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-md-primary">
+            <span class="material-symbols-outlined text-sm">cloud_upload</span>
+            <span>{{ i18n.translate('actions.savePdf') }}</span>
+          </button>
         </div>
-      </div>
-
-      <!-- Financial Calculations summary -->
-      <div class="space-y-1.5 pt-4 border-t text-sm font-semibold text-md-on-surface-variant bg-md-surface-variant/5 p-4 rounded-2xl border">
-        <div class="flex justify-between text-xs">
-          <span>Subtotal</span>
-          <span>${{ rec.subtotal | number:'1.2-2' }}</span>
-        </div>
-        <div class="flex justify-between text-xs text-md-error">
-          <span>Descuento (-)</span>
-          <span>${{ rec.discountAmount | number:'1.2-2' }}</span>
-        </div>
-        <div class="flex justify-between text-xs">
-          <span>Impuestos (+)</span>
-          <span>${{ rec.taxAmount | number:'1.2-2' }}</span>
-        </div>
-        <div class="flex justify-between text-sm font-bold border-t pt-1.5 mt-1.5">
-          <span>Total Facturado</span>
-          <span>${{ rec.total | number:'1.2-2' }}</span>
-        </div>
-        <div class="flex justify-between text-xs text-green-600">
-          <span>Total Abonado</span>
-          <span>${{ rec.paidAmount | number:'1.2-2' }}</span>
-        </div>
-        <div class="flex justify-between text-base font-black text-md-error border-t border-dashed pt-2 mt-2">
-          <span>Pendiente de Pago</span>
-          <span>${{ rec.pendingAmount | number:'1.2-2' }}</span>
-        </div>
-      </div>
-
-      <!-- Payments Log Sub-list -->
-      <div class="space-y-3 pt-4 border-t">
-        <p class="text-sm font-bold text-md-on-surface-variant">Historial de Abonos / Pagos</p>
-
-        <div *ngIf="!rec.payments || rec.payments.length === 0" class="text-xs text-center text-md-on-surface-variant py-3 bg-md-surface-variant/10 rounded-xl">
-          Sin transacciones registradas.
-        </div>
-
-        <div *ngIf="rec.payments && rec.payments.length > 0" class="space-y-2">
-          <div *ngFor="let p of rec.payments" class="p-3 bg-md-surface-variant/20 border rounded-2xl flex flex-col gap-1 text-xs">
-            <div class="flex justify-between">
-              <span class="font-bold text-green-600">${{ p.amount | number:'1.2-2' }}</span>
-              <span class="badge badge-secondary text-[10px] uppercase font-mono">{{ p.paymentMethod }}</span>
+        <!-- General Info -->
+        <div class="space-y-4 text-sm">
+          <div>
+            <p class="text-xs font-bold text-md-on-surface-variant">Cliente / Vehículo</p>
+            <p class="font-semibold">{{ getCustomerName(rec.customer) }} - {{ getVehiclePlate(rec.vehicle) }}</p>
+          </div>
+          @if (rec.notes) {
+            <div>
+              <p class="text-xs font-bold text-md-on-surface-variant">Observaciones</p>
+              <p class="text-xs p-2 border bg-md-surface-variant/10 rounded-lg italic">"{{ rec.notes }}"</p>
             </div>
-            <div class="flex justify-between text-[10px] text-md-on-surface-variant mt-1">
-              <span>Ref: {{ p.reference || 'N/A' }}</span>
-              <span>{{ p.paymentDate }}</span>
-            </div>
+          }
+        </div>
+        <!-- Financial Calculations summary -->
+        <div class="space-y-1.5 pt-4 border-t text-sm font-semibold text-md-on-surface-variant bg-md-surface-variant/5 p-4 rounded-2xl border">
+          <div class="flex justify-between text-xs">
+            <span>Subtotal</span>
+            <span>${{ rec.subtotal | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-xs text-md-error">
+            <span>Descuento (-)</span>
+            <span>${{ rec.discountAmount | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span>Impuestos (+)</span>
+            <span>${{ rec.taxAmount | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-sm font-bold border-t pt-1.5 mt-1.5">
+            <span>Total Facturado</span>
+            <span>${{ rec.total | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-xs text-green-600">
+            <span>Total Abonado</span>
+            <span>${{ rec.paidAmount | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between text-base font-black text-md-error border-t border-dashed pt-2 mt-2">
+            <span>Pendiente de Pago</span>
+            <span>${{ rec.pendingAmount | number:'1.2-2' }}</span>
           </div>
         </div>
+        <!-- Payments Log Sub-list -->
+        <div class="space-y-3 pt-4 border-t">
+          <p class="text-sm font-bold text-md-on-surface-variant">Historial de Abonos / Pagos</p>
+          @if (!rec.payments || rec.payments.length === 0) {
+            <div class="text-xs text-center text-md-on-surface-variant py-3 bg-md-surface-variant/10 rounded-xl">
+              Sin transacciones registradas.
+            </div>
+          }
+          @if (rec.payments && rec.payments.length > 0) {
+            <div class="space-y-2">
+              @for (p of rec.payments; track p) {
+                <div class="p-3 bg-md-surface-variant/20 border rounded-2xl flex flex-col gap-1 text-xs">
+                  <div class="flex justify-between">
+                    <span class="font-bold text-green-600">${{ p.amount | number:'1.2-2' }}</span>
+                    <span class="badge badge-secondary text-[10px] uppercase font-mono">{{ p.paymentMethod }}</span>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-md-on-surface-variant mt-1">
+                    <span>Ref: {{ p.reference || 'N/A' }}</span>
+                    <span>{{ p.paymentDate }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
       </div>
-    </div>
+    }
   </div>
 </div>
 
@@ -205,7 +220,9 @@
           <label class="text-xs font-bold text-md-on-surface-variant">Desde Orden de Trabajo (Referencia)</label>
           <select (change)="onOrderReferenceChange($event)" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl text-sm">
             <option value="">-- Manual (Sin referencia) --</option>
-            <option *ngFor="let o of workOrders()" [value]="o.id">Orden {{ o.code }} (${{ o.grandTotal }})</option>
+            @for (o of workOrders(); track o) {
+              <option [value]="o.id">Orden {{ o.code }} (${{ o.grandTotal }})</option>
+            }
           </select>
         </div>
 
@@ -214,21 +231,27 @@
           <label class="text-xs font-bold text-md-on-surface-variant">Desde Presupuesto Aprobado (Referencia)</label>
           <select (change)="onEstimateReferenceChange($event)" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl text-sm">
             <option value="">-- Manual (Sin referencia) --</option>
-            <option *ngFor="let e of estimates()" [value]="e.id">Presupuesto {{ e.code }} (${{ e.total }})</option>
+            @for (e of estimates(); track e) {
+              <option [value]="e.id">Presupuesto {{ e.code }} (${{ e.total }})</option>
+            }
           </select>
         </div>
 
         <div class="flex flex-col gap-1">
           <label class="text-xs font-bold text-md-on-surface-variant">Cliente *</label>
           <select [(ngModel)]="formModel.customer" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl text-sm" required>
-            <option *ngFor="let c of customers()" [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+            @for (c of customers(); track c) {
+              <option [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
+            }
           </select>
         </div>
 
         <div class="flex flex-col gap-1">
           <label class="text-xs font-bold text-md-on-surface-variant">Vehículo *</label>
           <select [(ngModel)]="formModel.vehicle" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl text-sm" required>
-            <option *ngFor="let v of vehicles()" [value]="v.id">{{ v.brand }} {{ v.model }} ({{ v.plate }})</option>
+            @for (v of vehicles(); track v) {
+              <option [value]="v.id">{{ v.brand }} {{ v.model }} ({{ v.plate }})</option>
+            }
           </select>
         </div>
 

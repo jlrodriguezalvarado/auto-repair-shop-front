@@ -17,15 +17,17 @@
           placeholder="Ingrese su usuario..."
           class="px-4 py-3 bg-md-surface border border-md-outline/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-md-primary text-base transition-all"
           required>
-      </div>
+        </div>
 
-      <button
-        type="submit"
-        [disabled]="loading() || !username"
-        class="w-full py-3 px-4 bg-md-primary hover:bg-md-primary/95 text-md-on-primary font-bold rounded-xl transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base">
-        <span *ngIf="loading()" class="animate-spin rounded-full h-5 w-5 border-2 border-md-on-primary border-t-transparent"></span>
-        <span>Iniciar Sesión</span>
-      </button>
-    </form>
+        <button
+          type="submit"
+          [disabled]="loading() || !username"
+          class="w-full py-3 px-4 bg-md-primary hover:bg-md-primary/95 text-md-on-primary font-bold rounded-xl transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base">
+          @if (loading()) {
+            <span class="animate-spin rounded-full h-5 w-5 border-2 border-md-on-primary border-t-transparent"></span>
+          }
+          <span>Iniciar Sesión</span>
+        </button>
+      </form>
+    </div>
   </div>
-</div>
