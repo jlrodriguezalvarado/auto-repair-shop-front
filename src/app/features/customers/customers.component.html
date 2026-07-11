@@ -1,0 +1,280 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-3xl font-bold tracking-tight">{{ i18n.translate('nav.customers') }}</h2>
+      <p class="text-sm text-md-on-surface-variant">Gestione los clientes y sus vehículos asociados</p>
+    </div>
+    <button
+      (click)="openCreateModal()"
+      class="flex items-center justify-center gap-2 px-5 py-3 bg-md-primary hover:bg-md-primary/95 text-md-on-primary font-bold rounded-2xl shadow-sm transition-colors duration-200">
+      <span class="material-symbols-outlined text-sm">person_add</span>
+      <span>{{ i18n.translate('actions.create') }}</span>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Listing (Left side span 2 if detail is active, else span 3) -->
+    <div [ngClass]="selectedCustomer() ? 'lg:col-span-2' : 'lg:col-span-3'" class="space-y-6 transition-all">
+      <!-- Search & Filters -->
+      <div class="p-4 bg-md-surface border border-md-outline/10 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div class="relative w-full md:max-w-md">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="loadCustomers()"
+            placeholder="Buscar por nombre, teléfono, documento o email..."
+            class="w-full pl-10 pr-4 py-2 bg-md-surface border border-md-outline/30 rounded-xl focus:ring-2 focus:ring-md-primary focus:outline-none text-sm transition-all">
+          <span class="material-symbols-outlined absolute left-3 top-2 text-md-outline text-xl">search</span>
+        </div>
+
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <label class="text-xs font-bold text-md-on-surface-variant whitespace-nowrap">Estado:</label>
+          <select (change)="loadCustomers()" [(ngModel)]="activeFilter" class="w-full md:w-44 px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl text-sm">
+            <option value="all">Todos</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- State views -->
+      <app-loading *ngIf="loading()"></app-loading>
+      <app-error *ngIf="error()" [message]="error()!" (retry)="loadCustomers()"></app-error>
+      <app-empty *ngIf="!loading() && !error() && customers().length === 0"></app-empty>
+
+      <!-- Table -->
+      <div *ngIf="!loading() && !error() && customers().length > 0" class="bg-md-surface border border-md-outline/10 rounded-3xl overflow-hidden shadow-sm animate-fadeIn">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="bg-md-surface-variant/20 border-b border-md-outline/15 text-md-on-surface-variant font-bold">
+                <th class="p-4">Cliente</th>
+                <th class="p-4">Cédula/ID</th>
+                <th class="p-4">Teléfono</th>
+                <th class="p-4">Email</th>
+                <th class="p-4 text-center">Estado</th>
+                <th class="p-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let customer of customers()"
+                (click)="viewDetail(customer)"
+                [ngClass]="selectedCustomer()?.id === customer.id ? 'bg-md-primary-container/20 border-l-4 border-l-md-primary' : ''"
+                class="border-b border-md-outline/5 hover:bg-md-surface-variant/10 transition-colors cursor-pointer">
+                <td class="p-4 font-semibold text-md-on-surface">{{ customer.firstName }} {{ customer.lastName }}</td>
+                <td class="p-4 text-md-on-surface-variant">{{ customer.documentId }}</td>
+                <td class="p-4 text-md-on-surface-variant">{{ customer.phone }}</td>
+                <td class="p-4 text-md-on-surface-variant truncate max-w-[120px]">{{ customer.email }}</td>
+                <td class="p-4 text-center">
+                  <span [ngClass]="customer.isActive ? 'badge-primary' : 'badge-error'" class="badge">
+                    {{ customer.isActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td class="p-4 text-right flex justify-end gap-1" (click)="$event.stopPropagation()">
+                  <button (click)="openEditModal(customer, $event)" class="p-2 text-md-primary hover:bg-md-primary-container/20 rounded-lg transition-colors" title="Editar">
+                    <span class="material-symbols-outlined text-xl">edit</span>
+                  </button>
+                  <button *ngIf="customer.isActive" (click)="deactivateCustomer(customer, $event)" class="p-2 text-md-error hover:bg-md-error-container/20 rounded-lg transition-colors" title="Desactivar">
+                    <span class="material-symbols-outlined text-xl">block</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Detail Sidebar Pane (Right side) -->
+    <div *ngIf="selectedCustomer() as cust" class="p-6 bg-md-surface border border-md-outline/10 rounded-3xl space-y-6 shadow-md animate-slideIn">
+      <div class="flex items-center justify-between border-b pb-4">
+        <h3 class="text-xl font-bold flex items-center gap-2">
+          <span class="material-symbols-outlined text-md-primary">contact_page</span>
+          <span>Ficha de Cliente</span>
+        </h3>
+        <button (click)="closeDetail()" class="p-1 hover:bg-md-surface-variant/50 rounded-lg transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Info details -->
+      <div class="space-y-4 text-sm">
+        <div>
+          <p class="text-xs font-bold text-md-on-surface-variant">Nombre</p>
+          <p class="font-semibold text-base">{{ cust.firstName }} {{ cust.lastName }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-md-on-surface-variant">Documento / Cédula</p>
+          <p class="font-semibold">{{ cust.documentId }}</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs font-bold text-md-on-surface-variant">Teléfono</p>
+            <p class="font-semibold">{{ cust.phone }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-md-on-surface-variant">Teléfono Secundario</p>
+            <p class="font-semibold">{{ cust.secondaryPhone || '-' }}</p>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-md-on-surface-variant">Email</p>
+          <p class="font-semibold truncate">{{ cust.email }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-md-on-surface-variant">Dirección</p>
+          <p>{{ cust.address }}</p>
+        </div>
+        <div *ngIf="cust.notes">
+          <p class="text-xs font-bold text-md-on-surface-variant">Notas</p>
+          <p class="text-xs bg-md-surface-variant/20 p-2.5 rounded-lg border italic">{{ cust.notes }}</p>
+        </div>
+      </div>
+
+      <!-- Associated Vehicles List -->
+      <div class="space-y-3 pt-4 border-t">
+        <div class="flex justify-between items-center">
+          <p class="text-sm font-bold text-md-on-surface-variant">Vehículos Asociados</p>
+          <button (click)="openAddVehicleModal()" class="text-xs font-bold text-md-primary flex items-center gap-1 hover:underline">
+            <span class="material-symbols-outlined text-xs">add</span>
+            <span>Añadir Vehículo</span>
+          </button>
+        </div>
+
+        <app-loading *ngIf="loadingVehicles()"></app-loading>
+
+        <div *ngIf="!loadingVehicles() && associatedVehicles().length === 0" class="text-xs text-center text-md-on-surface-variant py-4 bg-md-surface-variant/10 rounded-xl">
+          Sin vehículos vinculados.
+        </div>
+
+        <div *ngIf="!loadingVehicles() && associatedVehicles().length > 0" class="space-y-2">
+          <div *ngFor="let veh of associatedVehicles()" class="p-3 bg-md-surface-variant/20 border rounded-2xl flex items-center justify-between text-xs">
+            <div>
+              <p class="font-bold text-sm text-md-on-surface">{{ veh.brand }} {{ veh.model }} ({{ veh.year }})</p>
+              <p class="text-xs text-md-on-surface-variant font-mono">VIN: {{ veh.vin || '-' }}</p>
+            </div>
+            <span class="px-2 py-1 bg-md-primary-container text-md-on-primary-container font-extrabold rounded-md uppercase tracking-wider">
+              {{ veh.plate }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Customer Modal -->
+<ng-template #customerModalDirective="appDialogForm" appDialogForm>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="relative bg-md-surface text-md-on-surface rounded-3xl max-w-md w-full p-6 shadow-2xl border border-md-outline/15 flex flex-col gap-4 animate-scaleUp">
+      <h3 class="text-xl font-bold border-b pb-3">{{ modalTitle() }}</h3>
+
+      <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-md-on-surface-variant">Nombre *</label>
+            <input type="text" [(ngModel)]="formModel.firstName" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none" required>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-md-on-surface-variant">Apellido *</label>
+            <input type="text" [(ngModel)]="formModel.lastName" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none" required>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-md-on-surface-variant">ID / Cédula *</label>
+          <input type="text" [(ngModel)]="formModel.documentId" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none" required>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-md-on-surface-variant">Teléfono Principal *</label>
+            <input type="text" [(ngModel)]="formModel.phone" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none" required>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-md-on-surface-variant">Teléfono Secundario</label>
+            <input type="text" [(ngModel)]="formModel.secondaryPhone" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none">
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-md-on-surface-variant">Email</label>
+          <input type="email" [(ngModel)]="formModel.email" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none">
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-md-on-surface-variant">Dirección Completa</label>
+          <textarea rows="2" [(ngModel)]="formModel.address" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none"></textarea>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-md-on-surface-variant">Notas internas</label>
+          <textarea rows="2" [(ngModel)]="formModel.notes" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none"></textarea>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-3 border-t">
+        <button (click)="customerDialog().close()" class="px-4 py-2 text-sm font-semibold text-md-primary hover:bg-md-surface-variant/50 rounded-lg transition-colors">
+          {{ i18n.translate('actions.cancel') }}
+        </button>
+        <button (click)="saveCustomer()" class="px-4 py-2 text-sm font-semibold bg-md-primary hover:bg-md-primary/95 text-md-on-primary rounded-lg transition-colors">
+          {{ i18n.translate('actions.save') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Associated Vehicle Creation Modal -->
+<ng-template #vehicleModalDirective="appDialogForm" appDialogForm>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="relative bg-md-surface text-md-on-surface rounded-3xl max-w-md w-full p-6 shadow-2xl border border-md-outline/15 flex flex-col gap-4 animate-scaleUp">
+      <h3 class="text-xl font-bold border-b pb-3">Registrar Nuevo Vehículo</h3>
+
+      <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-md-on-surface-variant">Placa *</label>
+            <input type="text" [(ngModel)]="vehicleFormModel.plate" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none uppercase" required>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-md-on-surface-variant">Marca *</label>
+            <input type="text" [(ngModel)]="vehicleFormModel.brand" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none" required>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-md-on-surface-variant">Modelo *</label>
+            <input type="text" [(ngModel)]="vehicleFormModel.model" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none" required>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-md-on-surface-variant">Año</label>
+            <input type="number" [(ngModel)]="vehicleFormModel.year" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none">
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-md-on-surface-variant">Color</label>
+          <input type="text" [(ngModel)]="vehicleFormModel.color" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none">
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-md-on-surface-variant">Observaciones / Detalles visuales</label>
+          <textarea rows="2" [(ngModel)]="vehicleFormModel.notes" class="px-3 py-2 border border-md-outline/30 bg-md-surface rounded-xl focus:ring-1 focus:ring-md-primary text-sm focus:outline-none"></textarea>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-3 border-t">
+        <button (click)="vehicleDialog().close()" class="px-4 py-2 text-sm font-semibold text-md-primary hover:bg-md-surface-variant/50 rounded-lg transition-colors">
+          {{ i18n.translate('actions.cancel') }}
+        </button>
+        <button (click)="saveVehicle()" class="px-4 py-2 text-sm font-semibold bg-md-primary hover:bg-md-primary/95 text-md-on-primary rounded-lg transition-colors">
+          {{ i18n.translate('actions.save') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

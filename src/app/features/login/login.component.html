@@ -1,0 +1,31 @@
+<div class="flex items-center justify-center min-h-screen bg-md-background p-4">
+  <div class="bg-md-surface p-8 rounded-2xl shadow-2xl border border-md-outline/15 max-w-md w-full flex flex-col gap-6 animate-fadeIn">
+    <div class="flex flex-col items-center gap-2">
+      <span class="material-symbols-outlined text-md-primary text-6xl">build_circle</span>
+      <h1 class="text-3xl font-extrabold tracking-tight">App Taller Mecánico</h1>
+      <p class="text-sm text-md-on-surface-variant text-center">Inicie sesión con un nombre de usuario de prueba (p. ej. admin, sec, mech, cust)</p>
+    </div>
+
+    <form (submit)="onSubmit()" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label for="username" class="text-sm font-bold text-md-on-surface-variant">Usuario</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="username"
+          placeholder="Ingrese su usuario..."
+          class="px-4 py-3 bg-md-surface border border-md-outline/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-md-primary text-base transition-all"
+          required>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loading() || !username"
+        class="w-full py-3 px-4 bg-md-primary hover:bg-md-primary/95 text-md-on-primary font-bold rounded-xl transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base">
+        <span *ngIf="loading()" class="animate-spin rounded-full h-5 w-5 border-2 border-md-on-primary border-t-transparent"></span>
+        <span>Iniciar Sesión</span>
+      </button>
+    </form>
+  </div>
+</div>
