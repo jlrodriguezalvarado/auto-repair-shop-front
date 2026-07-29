@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { keysToCamel, keysToSnake } from './case-mapper';
+import { environment } from '../../../environments/environment';
 
 export interface PaginatedResponse<T> {
   count: number;
@@ -16,7 +17,7 @@ export interface PaginatedResponse<T> {
 })
 export class ApiService {
   private http = inject(HttpClient);
-  private baseUrl = '/api';
+  private baseUrl = environment.apiUrl;
 
   get<T>(endpoint: string, params?: any): Observable<T> {
     let httpParams = new HttpParams();
