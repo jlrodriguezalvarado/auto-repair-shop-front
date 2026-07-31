@@ -4,12 +4,14 @@
     <div>
       <p class="text-body-md text-on-surface-variant">Facturación, emisión de recibos y registro de pagos móviles o divisas</p>
     </div>
-    <button
-      (click)="openCreateManualModal()"
-      class="btn-cta flex items-center justify-center gap-sm px-md py-xs">
-      <span class="material-symbols-outlined text-sm">receipt</span>
-      <span>{{ i18n.translate('actions.create') }} Manual</span>
-    </button>
+    @if (auth.canMutateTenantData()) {
+      <button
+        (click)="openCreateManualModal()"
+        class="btn-cta flex items-center justify-center gap-sm px-md py-xs">
+        <span class="material-symbols-outlined text-sm">receipt</span>
+        <span>{{ i18n.translate('actions.create') }} Manual</span>
+      </button>
+    }
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -35,6 +37,14 @@
             @for (c of customers(); track c) {
               <option [value]="c.id">{{ c.firstName }} {{ c.lastName }}</option>
             }
+          </select>
+        </div>
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <label class="text-xs font-bold text-on-surface-variant whitespace-nowrap">Registro:</label>
+          <select (change)="loadReceipts()" [(ngModel)]="deletedFilter" class="w-full md:w-40 px-3 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-sm">
+            <option value="all">Todos</option>
+            <option value="false">Activos</option>
+            <option value="true">Eliminados</option>
           </select>
         </div>
       </div>
@@ -63,6 +73,7 @@
                   <th class="p-4">Abonado</th>
                   <th class="p-4">Pendiente</th>
                   <th class="p-4 text-center">Estado</th>
+                  <th class="p-4 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -88,6 +99,24 @@
                   }" class="badge">
                         {{ i18n.translate('status.' + rec.status) }}
                       </span>
+                    </td>
+                    <td class="p-4 text-right flex justify-end gap-1" (click)="$event.stopPropagation()">
+                      @if (auth.canMutateTenantData()) {
+                        @if (!rec.deletedAt) {
+                          <button (click)="deleteReceipt(rec, $event)" class="p-2 text-error hover:bg-error-container/20 rounded-lg transition-colors" title="Eliminar">
+                            <span class="material-symbols-outlined text-xl">delete</span>
+                          </button>
+                        } @else {
+                          <button (click)="restoreReceipt(rec, $event)" class="p-2 text-primary hover:bg-primary-container/20 rounded-lg transition-colors" [title]="i18n.translate('actions.restore')">
+                            <span class="material-symbols-outlined text-xl">restore_from_trash</span>
+                          </button>
+                          @if (auth.hasRole(['ADMIN'])) {
+                            <button (click)="hardDeleteReceipt(rec, $event)" class="p-2 text-error hover:bg-error-container/20 rounded-lg transition-colors" [title]="i18n.translate('actions.hardDelete')">
+                              <span class="material-symbols-outlined text-xl">delete_forever</span>
+                            </button>
+                          }
+                        }
+                      }
                     </td>
                   </tr>
                 }
@@ -115,7 +144,7 @@
         </div>
         <!-- Action Buttons -->
         <div class="flex flex-wrap gap-2 pb-4 border-b">
-          @if (rec.pendingAmount > 0) {
+          @if (auth.canMutateTenantData() && rec.pendingAmount > 0) {
             <button (click)="openPaymentModal()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-xs flex items-center gap-1">
               <span class="material-symbols-outlined text-xs font-bold">add_card</span>
               <span>Abonar Pago</span>
@@ -132,10 +161,12 @@
             <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
             <span>{{ i18n.translate('actions.downloadPdf') }}</span>
           </button>
-          <button (click)="persistPdf(rec)" class="flex-1 px-3 py-2 border border-outline-variant/30 hover:bg-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-primary">
-            <span class="material-symbols-outlined text-sm">cloud_upload</span>
-            <span>{{ i18n.translate('actions.savePdf') }}</span>
-          </button>
+          @if (auth.canMutateTenantData()) {
+            <button (click)="persistPdf(rec)" class="flex-1 px-3 py-2 border border-outline-variant/30 hover:bg-surface-variant/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 text-primary">
+              <span class="material-symbols-outlined text-sm">cloud_upload</span>
+              <span>{{ i18n.translate('actions.savePdf') }}</span>
+            </button>
+          }
         </div>
         <!-- General Info -->
         <div class="space-y-4 text-sm">

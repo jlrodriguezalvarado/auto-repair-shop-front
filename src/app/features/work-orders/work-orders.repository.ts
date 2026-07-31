@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/api/api.service';
 import { ENDPOINTS } from '../../core/api/endpoints';
-import { WorkOrder, WorkOrderService, WorkOrderItem } from '../../core/api/models';
+import { DeletedFilter, WorkOrder, WorkOrderService, WorkOrderItem } from '../../core/api/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class WorkOrdersRepository {
   private api = inject(ApiService);
 
-  list(params?: { status?: string; customer?: number | string; vehicle?: number | string }): Observable<PaginatedResponse<WorkOrder>> {
+  list(params?: { status?: string; customer?: number | string; vehicle?: number | string; deleted?: DeletedFilter }): Observable<PaginatedResponse<WorkOrder>> {
     return this.api.get<PaginatedResponse<WorkOrder>>(ENDPOINTS.workOrders.list, params);
   }
 
@@ -26,8 +26,16 @@ export class WorkOrdersRepository {
     return this.api.put<WorkOrder>(ENDPOINTS.workOrders.detail(id), order);
   }
 
-  delete(id: number | string): Observable<any> {
-    return this.api.delete<any>(ENDPOINTS.workOrders.detail(id));
+  delete(id: number | string): Observable<void> {
+    return this.api.delete<void>(ENDPOINTS.workOrders.detail(id));
+  }
+
+  restore(id: number | string): Observable<WorkOrder> {
+    return this.api.post<WorkOrder>(ENDPOINTS.workOrders.restore(id), {});
+  }
+
+  hardDelete(id: number | string): Observable<void> {
+    return this.api.post<void>(ENDPOINTS.workOrders.hardDelete(id), {});
   }
 
   changeStatus(id: number | string, status: string): Observable<WorkOrder> {

@@ -1,11 +1,44 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router, CanActivateFn } from '@angular/router';
 import { ApiService } from '../api/api.service';
 import { ENDPOINTS } from '../api/endpoints';
-import { User } from '../api/models';
+import { User, UserRole, CompanyBrief } from '../api/models';
 import { ToastService } from '../../shared/services/toast.service';
-import { Observable } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { PushNotificationService } from '../push/push-notification.service';
+import { Observable, of } from 'rxjs';
+import { tap, catchError, switchMap } from 'rxjs/operators';
+
+interface LoginResponse {
+  access: string;
+  refresh?: string;
+  user?: User;
+}
+
+const VIEWING_COMPANY_KEY = 'auth_viewing_company';
+
+function extractAuthErrorCode(err: unknown): string | null {
+  if (!(err instanceof HttpErrorResponse) || !err.error || typeof err.error !== 'object') {
+    return null;
+  }
+  const body = err.error as Record<string, unknown>;
+  if (typeof body['code'] === 'string') {
+    return body['code'];
+  }
+  const detail = body['detail'];
+  if (detail && typeof detail === 'object' && typeof (detail as Record<string, unknown>)['code'] === 'string') {
+    return (detail as Record<string, unknown>)['code'] as string;
+  }
+  if (typeof detail === 'string') {
+    if (detail.toLowerCase().includes('account has been deleted')) {
+      return 'user_deleted';
+    }
+    if (detail.toLowerCase().includes('company is unavailable')) {
+      return 'company_deleted';
+    }
+  }
+  return null;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -14,49 +47,144 @@ export class AuthService {
   private api = inject(ApiService);
   private router = inject(Router);
   private toast = inject(ToastService);
-
+  private push = inject(PushNotificationService);
   private currentUser = signal<User | null>(null);
   private token = signal<string | null>(null);
-
+  private viewingCompanySignal = signal<CompanyBrief | null>(null);
   readonly user = this.currentUser.asReadonly();
   readonly jwtToken = this.token.asReadonly();
+  readonly viewingCompany = this.viewingCompanySignal.asReadonly();
+  readonly isReadOnlyCompanyView = computed(
+    () => this.currentUser()?.role === 'SUPER_ADMIN' && this.viewingCompanySignal() !== null
+  );
+  readonly canMutateTenantData = computed(() => !this.isReadOnlyCompanyView());
 
   constructor() {
     const savedToken = localStorage.getItem('auth_token');
     const savedUser = localStorage.getItem('auth_user');
     if (savedToken && savedUser) {
       this.token.set(savedToken);
-      this.currentUser.set(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser) as User;
+      this.currentUser.set(parsedUser);
+      this.restoreViewingCompany(parsedUser);
+      this.api.get<User>(ENDPOINTS.auth.me).subscribe({
+        next: (user) => {
+          this.currentUser.set(user);
+          localStorage.setItem('auth_user', JSON.stringify(user));
+          this.restoreViewingCompany(user);
+        },
+        error: () => {
+          // jwtInterceptor logs out on 401
+        },
+      });
     }
   }
 
-  login(username: string): Observable<any> {
-    return this.api.post<any>(ENDPOINTS.auth.login, { username, password: 'password123' }).pipe(
-      tap(res => {
+  login(username: string, password: string): Observable<User> {
+    return this.api.post<LoginResponse>(ENDPOINTS.auth.login, { username, password }).pipe(
+      switchMap((res) => {
+        this.clearViewingCompany();
         this.token.set(res.access);
-        this.currentUser.set(res.user);
         localStorage.setItem('auth_token', res.access);
-        localStorage.setItem('auth_user', JSON.stringify(res.user));
-        this.toast.success(`¡Bienvenido de vuelta, ${res.user.username}!`);
+        if (res.refresh) {
+          localStorage.setItem('auth_refresh', res.refresh);
+        }
+        if (res.user) {
+          return of(res.user);
+        }
+        return this.api.get<User>(ENDPOINTS.auth.me);
       }),
-      catchError(err => {
-        this.toast.error('Nombre de usuario o contraseña incorrectos.');
+      tap((user) => {
+        this.clearViewingCompany();
+        this.currentUser.set(user);
+        localStorage.setItem('auth_user', JSON.stringify(user));
+        this.toast.success(`¡Bienvenido de vuelta, ${user.username}!`);
+        void this.push.registerAfterLogin();
+      }),
+      catchError((err) => {
+        this.clearViewingCompany();
+        this.token.set(null);
+        this.currentUser.set(null);
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_refresh');
+        localStorage.removeItem('auth_user');
+        const code = extractAuthErrorCode(err);
+        if (code === 'user_deleted') {
+          this.toast.error('Esta cuenta ha sido eliminada.');
+        } else if (code === 'company_deleted') {
+          this.toast.error('Su empresa no está disponible. Contacte al administrador.');
+        } else {
+          this.toast.error('Nombre de usuario o contraseña incorrectos.');
+        }
         throw err;
       })
     );
   }
 
-  logout(): void {
+  changePassword(payload: {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Observable<{ detail: string }> {
+    return this.api.post<{ detail: string }>(ENDPOINTS.auth.changePassword, payload);
+  }
+
+  enterCompanyView(company: CompanyBrief | { id: number; name: string }): void {
+    const brief: CompanyBrief = { id: company.id, name: company.name };
+    this.viewingCompanySignal.set(brief);
+    localStorage.setItem(VIEWING_COMPANY_KEY, JSON.stringify(brief));
+    this.router.navigate(['/dashboard']);
+  }
+
+  exitCompanyView(): void {
+    this.clearViewingCompany();
+    this.router.navigate(['/companies']);
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await this.push.unsubscribeOnLogout(true);
+    } catch {
+      // ignore push cleanup errors on logout
+    }
+    this.clearViewingCompany();
     this.token.set(null);
     this.currentUser.set(null);
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_refresh');
     localStorage.removeItem('auth_user');
     this.router.navigate(['/login']);
   }
 
-  hasRole(roles: string[]): boolean {
+  hasRole(roles: UserRole[]): boolean {
     const user = this.currentUser();
     return user ? roles.includes(user.role) : false;
+  }
+
+  private clearViewingCompany(): void {
+    this.viewingCompanySignal.set(null);
+    localStorage.removeItem(VIEWING_COMPANY_KEY);
+  }
+
+  private restoreViewingCompany(user: User): void {
+    if (user.role !== 'SUPER_ADMIN') {
+      this.clearViewingCompany();
+      return;
+    }
+    const raw = localStorage.getItem(VIEWING_COMPANY_KEY);
+    if (!raw) {
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw) as CompanyBrief;
+      if (typeof parsed?.id === 'number' && typeof parsed?.name === 'string') {
+        this.viewingCompanySignal.set({ id: parsed.id, name: parsed.name });
+        return;
+      }
+    } catch {
+      // ignore invalid storage
+    }
+    this.clearViewingCompany();
   }
 }
 
@@ -70,14 +198,26 @@ export const authGuard: CanActivateFn = (route, state) => {
   return false;
 };
 
-export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
-  return (route, state) => {
+export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
+  return () => {
     const auth = inject(AuthService);
     const router = inject(Router);
     if (auth.user() && auth.hasRole(allowedRoles)) {
       return true;
     }
-    router.navigate(['/dashboard']);
+    if (
+      auth.user() &&
+      auth.isReadOnlyCompanyView() &&
+      (allowedRoles.includes('ADMIN') || allowedRoles.includes('SECRETARY'))
+    ) {
+      return true;
+    }
+    const fallback = auth.isReadOnlyCompanyView()
+      ? '/dashboard'
+      : auth.hasRole(['SUPER_ADMIN'])
+        ? '/companies'
+        : '/dashboard';
+    router.navigate([fallback]);
     return false;
   };
 };

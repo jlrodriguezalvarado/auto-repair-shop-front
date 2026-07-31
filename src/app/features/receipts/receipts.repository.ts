@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/api/api.service';
 import { ENDPOINTS } from '../../core/api/endpoints';
-import { Receipt, ReceiptPayment } from '../../core/api/models';
+import { DeletedFilter, Receipt, ReceiptPayment } from '../../core/api/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class ReceiptsRepository {
   private api = inject(ApiService);
 
-  list(params?: { status?: string; customer?: number | string; vehicle?: number | string }): Observable<PaginatedResponse<Receipt>> {
+  list(params?: { status?: string; customer?: number | string; vehicle?: number | string; deleted?: DeletedFilter }): Observable<PaginatedResponse<Receipt>> {
     return this.api.get<PaginatedResponse<Receipt>>(ENDPOINTS.receipts.list, params);
   }
 
@@ -26,8 +26,16 @@ export class ReceiptsRepository {
     return this.api.put<Receipt>(ENDPOINTS.receipts.detail(id), receipt);
   }
 
-  delete(id: number | string): Observable<any> {
-    return this.api.delete<any>(ENDPOINTS.receipts.detail(id));
+  delete(id: number | string): Observable<void> {
+    return this.api.delete<void>(ENDPOINTS.receipts.detail(id));
+  }
+
+  restore(id: number | string): Observable<Receipt> {
+    return this.api.post<Receipt>(ENDPOINTS.receipts.restore(id), {});
+  }
+
+  hardDelete(id: number | string): Observable<void> {
+    return this.api.post<void>(ENDPOINTS.receipts.hardDelete(id), {});
   }
 
   addPayment(receiptId: number | string, payment: Partial<ReceiptPayment>): Observable<ReceiptPayment> {

@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CustomersRepository } from './customers.repository';
 import { VehiclesRepository } from '../vehicles/vehicles.repository';
-import { CustomerProfile, Vehicle } from '../../core/api/models';
+import { CustomerProfile, Vehicle, DeletedFilter } from '../../core/api/models';
+import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
@@ -23,6 +24,7 @@ import { DialogFormDirective } from '../../shared/directives/dialog-form.directi
 export class CustomersComponent implements OnInit {
   private repository = inject(CustomersRepository);
   private vehiclesRepository = inject(VehiclesRepository);
+  auth = inject(AuthService);
   i18n = inject(I18nService);
   private toast = inject(ToastService);
   private confirm = inject(ConfirmService);
@@ -31,9 +33,9 @@ export class CustomersComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
 
-  // Search/Filters
-  searchQuery = signal('');
-  activeFilter = signal<'all' | 'active' | 'inactive'>('all');
+  // Search/Filters (plain fields for ngModel two-way binding)
+  searchQuery = '';
+  deletedFilter: DeletedFilter = 'false';
 
   // Detail / Associated Vehicles
   selectedCustomer = signal<CustomerProfile | null>(null);
@@ -77,17 +79,14 @@ export class CustomersComponent implements OnInit {
   loadCustomers(): void {
     this.loading.set(true);
     this.error.set(null);
-    const params: any = {};
-    if (this.searchQuery()) {
-      params.search = this.searchQuery();
-    }
-    if (this.activeFilter() !== 'all') {
-      params.isActive = this.activeFilter() === 'active';
+    const params: { search?: string; deleted?: DeletedFilter } = { deleted: this.deletedFilter };
+    if (this.searchQuery) {
+      params.search = this.searchQuery;
     }
 
     this.repository.list(params).subscribe({
       next: (res) => {
-        this.customers.set(res.results);
+        this.customers.set(res.results ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -102,7 +101,7 @@ export class CustomersComponent implements OnInit {
     this.loadingVehicles.set(true);
     this.vehiclesRepository.list({ customer: customer.id }).subscribe({
       next: (res) => {
-        this.associatedVehicles.set(res.results);
+        this.associatedVehicles.set(res.results ?? []);
         this.loadingVehicles.set(false);
       },
       error: () => {
@@ -179,19 +178,63 @@ export class CustomersComponent implements OnInit {
     }
   }
 
-  deactivateCustomer(customer: CustomerProfile, event: Event): void {
+  deleteCustomer(customer: CustomerProfile, event: Event): void {
     event.stopPropagation();
     this.confirm.confirm({
-      title: 'Desactivar Cliente',
-      message: `¿Está seguro de que desea desactivar al cliente "${customer.firstName} ${customer.lastName}"?`
+      title: 'Eliminar Cliente',
+      message: `¿Está seguro de que desea eliminar al cliente "${customer.firstName} ${customer.lastName}"? Podrá restaurarlo después.`
     }).then(approved => {
       if (approved) {
-        this.repository.update(customer.id, { isActive: false }).subscribe({
+        this.repository.delete(customer.id).subscribe({
           next: () => {
-            this.toast.success('Cliente desactivado');
+            this.toast.success('Cliente eliminado');
+            if (this.selectedCustomer()?.id === customer.id) {
+              this.closeDetail();
+            }
             this.loadCustomers();
           },
-          error: () => this.toast.error('Error al desactivar')
+          error: () => this.toast.error('Error al eliminar')
+        });
+      }
+    });
+  }
+
+  restoreCustomer(customer: CustomerProfile, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: 'Restaurar Cliente',
+      message: `¿Restaurar al cliente "${customer.firstName} ${customer.lastName}"?`
+    }).then(approved => {
+      if (approved) {
+        this.repository.restore(customer.id).subscribe({
+          next: () => {
+            this.toast.success('Cliente restaurado');
+            this.loadCustomers();
+          },
+          error: () => this.toast.error('Error al restaurar')
+        });
+      }
+    });
+  }
+
+  hardDeleteCustomer(customer: CustomerProfile, event: Event): void {
+    event.stopPropagation();
+    const name = `${customer.firstName} ${customer.lastName}`;
+    this.confirm.confirm({
+      title: this.i18n.translate('softDelete.hardDeleteTitle'),
+      message: this.i18n.translate('softDelete.hardDeleteMessage', { name }),
+      confirmText: this.i18n.translate('actions.hardDelete')
+    }).then(approved => {
+      if (approved) {
+        this.repository.hardDelete(customer.id).subscribe({
+          next: () => {
+            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+            if (this.selectedCustomer()?.id === customer.id) {
+              this.closeDetail();
+            }
+            this.loadCustomers();
+          },
+          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
         });
       }
     });

@@ -5,24 +5,29 @@ import { keysToSnake, keysToCamel } from './case-mapper';
 import { User, Company, CustomerProfile, Vehicle, ServiceCatalog, WorkOrder, Estimate, Receipt } from './models';
 
 const MOCK_USERS: User[] = [
-  { id: 1, username: 'admin', email: 'admin@taller.com', role: 'Administrator', isActive: true },
-  { id: 2, username: 'sec', email: 'secretary@taller.com', role: 'Secretary', isActive: true },
-  { id: 3, username: 'mech', email: 'mech@taller.com', role: 'Mechanic', isActive: true },
-  { id: 4, username: 'cust', email: 'customer@taller.com', role: 'Customer', isActive: true },
+  { id: 0, username: 'superadmin', email: 'superadmin@saas.com', role: 'SUPER_ADMIN', isActive: true, company: null },
+  { id: 1, username: 'admin', email: 'admin@taller.com', role: 'ADMIN', isActive: true, company: { id: 1, name: 'Taller Mecánico El Chasis Feliz, C.A.' } },
+  { id: 2, username: 'sec', email: 'secretary@taller.com', role: 'SECRETARY', isActive: true, company: { id: 1, name: 'Taller Mecánico El Chasis Feliz, C.A.' } },
+  { id: 3, username: 'mech', email: 'mech@taller.com', role: 'MECHANIC', isActive: true, company: { id: 1, name: 'Taller Mecánico El Chasis Feliz, C.A.' } },
+  { id: 4, username: 'cust', email: 'customer@taller.com', role: 'CUSTOMER', isActive: true, company: { id: 1, name: 'Taller Mecánico El Chasis Feliz, C.A.' } },
 ];
 
-let mockCompany: Company = {
-  id: 1,
-  name: 'Taller Mecánico El Chasis Feliz, C.A.',
-  taxId: 'J-12345678-9',
-  address: 'Calle Principal del Motor, Local 4, Caracas, Venezuela',
-  phone: '+582125551234',
-  secondaryPhone: '+584125551234',
-  email: 'contacto@elchasisfeliz.com',
-  logo: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=200',
-  createdAt: '2026-01-01T08:00:00Z',
-  updatedAt: '2026-01-01T08:00:00Z'
-};
+let mockCompanies: Company[] = [
+  {
+    id: 1,
+    name: 'Taller Mecánico El Chasis Feliz, C.A.',
+    taxId: 'J-12345678-9',
+    address: 'Calle Principal del Motor, Local 4, Caracas, Venezuela',
+    phone: '+582125551234',
+    secondaryPhone: '+584125551234',
+    email: 'contacto@elchasisfeliz.com',
+    logo: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=200',
+    createdAt: '2026-01-01T08:00:00Z',
+    updatedAt: '2026-01-01T08:00:00Z'
+  }
+];
+
+let mockCompany: Company = { ...mockCompanies[0] };
 
 let mockCustomers: CustomerProfile[] = [
   { id: 1, firstName: 'Juan', lastName: 'Pérez', documentId: 'V-12345678', phone: '+584141234567', email: 'juan.perez@gmail.com', address: 'Las Mercedes, Caracas', isActive: true, createdAt: '2026-01-02T10:00:00Z', updatedAt: '2026-01-02T10:00:00Z', notes: 'Cliente frecuente, prefiere repuestos originales.' },
@@ -153,6 +158,26 @@ export const mockApiInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
   }
 
   const endpoint = url.split('/api')[1] || '';
+  const companyHeader = req.headers.get('X-Company-Id');
+  const tenantEndpoints = [
+    '/company/',
+    '/customers/',
+    '/vehicles/',
+    '/service-catalog/',
+    '/catalog/',
+    '/work-orders/',
+    '/estimates/',
+    '/receipts/',
+    '/dashboard/',
+    '/users/users/',
+  ];
+  const isTenantEndpoint = tenantEndpoints.some((p) => endpoint.startsWith(p));
+  const isSafeMethod = method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
+  if (companyHeader && isTenantEndpoint && !isSafeMethod) {
+    return new Observable((observer) =>
+      observer.error({ status: 403, error: { detail: 'Read-only company view' } })
+    );
+  }
 
   const paginate = (array: any[]) => {
     return {
@@ -165,10 +190,10 @@ export const mockApiInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
 
   let responseBody: any = null;
 
-  if (endpoint.startsWith('/auth/login/')) {
+  if (endpoint.startsWith('/users/token/') && !endpoint.includes('refresh')) {
     const body = req.body as any;
     const user = MOCK_USERS.find(u => u.username === body.username || u.email === body.username);
-    if (user) {
+    if (user && body.password) {
       responseBody = {
         access: 'mock-access-token-jwt',
         refresh: 'mock-refresh-token-jwt',
@@ -177,9 +202,9 @@ export const mockApiInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
     } else {
       return new Observable(observer => observer.error({ status: 401, error: { detail: 'Credenciales inválidas' } }));
     }
-  } else if (endpoint.startsWith('/auth/refresh/')) {
+  } else if (endpoint.startsWith('/users/token/refresh/')) {
     responseBody = { access: 'mock-new-access-token-jwt' };
-  } else if (endpoint.startsWith('/auth/me/')) {
+  } else if (endpoint.startsWith('/users/users/me/')) {
     responseBody = MOCK_USERS[0];
   }
 
@@ -218,6 +243,68 @@ export const mockApiInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
         debt: r.pendingAmount
       }))
     };
+  }
+
+  else if (endpoint.startsWith('/companies/')) {
+    const idMatch = endpoint.match(/\/companies\/(\d+)\//);
+    if (idMatch) {
+      const id = parseInt(idMatch[1], 10);
+      const index = mockCompanies.findIndex(c => c.id === id);
+      if (method === 'PUT' || method === 'PATCH') {
+        const body = req.body as any;
+        mockCompanies[index] = { ...mockCompanies[index], ...body, updatedAt: new Date().toISOString() };
+        if (mockCompany.id === id) {
+          mockCompany = { ...mockCompanies[index] };
+        }
+        responseBody = mockCompanies[index];
+      } else if (method === 'DELETE') {
+        mockCompanies = mockCompanies.filter(c => c.id !== id);
+        responseBody = { success: true };
+      } else {
+        responseBody = mockCompanies.find(c => c.id === id);
+      }
+    } else if (method === 'POST') {
+      const body = req.body as any;
+      const newCompany: Company = {
+        id: mockCompanies.length + 1,
+        name: body.name,
+        taxId: body.taxId ?? body.tax_id,
+        address: body.address,
+        phone: body.phone,
+        secondaryPhone: body.secondaryPhone ?? body.secondary_phone,
+        email: body.email,
+        logo: body.logo,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      mockCompanies.push(newCompany);
+      const admin = body.adminUser ?? body.admin_user;
+      if (admin) {
+        MOCK_USERS.push({
+          id: MOCK_USERS.length + 1,
+          username: admin.username,
+          email: admin.email,
+          firstName: admin.firstName ?? admin.first_name,
+          lastName: admin.lastName ?? admin.last_name,
+          role: 'ADMIN',
+          isActive: true,
+          company: { id: newCompany.id, name: newCompany.name }
+        });
+      }
+      responseBody = newCompany;
+    } else {
+      let list = [...mockCompanies];
+      const search = req.params.get('search');
+      if (search) {
+        const s = search.toLowerCase();
+        list = list.filter(c =>
+          c.name.toLowerCase().includes(s) ||
+          c.taxId.toLowerCase().includes(s) ||
+          c.email.toLowerCase().includes(s)
+        );
+      }
+      responseBody = paginate(list);
+    }
   }
 
   else if (endpoint.startsWith('/company/')) {
@@ -602,6 +689,40 @@ export const mockApiInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
     } else {
       responseBody = paginate(MOCK_USERS);
     }
+  }
+
+  else if (endpoint.startsWith('/notifications/push-subscriptions/vapid-public-key/')) {
+    responseBody = { public_key: '' };
+  }
+  else if (endpoint.startsWith('/notifications/push-subscriptions/unsubscribe/')) {
+    responseBody = {};
+  }
+  else if (endpoint.startsWith('/notifications/push-subscriptions/')) {
+    responseBody = method === 'POST'
+      ? { id: 1, endpoint: (req.body as any)?.endpoint, is_active: true }
+      : [];
+  }
+  else if (endpoint.startsWith('/notifications/unread-count/')) {
+    responseBody = { unread_count: 0 };
+  }
+  else if (endpoint.startsWith('/notifications/mark-all-read/')) {
+    responseBody = { updated_count: 0 };
+  }
+  else if (endpoint.match(/\/notifications\/\d+\/mark-read\//)) {
+    responseBody = {
+      id: 1,
+      notification_type: 'work_order.status_changed',
+      title: 'Mock',
+      body: '',
+      data: {},
+      is_read: true,
+      read_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+  }
+  else if (endpoint.startsWith('/notifications/')) {
+    responseBody = paginate([]);
   }
 
   const snakePayload = keysToSnake(responseBody);

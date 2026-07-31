@@ -6,7 +6,8 @@ import { CustomersRepository } from '../customers/customers.repository';
 import { VehiclesRepository } from '../vehicles/vehicles.repository';
 import { WorkOrdersRepository } from '../work-orders/work-orders.repository';
 import { EstimatesRepository } from '../estimates/estimates.repository';
-import { Receipt, CustomerProfile, Vehicle, WorkOrder, Estimate, ReceiptPayment } from '../../core/api/models';
+import { Receipt, CustomerProfile, Vehicle, WorkOrder, Estimate, ReceiptPayment, DeletedFilter } from '../../core/api/models';
+import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
@@ -28,8 +29,8 @@ export class ReceiptsComponent implements OnInit {
   private customersRepository = inject(CustomersRepository);
   private vehiclesRepository = inject(VehiclesRepository);
   private workOrdersRepository = inject(WorkOrdersRepository);
+  auth = inject(AuthService);
   private estimatesRepository = inject(EstimatesRepository);
-
   i18n = inject(I18nService);
   private toast = inject(ToastService);
   private confirm = inject(ConfirmService);
@@ -46,6 +47,7 @@ export class ReceiptsComponent implements OnInit {
   // Search/Filters
   statusFilter = signal<string>('all');
   selectedCustomerFilter = signal<string>('all');
+  deletedFilter = signal<DeletedFilter>('false');
 
   // Detailed selected receipt
   selectedReceipt = signal<Receipt | null>(null);
@@ -86,7 +88,7 @@ export class ReceiptsComponent implements OnInit {
   loadReceipts(): void {
     this.loading.set(true);
     this.error.set(null);
-    const params: any = {};
+    const params: { status?: string; customer?: string; deleted?: DeletedFilter } = { deleted: this.deletedFilter() };
     if (this.statusFilter() !== 'all') {
       params.status = this.statusFilter();
     }
@@ -96,7 +98,7 @@ export class ReceiptsComponent implements OnInit {
 
     this.repository.list(params).subscribe({
       next: (res) => {
-        this.receipts.set(res.results);
+        this.receipts.set(res.results ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -107,10 +109,10 @@ export class ReceiptsComponent implements OnInit {
   }
 
   loadFilterData(): void {
-    this.customersRepository.list().subscribe(res => this.customers.set(res.results));
-    this.vehiclesRepository.list().subscribe(res => this.vehicles.set(res.results));
-    this.workOrdersRepository.list().subscribe(res => this.workOrders.set(res.results));
-    this.estimatesRepository.list().subscribe(res => this.estimates.set(res.results));
+    this.customersRepository.list().subscribe(res => this.customers.set(res.results ?? []));
+    this.vehiclesRepository.list().subscribe(res => this.vehicles.set(res.results ?? []));
+    this.workOrdersRepository.list().subscribe(res => this.workOrders.set(res.results ?? []));
+    this.estimatesRepository.list().subscribe(res => this.estimates.set(res.results ?? []));
   }
 
   getCustomerName(id: number): string {
@@ -261,6 +263,67 @@ export class ReceiptsComponent implements OnInit {
         });
       },
       error: () => this.toast.error('Error al registrar pago')
+    });
+  }
+
+  deleteReceipt(rec: Receipt, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: 'Eliminar Recibo',
+      message: `¿Está seguro de que desea eliminar el recibo "${rec.code}"? Podrá restaurarlo después.`
+    }).then(approved => {
+      if (approved) {
+        this.repository.delete(rec.id).subscribe({
+          next: () => {
+            this.toast.success('Recibo eliminado');
+            if (this.selectedReceipt()?.id === rec.id) {
+              this.selectedReceipt.set(null);
+            }
+            this.loadReceipts();
+          },
+          error: () => this.toast.error('Error al eliminar')
+        });
+      }
+    });
+  }
+
+  restoreReceipt(rec: Receipt, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: 'Restaurar Recibo',
+      message: `¿Restaurar el recibo "${rec.code}"?`
+    }).then(approved => {
+      if (approved) {
+        this.repository.restore(rec.id).subscribe({
+          next: () => {
+            this.toast.success('Recibo restaurado');
+            this.loadReceipts();
+          },
+          error: () => this.toast.error('Error al restaurar')
+        });
+      }
+    });
+  }
+
+  hardDeleteReceipt(rec: Receipt, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: this.i18n.translate('softDelete.hardDeleteTitle'),
+      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: rec.code }),
+      confirmText: this.i18n.translate('actions.hardDelete')
+    }).then(approved => {
+      if (approved) {
+        this.repository.hardDelete(rec.id).subscribe({
+          next: () => {
+            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+            if (this.selectedReceipt()?.id === rec.id) {
+              this.selectedReceipt.set(null);
+            }
+            this.loadReceipts();
+          },
+          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
+        });
+      }
     });
   }
 }

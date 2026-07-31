@@ -24,51 +24,53 @@
         <!-- Name -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">Nombre de la Empresa</label>
-          <input type="text" [(ngModel)]="c.name" name="name" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+          <input type="text" [(ngModel)]="c.name" name="name" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
         </div>
         <!-- Tax ID (RIF) -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">RIF / Tax ID</label>
-          <input type="text" [(ngModel)]="c.taxId" name="taxId" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+          <input type="text" [(ngModel)]="c.taxId" name="taxId" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
         </div>
         <!-- Email -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">Correo Electrónico</label>
-          <input type="email" [(ngModel)]="c.email" name="email" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+          <input type="email" [(ngModel)]="c.email" name="email" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
         </div>
         <!-- Phone -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">Teléfono Principal</label>
-          <input type="text" [(ngModel)]="c.phone" name="phone" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+          <input type="text" [(ngModel)]="c.phone" name="phone" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
         </div>
         <!-- Secondary Phone -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">Teléfono Secundario (Opcional)</label>
-          <input type="text" [(ngModel)]="c.secondaryPhone" name="secondaryPhone" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+          <input type="text" [(ngModel)]="c.secondaryPhone" name="secondaryPhone" [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
         </div>
         <!-- Logo URL (Mock upload) -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">URL del Logo (Mock)</label>
-          <input type="text" [(ngModel)]="c.logo" name="logo" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none">
+          <input type="text" [(ngModel)]="c.logo" name="logo" [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
         </div>
         <!-- Address -->
         <div class="flex flex-col gap-1 md:col-span-2">
           <label class="text-sm font-bold text-on-surface-variant">Dirección Completa</label>
-          <textarea rows="3" [(ngModel)]="c.address" name="address" required class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"></textarea>
+          <textarea rows="3" [(ngModel)]="c.address" name="address" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70"></textarea>
         </div>
       </div>
       <!-- Actions -->
-      <div class="flex justify-end pt-4 border-t border-outline-variant/10">
-        <button
-          type="submit"
-          [disabled]="saving()"
-          class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-on-primary font-bold rounded-xl shadow-md transition-colors disabled:opacity-50">
-          @if (saving()) {
-            <span class="animate-spin rounded-full h-4 w-4 border-2 border-on-primary border-t-transparent"></span>
-          }
-          <span>{{ i18n.translate('actions.save') }}</span>
-        </button>
-      </div>
+      @if (auth.canMutateTenantData()) {
+        <div class="flex justify-end pt-4 border-t border-outline-variant/10">
+          <button
+            type="submit"
+            [disabled]="saving()"
+            class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-on-primary font-bold rounded-xl shadow-md transition-colors disabled:opacity-50">
+            @if (saving()) {
+              <span class="animate-spin rounded-full h-4 w-4 border-2 border-on-primary border-t-transparent"></span>
+            }
+            <span>{{ i18n.translate('actions.save') }}</span>
+          </button>
+        </div>
+      }
     </form>
   }
 </div>

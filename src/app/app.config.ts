@@ -16,7 +16,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withXhr(), withInterceptors(httpInterceptors)),
-    provideServiceWorker('ngsw-worker.js', {
+    provideServiceWorker('sw.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
     })

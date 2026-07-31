@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/api/api.service';
 import { ENDPOINTS } from '../../core/api/endpoints';
-import { Vehicle } from '../../core/api/models';
+import { DeletedFilter, Vehicle } from '../../core/api/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class VehiclesRepository {
   private api = inject(ApiService);
 
-  list(params?: { search?: string; customer?: number | string }): Observable<PaginatedResponse<Vehicle>> {
+  list(params?: { search?: string; customer?: number | string; deleted?: DeletedFilter }): Observable<PaginatedResponse<Vehicle>> {
     return this.api.get<PaginatedResponse<Vehicle>>(ENDPOINTS.vehicles.list, params);
   }
 
@@ -26,7 +26,15 @@ export class VehiclesRepository {
     return this.api.put<Vehicle>(ENDPOINTS.vehicles.detail(id), vehicle);
   }
 
-  delete(id: number | string): Observable<any> {
-    return this.api.delete<any>(ENDPOINTS.vehicles.detail(id));
+  delete(id: number | string): Observable<void> {
+    return this.api.delete<void>(ENDPOINTS.vehicles.detail(id));
+  }
+
+  restore(id: number | string): Observable<Vehicle> {
+    return this.api.post<Vehicle>(ENDPOINTS.vehicles.restore(id), {});
+  }
+
+  hardDelete(id: number | string): Observable<void> {
+    return this.api.post<void>(ENDPOINTS.vehicles.hardDelete(id), {});
   }
 }

@@ -1,9 +1,23 @@
+export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'SECRETARY' | 'MECHANIC' | 'CUSTOMER';
+
+export interface CompanyBrief {
+  id: number;
+  name: string;
+}
+
+/** List filter for soft-delete: maps to query ?deleted=all|false|true */
+export type DeletedFilter = 'all' | 'false' | 'true';
+
 export interface User {
   id: number;
   username: string;
   email: string;
-  role: 'Administrator' | 'Secretary' | 'Mechanic' | 'Customer';
-  isActive: boolean;
+  firstName?: string;
+  lastName?: string;
+  role: UserRole;
+  isActive?: boolean;
+  company: CompanyBrief | null;
+  deletedAt?: string | null;
 }
 
 export interface Company {
@@ -17,6 +31,26 @@ export interface Company {
   logo?: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
+}
+
+export interface CompanyAdminUserPayload {
+  username: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface CompanyCreatePayload {
+  name: string;
+  taxId: string;
+  address: string;
+  phone: string;
+  secondaryPhone?: string;
+  email: string;
+  logo?: string;
+  adminUser: CompanyAdminUserPayload;
 }
 
 export interface CustomerProfile {
@@ -33,6 +67,7 @@ export interface CustomerProfile {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 }
 
 export interface Vehicle {
@@ -50,6 +85,7 @@ export interface Vehicle {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 }
 
 export interface ServiceCatalog {
@@ -61,6 +97,7 @@ export interface ServiceCatalog {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 }
 
 export interface WorkOrder {
@@ -84,6 +121,7 @@ export interface WorkOrder {
   grandTotal: number;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
   services?: WorkOrderService[];
   items?: WorkOrderItem[];
 }
@@ -132,6 +170,7 @@ export interface Estimate {
   pdfFile?: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
   services?: any[];
   items?: any[];
 }
@@ -157,6 +196,7 @@ export interface Receipt {
   issuedAt: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
   services?: any[];
   items?: any[];
   payments?: ReceiptPayment[];

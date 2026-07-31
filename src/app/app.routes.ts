@@ -1,5 +1,17 @@
+import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
-import { authGuard } from './core/services/auth.service';
+import { authGuard, roleGuard, AuthService } from './core/services/auth.service';
+
+const homePath = (): string => {
+  const auth = inject(AuthService);
+  if (!auth.user()) {
+    return '/login';
+  }
+  if (auth.isReadOnlyCompanyView()) {
+    return '/dashboard';
+  }
+  return auth.hasRole(['SUPER_ADMIN']) ? '/companies' : '/dashboard';
+};
 
 export const routes: Routes = [
   {
@@ -13,15 +25,26 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
+        pathMatch: 'full',
+        redirectTo: () => {
+          const auth = inject(AuthService);
+          if (auth.isReadOnlyCompanyView()) return 'dashboard';
+          return auth.hasRole(['SUPER_ADMIN']) ? 'companies' : 'dashboard';
+        }
       },
       {
         path: 'dashboard',
+        canActivate: [roleGuard(['ADMIN', 'SECRETARY', 'MECHANIC', 'CUSTOMER'])],
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
       {
+        path: 'companies',
+        canActivate: [roleGuard(['SUPER_ADMIN'])],
+        loadComponent: () => import('./features/companies/companies.component').then(m => m.CompaniesComponent)
+      },
+      {
         path: 'company',
+        canActivate: [roleGuard(['ADMIN', 'SECRETARY'])],
         loadComponent: () => import('./features/company/company.component').then(m => m.CompanyComponent)
       },
       {
@@ -50,12 +73,17 @@ export const routes: Routes = [
       },
       {
         path: 'users',
+        canActivate: [roleGuard(['ADMIN'])],
         loadComponent: () => import('./features/users/users.component').then(m => m.UsersComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
       }
     ]
   },
   {
     path: '**',
-    redirectTo: 'dashboard'
+    redirectTo: () => homePath()
   }
 ];

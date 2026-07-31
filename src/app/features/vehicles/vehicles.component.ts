@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { VehiclesRepository } from './vehicles.repository';
 import { CustomersRepository } from '../customers/customers.repository';
 import { WorkOrdersRepository } from '../work-orders/work-orders.repository';
-import { Vehicle, CustomerProfile, WorkOrder } from '../../core/api/models';
+import { Vehicle, CustomerProfile, WorkOrder, DeletedFilter } from '../../core/api/models';
+import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
@@ -25,6 +26,7 @@ export class VehiclesComponent implements OnInit {
   private repository = inject(VehiclesRepository);
   private customersRepository = inject(CustomersRepository);
   private workOrdersRepository = inject(WorkOrdersRepository);
+  auth = inject(AuthService);
   i18n = inject(I18nService);
   private toast = inject(ToastService);
   private confirm = inject(ConfirmService);
@@ -34,9 +36,10 @@ export class VehiclesComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
 
-  // Search/Filters
-  searchQuery = signal('');
-  selectedCustomerFilter = signal<string>('all');
+  // Search/Filters (plain fields for ngModel two-way binding)
+  searchQuery = '';
+  selectedCustomerFilter = 'all';
+  deletedFilter: DeletedFilter = 'false';
 
   // Detail / Associated Work Orders
   selectedVehicle = signal<Vehicle | null>(null);
@@ -70,17 +73,17 @@ export class VehiclesComponent implements OnInit {
   loadVehicles(): void {
     this.loading.set(true);
     this.error.set(null);
-    const params: any = {};
-    if (this.searchQuery()) {
-      params.search = this.searchQuery();
+    const params: { search?: string; customer?: string; deleted?: DeletedFilter } = { deleted: this.deletedFilter };
+    if (this.searchQuery) {
+      params.search = this.searchQuery;
     }
-    if (this.selectedCustomerFilter() !== 'all') {
-      params.customer = this.selectedCustomerFilter();
+    if (this.selectedCustomerFilter !== 'all') {
+      params.customer = this.selectedCustomerFilter;
     }
 
     this.repository.list(params).subscribe({
       next: (res) => {
-        this.vehicles.set(res.results);
+        this.vehicles.set(res.results ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -92,7 +95,7 @@ export class VehiclesComponent implements OnInit {
 
   loadCustomers(): void {
     this.customersRepository.list().subscribe(res => {
-      this.customers.set(res.results);
+      this.customers.set(res.results ?? []);
     });
   }
 
@@ -106,7 +109,7 @@ export class VehiclesComponent implements OnInit {
     this.loadingOrders.set(true);
     this.workOrdersRepository.list({ vehicle: vehicle.id }).subscribe({
       next: (res) => {
-        this.associatedOrders.set(res.results);
+        this.associatedOrders.set(res.results ?? []);
         this.loadingOrders.set(false);
       },
       error: () => {
@@ -185,19 +188,62 @@ export class VehiclesComponent implements OnInit {
     }
   }
 
-  deactivateVehicle(vehicle: Vehicle, event: Event): void {
+  deleteVehicle(vehicle: Vehicle, event: Event): void {
     event.stopPropagation();
     this.confirm.confirm({
-      title: 'Desactivar Vehículo',
-      message: `¿Está seguro de que desea desactivar el vehículo con placa "${vehicle.plate}"?`
+      title: 'Eliminar Vehículo',
+      message: `¿Está seguro de que desea eliminar el vehículo con placa "${vehicle.plate}"? Podrá restaurarlo después.`
     }).then(approved => {
       if (approved) {
-        this.repository.update(vehicle.id, { isActive: false }).subscribe({
+        this.repository.delete(vehicle.id).subscribe({
           next: () => {
-            this.toast.success('Vehículo desactivado');
+            this.toast.success('Vehículo eliminado');
+            if (this.selectedVehicle()?.id === vehicle.id) {
+              this.closeDetail();
+            }
             this.loadVehicles();
           },
-          error: () => this.toast.error('Error al desactivar')
+          error: () => this.toast.error('Error al eliminar')
+        });
+      }
+    });
+  }
+
+  restoreVehicle(vehicle: Vehicle, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: 'Restaurar Vehículo',
+      message: `¿Restaurar el vehículo con placa "${vehicle.plate}"?`
+    }).then(approved => {
+      if (approved) {
+        this.repository.restore(vehicle.id).subscribe({
+          next: () => {
+            this.toast.success('Vehículo restaurado');
+            this.loadVehicles();
+          },
+          error: () => this.toast.error('Error al restaurar')
+        });
+      }
+    });
+  }
+
+  hardDeleteVehicle(vehicle: Vehicle, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: this.i18n.translate('softDelete.hardDeleteTitle'),
+      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: vehicle.plate }),
+      confirmText: this.i18n.translate('actions.hardDelete')
+    }).then(approved => {
+      if (approved) {
+        this.repository.hardDelete(vehicle.id).subscribe({
+          next: () => {
+            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+            if (this.selectedVehicle()?.id === vehicle.id) {
+              this.closeDetail();
+            }
+            this.loadVehicles();
+          },
+          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
         });
       }
     });

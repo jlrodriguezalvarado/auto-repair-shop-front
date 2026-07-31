@@ -11,7 +11,7 @@
         </div>
       </div>
       <nav class="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
-        @for (item of menuItems; track item) {
+        @for (item of menuItems(); track item.path) {
           <a
             [routerLink]="item.path"
             routerLinkActive="text-primary font-bold border-r-4 border-primary bg-surface-container-high"
@@ -32,20 +32,6 @@
             <p class="text-[10px] text-outline truncate">{{ auth.user()?.role }}</p>
           </div>
         </div>
-        <div class="flex gap-sm">
-          <button
-            (click)="toggleLanguage()"
-            class="flex-1 px-sm py-xs text-label-sm font-semibold border border-outline-variant/50 hover:bg-surface-container-high rounded-lg transition-colors flex items-center justify-center gap-xs">
-            <span class="material-symbols-outlined text-[16px]">translate</span>
-            <span>{{ i18n.language() === 'es' ? 'EN' : 'ES' }}</span>
-          </button>
-          <button
-            (click)="logout()"
-            class="flex-1 px-sm py-xs text-label-sm font-semibold text-error border border-error/20 hover:bg-error-container/30 rounded-lg transition-colors flex items-center justify-center gap-xs">
-            <span class="material-symbols-outlined text-[16px]">logout</span>
-            <span>{{ i18n.translate('nav.logout') }}</span>
-          </button>
-        </div>
       </div>
     </div>
   </aside>
@@ -62,7 +48,7 @@
         </button>
       </div>
       <nav class="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
-        @for (item of menuItems; track item) {
+        @for (item of menuItems(); track item.path) {
           <a
             [routerLink]="item.path"
             routerLinkActive="text-primary font-bold border-r-4 border-primary bg-surface-container-high"
@@ -77,6 +63,25 @@
     </aside>
   }
   <div class="flex-1 flex flex-col overflow-hidden md:ml-[260px]">
+    @if (auth.isReadOnlyCompanyView() && auth.viewingCompany(); as company) {
+      <div class="flex-shrink-0 flex items-center justify-between gap-md px-gutter md:px-lg py-sm bg-primary-container text-on-primary-container border-b border-outline-variant/20 z-20">
+        <div class="flex items-center gap-sm min-w-0">
+          <span class="material-symbols-outlined text-xl">visibility</span>
+          <p class="text-label-sm font-bold truncate">
+            {{ i18n.translate('companyView.banner', { name: company.name }) }}
+          </p>
+          <span class="hidden sm:inline text-[10px] uppercase tracking-wide opacity-80">
+            {{ i18n.translate('companyView.readOnly') }}
+          </span>
+        </div>
+        <button
+          type="button"
+          (click)="auth.exitCompanyView()"
+          class="flex-shrink-0 px-3 py-1.5 text-xs font-bold rounded-lg bg-surface-container-lowest/80 text-on-surface hover:bg-surface-container-lowest transition-colors">
+          {{ i18n.translate('companyView.exit') }}
+        </button>
+      </div>
+    }
     <header class="flex-shrink-0 h-16 bg-surface-bright shadow-sm z-20 px-gutter flex items-center justify-between border-b border-outline-variant/10">
       <div class="flex items-center gap-md">
         <button (click)="toggleMobileNav()" class="md:hidden p-2 text-primary rounded-full hover:bg-surface-container transition-colors">
@@ -85,22 +90,20 @@
         <h1 class="text-headline-md font-headline-md font-bold text-primary">{{ pageTitle() }}</h1>
       </div>
       <div class="flex items-center gap-sm md:gap-lg">
-        <button
-          (click)="toggleLanguage()"
-          class="md:hidden w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant">
-          <span class="material-symbols-outlined text-xl">translate</span>
-        </button>
-        <button class="hidden sm:flex w-10 h-10 rounded-full items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant">
-          <span class="material-symbols-outlined">notifications</span>
-        </button>
-        <button class="hidden sm:flex w-10 h-10 rounded-full items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant">
-          <span class="material-symbols-outlined">settings</span>
-        </button>
-        <button
-          (click)="logout()"
-          class="md:hidden w-10 h-10 rounded-full flex items-center justify-center hover:bg-error-container/30 transition-colors text-error">
-          <span class="material-symbols-outlined text-xl">logout</span>
-        </button>
+        <div class="relative">
+          <button
+            (click)="toggleNotificationsPanel()"
+            class="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant">
+            <span class="material-symbols-outlined">notifications</span>
+            @if (notifications.unreadCount() > 0) {
+              <span class="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center">
+                {{ notifications.unreadCount() }}
+              </span>
+            }
+          </button>
+          <app-notification-panel />
+        </div>
+        <app-user-profile-menu />
       </div>
     </header>
     <main class="flex-1 overflow-y-auto px-gutter md:px-lg py-md pb-24 md:pb-lg bg-[#f5f7f9] custom-scrollbar">
@@ -108,7 +111,7 @@
     </main>
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface shadow-nav-mobile border-t border-outline-variant/10">
       <div class="flex justify-around items-center px-4 py-2">
-        @for (item of mobileNavItems; track item) {
+        @for (item of mobileNavItems(); track item.path) {
           <a
             [routerLink]="item.path"
             routerLinkActive="bg-secondary-container text-on-secondary-container rounded-xl scale-95"

@@ -1,0 +1,126 @@
+<div class="relative" data-user-profile-menu-root>
+  <button
+    type="button"
+    (click)="toggleMenu($event)"
+    class="hover:ring-primary/30 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-outline-variant bg-primary-container transition-all hover:ring-2 md:h-10 md:w-10"
+    [attr.aria-expanded]="menuOpen()"
+    aria-haspopup="true"
+    [attr.aria-label]="t('profile.title')">
+    <span class="material-symbols-outlined text-[18px] text-on-primary-container md:text-[24px]">person</span>
+  </button>
+  @if (menuOpen()) {
+    <div
+      (click)="$event.stopPropagation()"
+      class="profile-menu absolute right-0 top-full z-50 mt-2 w-[min(18rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-outline-variant bg-surface shadow-elevated">
+      <div class="py-1">
+        <button
+          type="button"
+          (click)="toggleLang($event)"
+          class="profile-menu-item flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-container">
+          <span class="material-symbols-outlined text-[20px] text-on-surface-variant">language</span>
+          <span class="text-label-sm text-on-surface"
+            >{{ t('profile.language') }}: {{ i18n.language() | uppercase }}</span>
+        </button>
+        @if (pushSupported()) {
+          <button
+            type="button"
+            (click)="togglePushNotifications($event)"
+            [disabled]="pushLoading()"
+            class="profile-menu-item flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-container disabled:opacity-60">
+            <span class="material-symbols-outlined text-[20px] text-on-surface-variant">
+              {{ pushSubscribed() ? 'notifications_active' : 'notifications_off' }}
+            </span>
+            <span class="flex-1 text-label-sm text-on-surface">
+              {{ pushSubscribed() ? t('profile.disableNotifications') : t('profile.enableNotifications') }}
+            </span>
+            <span
+              class="relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors"
+              [class.bg-primary]="pushSubscribed()"
+              [class.bg-outline-variant]="!pushSubscribed()">
+              <span
+                class="absolute top-0.5 h-4 w-4 rounded-full bg-surface shadow transition-transform"
+                [class.translate-x-4]="pushSubscribed()"
+                [class.translate-x-0.5]="!pushSubscribed()"></span>
+            </span>
+          </button>
+        }
+        @if (!pushSupported()) {
+          <p class="px-4 py-2 text-body-md text-on-surface-variant">
+            {{ t('profile.notificationsNotSupported') }}
+          </p>
+        }
+        @if (mediaSupported()) {
+          <button
+            type="button"
+            (click)="toggleMediaPermission($event, 'camera')"
+            [disabled]="mediaPermissionLoading() === 'camera'"
+            class="profile-menu-item flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-container disabled:opacity-60">
+            <span class="material-symbols-outlined text-[20px] text-on-surface-variant">
+              {{ cameraGranted() ? 'videocam' : 'videocam_off' }}
+            </span>
+            <span class="flex-1 text-label-sm text-on-surface">
+              {{ cameraGranted() ? t('profile.cameraAccess') : t('profile.enableCamera') }}
+            </span>
+            <span
+              class="relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors"
+              [class.bg-primary]="cameraGranted()"
+              [class.bg-outline-variant]="!cameraGranted()">
+              <span
+                class="absolute top-0.5 h-4 w-4 rounded-full bg-surface shadow transition-transform"
+                [class.translate-x-4]="cameraGranted()"
+                [class.translate-x-0.5]="!cameraGranted()"></span>
+            </span>
+          </button>
+        }
+        @if (mediaSupported()) {
+          <button
+            type="button"
+            (click)="toggleMediaPermission($event, 'microphone')"
+            [disabled]="mediaPermissionLoading() === 'microphone'"
+            class="profile-menu-item flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-container disabled:opacity-60">
+            <span class="material-symbols-outlined text-[20px] text-on-surface-variant">
+              {{ microphoneGranted() ? 'mic' : 'mic_off' }}
+            </span>
+            <span class="flex-1 text-label-sm text-on-surface">
+              {{ microphoneGranted() ? t('profile.microphoneAccess') : t('profile.enableMicrophone') }}
+            </span>
+            <span
+              class="relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors"
+              [class.bg-primary]="microphoneGranted()"
+              [class.bg-outline-variant]="!microphoneGranted()">
+              <span
+                class="absolute top-0.5 h-4 w-4 rounded-full bg-surface shadow transition-transform"
+                [class.translate-x-4]="microphoneGranted()"
+                [class.translate-x-0.5]="!microphoneGranted()"></span>
+            </span>
+          </button>
+        }
+        @if (!mediaSupported()) {
+          <p class="px-4 py-2 text-body-md text-on-surface-variant">
+            {{ t('profile.mediaPermissionsNotSupported') }}
+          </p>
+        }
+      </div>
+      <div class="mx-4 h-px bg-outline-variant/40"></div>
+      <div class="py-1">
+        <a
+          routerLink="/profile"
+          (click)="closeMenu()"
+          class="profile-menu-item flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-surface-container">
+          <span class="material-symbols-outlined text-[20px] text-on-surface-variant">manage_accounts</span>
+          <span class="text-label-sm text-on-surface">{{ t('profile.manageProfile') }}</span>
+        </a>
+      </div>
+      <div class="mx-4 h-px bg-outline-variant/40"></div>
+      <div class="py-1">
+        <button
+          type="button"
+          (click)="logout($event)"
+          class="profile-menu-item flex w-full items-center gap-3 px-4 py-2.5 text-left text-error transition-colors hover:bg-surface-container">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+          <span class="text-label-sm">{{ t('nav.logout') }}</span>
+        </button>
+      </div>
+    </div>
+  }
+</div>

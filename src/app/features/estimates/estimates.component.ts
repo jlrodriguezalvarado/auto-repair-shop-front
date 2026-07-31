@@ -5,7 +5,8 @@ import { EstimatesRepository } from './estimates.repository';
 import { CustomersRepository } from '../customers/customers.repository';
 import { VehiclesRepository } from '../vehicles/vehicles.repository';
 import { ServiceCatalogRepository } from '../service-catalog/service-catalog.repository';
-import { Estimate, CustomerProfile, Vehicle, ServiceCatalog } from '../../core/api/models';
+import { Estimate, CustomerProfile, Vehicle, ServiceCatalog, DeletedFilter } from '../../core/api/models';
+import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
@@ -27,7 +28,7 @@ export class EstimatesComponent implements OnInit {
   private customersRepository = inject(CustomersRepository);
   private vehiclesRepository = inject(VehiclesRepository);
   private servicesRepository = inject(ServiceCatalogRepository);
-
+  auth = inject(AuthService);
   i18n = inject(I18nService);
   private toast = inject(ToastService);
   private confirm = inject(ConfirmService);
@@ -43,6 +44,7 @@ export class EstimatesComponent implements OnInit {
   // Search/Filters
   statusFilter = signal<string>('all');
   selectedCustomerFilter = signal<string>('all');
+  deletedFilter = signal<DeletedFilter>('false');
 
   // Detail View
   selectedEstimate = signal<Estimate | null>(null);
@@ -80,7 +82,7 @@ export class EstimatesComponent implements OnInit {
   loadEstimates(): void {
     this.loading.set(true);
     this.error.set(null);
-    const params: any = {};
+    const params: { status?: string; customer?: string; deleted?: DeletedFilter } = { deleted: this.deletedFilter() };
     if (this.statusFilter() !== 'all') {
       params.status = this.statusFilter();
     }
@@ -90,7 +92,7 @@ export class EstimatesComponent implements OnInit {
 
     this.repository.list(params).subscribe({
       next: (res) => {
-        this.estimates.set(res.results);
+        this.estimates.set(res.results ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -101,9 +103,9 @@ export class EstimatesComponent implements OnInit {
   }
 
   loadFilterData(): void {
-    this.customersRepository.list().subscribe(res => this.customers.set(res.results));
-    this.vehiclesRepository.list().subscribe(res => this.vehicles.set(res.results));
-    this.servicesRepository.list({ isActive: true }).subscribe(res => this.catalogServices.set(res.results));
+    this.customersRepository.list().subscribe(res => this.customers.set(res.results ?? []));
+    this.vehiclesRepository.list().subscribe(res => this.vehicles.set(res.results ?? []));
+    this.servicesRepository.list({ isActive: true }).subscribe(res => this.catalogServices.set(res.results ?? []));
   }
 
   getCustomerName(id: number): string {
@@ -297,6 +299,67 @@ export class EstimatesComponent implements OnInit {
       this.loadEstimates();
       this.toast.success('Servicio añadido al presupuesto');
       this.serviceDialog().close();
+    });
+  }
+
+  deleteEstimate(est: Estimate, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: 'Eliminar Presupuesto',
+      message: `¿Está seguro de que desea eliminar el presupuesto "${est.code}"? Podrá restaurarlo después.`
+    }).then(approved => {
+      if (approved) {
+        this.repository.delete(est.id).subscribe({
+          next: () => {
+            this.toast.success('Presupuesto eliminado');
+            if (this.selectedEstimate()?.id === est.id) {
+              this.selectedEstimate.set(null);
+            }
+            this.loadEstimates();
+          },
+          error: () => this.toast.error('Error al eliminar')
+        });
+      }
+    });
+  }
+
+  restoreEstimate(est: Estimate, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: 'Restaurar Presupuesto',
+      message: `¿Restaurar el presupuesto "${est.code}"?`
+    }).then(approved => {
+      if (approved) {
+        this.repository.restore(est.id).subscribe({
+          next: () => {
+            this.toast.success('Presupuesto restaurado');
+            this.loadEstimates();
+          },
+          error: () => this.toast.error('Error al restaurar')
+        });
+      }
+    });
+  }
+
+  hardDeleteEstimate(est: Estimate, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: this.i18n.translate('softDelete.hardDeleteTitle'),
+      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: est.code }),
+      confirmText: this.i18n.translate('actions.hardDelete')
+    }).then(approved => {
+      if (approved) {
+        this.repository.hardDelete(est.id).subscribe({
+          next: () => {
+            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+            if (this.selectedEstimate()?.id === est.id) {
+              this.selectedEstimate.set(null);
+            }
+            this.loadEstimates();
+          },
+          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
+        });
+      }
     });
   }
 }

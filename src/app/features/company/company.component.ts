@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CompanyRepository } from './company.repository';
 import { Company } from '../../core/api/models';
+import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
@@ -18,6 +19,7 @@ import { ErrorComponent } from '../../shared/components/error/error.component';
 })
 export class CompanyComponent implements OnInit {
   private repository = inject(CompanyRepository);
+  auth = inject(AuthService);
   i18n = inject(I18nService);
   private toast = inject(ToastService);
 
@@ -30,6 +32,21 @@ export class CompanyComponent implements OnInit {
     this.loadCompany();
   }
 
+  private emptyCompany(): Company {
+    return {
+      id: 0,
+      name: '',
+      taxId: '',
+      address: '',
+      phone: '',
+      secondaryPhone: '',
+      email: '',
+      logo: '',
+      createdAt: '',
+      updatedAt: ''
+    };
+  }
+
   loadCompany(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -38,7 +55,12 @@ export class CompanyComponent implements OnInit {
         this.company.set(res);
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
+        if (err?.status === 404) {
+          this.company.set(this.emptyCompany());
+          this.loading.set(false);
+          return;
+        }
         this.error.set(this.i18n.translate('common.error'));
         this.loading.set(false);
       }

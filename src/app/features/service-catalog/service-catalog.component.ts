@@ -2,7 +2,8 @@ import { Component, inject, signal, OnInit, viewChild, ChangeDetectionStrategy }
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ServiceCatalogRepository } from './service-catalog.repository';
-import { ServiceCatalog } from '../../core/api/models';
+import { ServiceCatalog, DeletedFilter } from '../../core/api/models';
+import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
@@ -21,6 +22,7 @@ import { DialogFormDirective } from '../../shared/directives/dialog-form.directi
 })
 export class ServiceCatalogComponent implements OnInit {
   private repository = inject(ServiceCatalogRepository);
+  auth = inject(AuthService);
   i18n = inject(I18nService);
   private toast = inject(ToastService);
   private confirm = inject(ConfirmService);
@@ -31,7 +33,7 @@ export class ServiceCatalogComponent implements OnInit {
 
   // Search/Filters
   searchQuery = signal('');
-  activeFilter = signal<'all' | 'active' | 'inactive'>('all');
+  deletedFilter = signal<DeletedFilter>('false');
 
   // Modal directives
   serviceModal = viewChild.required(DialogFormDirective);
@@ -54,17 +56,14 @@ export class ServiceCatalogComponent implements OnInit {
   loadServices(): void {
     this.loading.set(true);
     this.error.set(null);
-    const params: any = {};
+    const params: { search?: string; deleted?: DeletedFilter } = { deleted: this.deletedFilter() };
     if (this.searchQuery()) {
       params.search = this.searchQuery();
-    }
-    if (this.activeFilter() !== 'all') {
-      params.isActive = this.activeFilter() === 'active';
     }
 
     this.repository.list(params).subscribe({
       next: (res) => {
-        this.services.set(res.results);
+        this.services.set(res.results ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -78,8 +77,9 @@ export class ServiceCatalogComponent implements OnInit {
     this.loadServices();
   }
 
-  onFilterChange(event: any): void {
-    this.activeFilter.set(event.target.value);
+  onFilterChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value as DeletedFilter;
+    this.deletedFilter.set(value);
     this.loadServices();
   }
 
@@ -137,18 +137,53 @@ export class ServiceCatalogComponent implements OnInit {
     }
   }
 
-  deactivateService(service: ServiceCatalog): void {
+  deleteService(service: ServiceCatalog): void {
     this.confirm.confirm({
-      title: 'Desactivar Servicio',
-      message: `¿Está seguro de que desea desactivar el servicio "${service.name}"?`
+      title: 'Eliminar Servicio',
+      message: `¿Está seguro de que desea eliminar el servicio "${service.name}"? Podrá restaurarlo después.`
     }).then(approved => {
       if (approved) {
-        this.repository.update(service.id, { isActive: false }).subscribe({
+        this.repository.delete(service.id).subscribe({
           next: () => {
-            this.toast.success('Servicio desactivado');
+            this.toast.success('Servicio eliminado');
             this.loadServices();
           },
-          error: () => this.toast.error('Error al desactivar')
+          error: () => this.toast.error('Error al eliminar')
+        });
+      }
+    });
+  }
+
+  restoreService(service: ServiceCatalog): void {
+    this.confirm.confirm({
+      title: 'Restaurar Servicio',
+      message: `¿Restaurar el servicio "${service.name}"?`
+    }).then(approved => {
+      if (approved) {
+        this.repository.restore(service.id).subscribe({
+          next: () => {
+            this.toast.success('Servicio restaurado');
+            this.loadServices();
+          },
+          error: () => this.toast.error('Error al restaurar')
+        });
+      }
+    });
+  }
+
+  hardDeleteService(service: ServiceCatalog): void {
+    this.confirm.confirm({
+      title: this.i18n.translate('softDelete.hardDeleteTitle'),
+      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: service.name }),
+      confirmText: this.i18n.translate('actions.hardDelete')
+    }).then(approved => {
+      if (approved) {
+        this.repository.hardDelete(service.id).subscribe({
+          next: () => {
+            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+            this.loadServices();
+          },
+          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
         });
       }
     });

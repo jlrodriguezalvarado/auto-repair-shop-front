@@ -6,7 +6,8 @@ import { CustomersRepository } from '../customers/customers.repository';
 import { VehiclesRepository } from '../vehicles/vehicles.repository';
 import { ServiceCatalogRepository } from '../service-catalog/service-catalog.repository';
 import { UsersRepository } from '../users/users.repository';
-import { WorkOrder, CustomerProfile, Vehicle, ServiceCatalog, User, WorkOrderService, WorkOrderItem } from '../../core/api/models';
+import { WorkOrder, CustomerProfile, Vehicle, ServiceCatalog, User, WorkOrderService, WorkOrderItem, DeletedFilter } from '../../core/api/models';
+import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ConfirmService } from '../../shared/services/confirm.service';
@@ -28,8 +29,8 @@ export class WorkOrdersComponent implements OnInit {
   private customersRepository = inject(CustomersRepository);
   private vehiclesRepository = inject(VehiclesRepository);
   private servicesRepository = inject(ServiceCatalogRepository);
+  auth = inject(AuthService);
   private usersRepository = inject(UsersRepository);
-
   i18n = inject(I18nService);
   private toast = inject(ToastService);
   private confirm = inject(ConfirmService);
@@ -46,6 +47,7 @@ export class WorkOrdersComponent implements OnInit {
   // Search/Filters
   statusFilter = signal<string>('all');
   selectedCustomerFilter = signal<string>('all');
+  deletedFilter = signal<DeletedFilter>('false');
 
   // Detailed selected order
   selectedOrder = signal<WorkOrder | null>(null);
@@ -94,7 +96,7 @@ export class WorkOrdersComponent implements OnInit {
   loadOrders(): void {
     this.loading.set(true);
     this.error.set(null);
-    const params: any = {};
+    const params: { status?: string; customer?: string; deleted?: DeletedFilter } = { deleted: this.deletedFilter() };
     if (this.statusFilter() !== 'all') {
       params.status = this.statusFilter();
     }
@@ -104,7 +106,7 @@ export class WorkOrdersComponent implements OnInit {
 
     this.repository.list(params).subscribe({
       next: (res) => {
-        this.orders.set(res.results);
+        this.orders.set(res.results ?? []);
         this.loading.set(false);
       },
       error: () => {
@@ -115,11 +117,11 @@ export class WorkOrdersComponent implements OnInit {
   }
 
   loadFilterData(): void {
-    this.customersRepository.list().subscribe(res => this.customers.set(res.results));
-    this.vehiclesRepository.list().subscribe(res => this.vehicles.set(res.results));
-    this.servicesRepository.list({ isActive: true }).subscribe(res => this.catalogServices.set(res.results));
+    this.customersRepository.list().subscribe(res => this.customers.set(res.results ?? []));
+    this.vehiclesRepository.list().subscribe(res => this.vehicles.set(res.results ?? []));
+    this.servicesRepository.list({ isActive: true }).subscribe(res => this.catalogServices.set(res.results ?? []));
     this.usersRepository.list().subscribe(res => {
-      this.mechanics.set(res.results.filter(u => u.role === 'Mechanic'));
+      this.mechanics.set((res.results ?? []).filter(u => u.role === 'MECHANIC'));
     });
   }
 
@@ -401,6 +403,67 @@ export class WorkOrdersComponent implements OnInit {
               this.toast.success('Artículo removido');
             });
           }
+        });
+      }
+    });
+  }
+
+  deleteOrder(order: WorkOrder, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: 'Eliminar Orden',
+      message: `¿Está seguro de que desea eliminar la orden "${order.code}"? Podrá restaurarla después.`
+    }).then(approved => {
+      if (approved) {
+        this.repository.delete(order.id).subscribe({
+          next: () => {
+            this.toast.success('Orden eliminada');
+            if (this.selectedOrder()?.id === order.id) {
+              this.selectedOrder.set(null);
+            }
+            this.loadOrders();
+          },
+          error: () => this.toast.error('Error al eliminar')
+        });
+      }
+    });
+  }
+
+  restoreOrder(order: WorkOrder, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: 'Restaurar Orden',
+      message: `¿Restaurar la orden "${order.code}"?`
+    }).then(approved => {
+      if (approved) {
+        this.repository.restore(order.id).subscribe({
+          next: () => {
+            this.toast.success('Orden restaurada');
+            this.loadOrders();
+          },
+          error: () => this.toast.error('Error al restaurar')
+        });
+      }
+    });
+  }
+
+  hardDeleteOrder(order: WorkOrder, event: Event): void {
+    event.stopPropagation();
+    this.confirm.confirm({
+      title: this.i18n.translate('softDelete.hardDeleteTitle'),
+      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: order.code }),
+      confirmText: this.i18n.translate('actions.hardDelete')
+    }).then(approved => {
+      if (approved) {
+        this.repository.hardDelete(order.id).subscribe({
+          next: () => {
+            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+            if (this.selectedOrder()?.id === order.id) {
+              this.selectedOrder.set(null);
+            }
+            this.loadOrders();
+          },
+          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
         });
       }
     });

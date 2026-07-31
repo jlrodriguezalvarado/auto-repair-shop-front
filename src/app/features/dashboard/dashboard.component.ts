@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { DashboardRepository } from './dashboard.repository';
 import { DashboardSummary } from '../../core/api/models';
+import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { ErrorComponent } from '../../shared/components/error/error.component';
@@ -18,6 +19,7 @@ import { ErrorComponent } from '../../shared/components/error/error.component';
 })
 export class DashboardComponent implements OnInit {
   private repository = inject(DashboardRepository);
+  auth = inject(AuthService);
   i18n = inject(I18nService);
 
   summary = signal<DashboardSummary | null>(null);

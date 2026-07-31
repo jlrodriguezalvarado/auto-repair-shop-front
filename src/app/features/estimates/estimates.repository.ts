@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/api/api.service';
 import { ENDPOINTS } from '../../core/api/endpoints';
-import { Estimate } from '../../core/api/models';
+import { DeletedFilter, Estimate } from '../../core/api/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class EstimatesRepository {
   private api = inject(ApiService);
 
-  list(params?: { status?: string; customer?: number | string; vehicle?: number | string }): Observable<PaginatedResponse<Estimate>> {
+  list(params?: { status?: string; customer?: number | string; vehicle?: number | string; deleted?: DeletedFilter }): Observable<PaginatedResponse<Estimate>> {
     return this.api.get<PaginatedResponse<Estimate>>(ENDPOINTS.estimates.list, params);
   }
 
@@ -26,8 +26,16 @@ export class EstimatesRepository {
     return this.api.put<Estimate>(ENDPOINTS.estimates.detail(id), estimate);
   }
 
-  delete(id: number | string): Observable<any> {
-    return this.api.delete<any>(ENDPOINTS.estimates.detail(id));
+  delete(id: number | string): Observable<void> {
+    return this.api.delete<void>(ENDPOINTS.estimates.detail(id));
+  }
+
+  restore(id: number | string): Observable<Estimate> {
+    return this.api.post<Estimate>(ENDPOINTS.estimates.restore(id), {});
+  }
+
+  hardDelete(id: number | string): Observable<void> {
+    return this.api.post<void>(ENDPOINTS.estimates.hardDelete(id), {});
   }
 
   approve(id: number | string): Observable<Estimate> {

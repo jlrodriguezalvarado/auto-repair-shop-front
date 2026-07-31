@@ -26,12 +26,14 @@
         class="px-md py-xs text-label-sm font-semibold rounded-full transition-all">
         {{ i18n.translate('dashboard.filterCustom') }}
       </button>
-      <a
-        routerLink="/work-orders"
-        class="btn-cta px-md py-xs flex items-center gap-sm">
-        <span class="material-symbols-outlined text-[18px]">add</span>
-        <span class="text-label-sm font-label-sm uppercase">Nueva Orden</span>
-      </a>
+      @if (auth.canMutateTenantData()) {
+        <a
+          routerLink="/work-orders"
+          class="btn-cta px-md py-xs flex items-center gap-sm">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          <span class="text-label-sm font-label-sm uppercase">Nueva Orden</span>
+        </a>
+      }
     </div>
   </div>
   @if (selectedPeriod() === 'custom') {
