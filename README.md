@@ -1,59 +1,75 @@
-# AppTallerMecanico
+# Auto Repair Shop Front
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.27.
+Angular **22** PWA client for the multi-tenant auto repair shop SaaS. Sole first-party consumer of [auto-repair-shop-api](https://github.com/jlrodriguezalvarado/auto-repair-shop-api).
 
-## Development server
+## Why this project
 
-To start a local development server, run:
+Shows frontend delivery aligned with a real API contract:
 
-```bash
-ng serve
-```
+- Feature folders, repositories, and case-mapping against DRF snake_case
+- JWT interceptor, role-aware shell, dashboard / OT / estimates / receipts flows
+- Tailwind UI, service worker (PWA), optional mock API for UI work without backend
+- Production Nginx image build wired to the API deploy stack
+- Same agent workflow kit (`.agents/`, plans) as the API for cross-layer features
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Stack
 
-## Code scaffolding
+| Layer | Choice |
+|-------|--------|
+| Framework | Angular 22, RxJS, standalone components |
+| Styling | Tailwind CSS 3 |
+| PWA | `@angular/service-worker` |
+| API | REST + JWT against Django DRF |
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+## Quick start
 
 ```bash
-ng build
+npm i --legacy-peer-deps
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+App: `http://localhost:4300` (proxies/uses `src/environments/environment.ts` → API `http://localhost:8001/api`).
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+For production builds, copy:
 
 ```bash
-ng test
+cp src/environments/environment.production.example.ts src/environments/environment.production.ts
+# set apiUrl to your public API origin
+npm run build:prod
 ```
 
-## Running end-to-end tests
+`environment.production.ts` is gitignored so host-specific URLs stay local.
 
-For end-to-end (e2e) testing, run:
+## Features (UI)
 
-```bash
-ng e2e
+- Auth (login / refresh / change password)
+- Multi-company admin (`SUPER_ADMIN`) and tenant company profile
+- Customers, vehicles, service catalog
+- Work orders, estimates, receipts & payments
+- Dashboard summary (period filters)
+- Optional Web Push opt-in when the API exposes VAPID
+
+## Project layout
+
+```text
+src/app/
+  core/          API client, interceptors, models, i18n
+  features/      routed feature pages (dashboard, customers, …)
+  shared/        shared UI pieces
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Deploy
 
-## Additional Resources
+See [DEPLOY.md](DEPLOY.md). Images push to a private registry; Compose lives in the API repo.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Working style
+
+`.agents/` + `.plans/` document how cross-cutting features are planned with the API (contract first, then Angular, then QA).
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+## Security
+
+See [SECURITY.md](SECURITY.md).
