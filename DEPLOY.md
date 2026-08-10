@@ -1,7 +1,7 @@
 # Deploy — auto-repair-shop-front
 
-Build de la SPA Angular y empaquetado en imagen `mechanics/web` (Nginx + `dist/`).
-El stack Compose y `deploy.sh` viven en `../auto-repair-shop-api`.
+Build the Angular SPA and package it as image `mechanics/web` (Nginx + `dist/`).
+Compose stack and `deploy.sh` live in `../auto-repair-shop-api`.
 
 ## Local
 
@@ -10,13 +10,13 @@ npm i --legacy-peer-deps
 npm start
 ```
 
-No hace falta Docker para el front en desarrollo.
+Docker is not required for front development.
 
-## Producción
+## Production
 
-1. Configura `src/environments/environment.production.ts` (apiUrl absoluto al host del API).
-2. Desde la raíz `mechanics/`: `./build-front.sh` (build + push).
-3. Sube tags con `./upload.sh` y en el servidor ejecuta `./deploy.sh`.
+1. Configure `src/environments/environment.production.ts` (absolute `apiUrl` to the API host). Copy from `environment.production.example.ts`.
+2. From workspace root `mechanics/`: `./build-front.sh` (build + push).
+3. Upload tags with `./upload.sh` and run `./deploy.sh` on the server.
 
-Imagen: `registry.lumuscore.com/mechanics/web:<git-sha>`  
-Host: `mechanics.lumuscore.com`
+Image: `registry.example.com/mechanics/web:<git-sha>`  
+Host: `mechanics.example.com`

@@ -37,7 +37,7 @@ if [[ -f "$ENV_FILE" ]]; then
 fi
 
 FRONT_DIST_PATH="${FRONT_DIST_PATH:-dist/app-taller-mecanico/browser}"
-REGISTRY_HOST="${REGISTRY_HOST:-registry.lumuscore.com}"
+REGISTRY_HOST="${REGISTRY_HOST:-registry.example.com}"
 WEB_IMAGE="${WEB_IMAGE:-mechanics/web}"
 WEB_VERSION="${WEB_VERSION:-$(git rev-parse --short HEAD)}"
 PUSH=0
