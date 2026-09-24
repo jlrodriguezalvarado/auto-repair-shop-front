@@ -9,7 +9,7 @@ export interface ToastMessage {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ToastService {
   private static counter = 0;
@@ -31,7 +31,7 @@ export class ToastService {
 
   private add(message: string, type: ToastType): void {
     const id = ++ToastService.counter;
-    this.toastList.update(list => [...list, { id, message, type }]);
+    this.toastList.update((list) => [...list, { id, message, type }]);
 
     // Auto remove after 4s
     setTimeout(() => {
@@ -40,6 +40,6 @@ export class ToastService {
   }
 
   remove(id: number): void {
-    this.toastList.update(list => list.filter(toast => toast.id !== id));
+    this.toastList.update((list) => list.filter((toast) => toast.id !== id));
   }
 }

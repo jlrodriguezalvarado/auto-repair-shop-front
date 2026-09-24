@@ -15,7 +15,7 @@ import { ErrorComponent } from '../../shared/components/error/error.component';
   imports: [CommonModule, FormsModule, RouterLink, LoadingComponent, ErrorComponent],
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
   private repository = inject(DashboardRepository);
@@ -50,7 +50,7 @@ export class DashboardComponent implements OnInit {
       error: () => {
         this.error.set(this.i18n.translate('common.error'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -66,7 +66,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getServiceBarWidth(count: number, services: { count: number }[]): number {
-    const max = Math.max(...services.map(s => s.count), 1);
+    const max = Math.max(...services.map((s) => s.count), 1);
     return Math.round((count / max) * 100);
   }
 }

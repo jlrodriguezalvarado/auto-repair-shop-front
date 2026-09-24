@@ -5,7 +5,14 @@ import { EstimatesRepository } from './estimates.repository';
 import { CustomersRepository } from '../customers/customers.repository';
 import { VehiclesRepository } from '../vehicles/vehicles.repository';
 import { ServiceCatalogRepository } from '../service-catalog/service-catalog.repository';
-import { Estimate, CustomerProfile, Vehicle, ServiceCatalog, DeletedFilter } from '../../core/api/models';
+import {
+  Estimate,
+  CustomerProfile,
+  Vehicle,
+  ServiceCatalog,
+  DeletedFilter,
+  EstimateLineSnapshot,
+} from '../../core/api/models';
 import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -21,7 +28,7 @@ import { DialogFormDirective } from '../../shared/directives/dialog-form.directi
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent, EmptyComponent, DialogFormDirective],
   templateUrl: './estimates.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./estimates.component.scss']
+  styleUrls: ['./estimates.component.scss'],
 })
 export class EstimatesComponent implements OnInit {
   private repository = inject(EstimatesRepository);
@@ -64,14 +71,14 @@ export class EstimatesComponent implements OnInit {
     subtotal: 0,
     discountAmount: 0,
     taxAmount: 0,
-    total: 0
+    total: 0,
   };
 
   // Service item Form State
   serviceFormModel = {
     name: '',
     quantity: 1,
-    price: 0
+    price: 0,
   };
 
   ngOnInit(): void {
@@ -98,23 +105,23 @@ export class EstimatesComponent implements OnInit {
       error: () => {
         this.error.set(this.i18n.translate('common.error'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
   loadFilterData(): void {
-    this.customersRepository.list().subscribe(res => this.customers.set(res.results ?? []));
-    this.vehiclesRepository.list().subscribe(res => this.vehicles.set(res.results ?? []));
-    this.servicesRepository.list({ isActive: true }).subscribe(res => this.catalogServices.set(res.results ?? []));
+    this.customersRepository.list().subscribe((res) => this.customers.set(res.results ?? []));
+    this.vehiclesRepository.list().subscribe((res) => this.vehicles.set(res.results ?? []));
+    this.servicesRepository.list({ isActive: true }).subscribe((res) => this.catalogServices.set(res.results ?? []));
   }
 
   getCustomerName(id: number): string {
-    const cust = this.customers().find(c => c.id === id);
+    const cust = this.customers().find((c) => c.id === id);
     return cust ? `${cust.firstName} ${cust.lastName}` : `Cliente #${id}`;
   }
 
   getVehiclePlate(id: number): string {
-    const veh = this.vehicles().find(v => v.id === id);
+    const veh = this.vehicles().find((v) => v.id === id);
     return veh ? `${veh.brand} ${veh.model} (${veh.plate})` : `Vehículo #${id}`;
   }
 
@@ -142,7 +149,7 @@ export class EstimatesComponent implements OnInit {
       subtotal: 0,
       discountAmount: 0,
       taxAmount: 0,
-      total: 0
+      total: 0,
     };
     this.estimateDialog().open();
   }
@@ -159,14 +166,16 @@ export class EstimatesComponent implements OnInit {
       subtotal: est.subtotal,
       discountAmount: est.discountAmount,
       taxAmount: est.taxAmount,
-      total: est.total
+      total: est.total,
     };
     this.estimateDialog().open();
   }
 
   recalculateFormTotals(): void {
     this.formModel.taxAmount = parseFloat((this.formModel.subtotal * 0.16).toFixed(2));
-    this.formModel.total = parseFloat((this.formModel.subtotal - this.formModel.discountAmount + this.formModel.taxAmount).toFixed(2));
+    this.formModel.total = parseFloat(
+      (this.formModel.subtotal - this.formModel.discountAmount + this.formModel.taxAmount).toFixed(2)
+    );
   }
 
   saveEstimate(): void {
@@ -186,7 +195,7 @@ export class EstimatesComponent implements OnInit {
             this.selectedEstimate.set(res);
           }
         },
-        error: () => this.toast.error('Error al actualizar presupuesto')
+        error: () => this.toast.error('Error al actualizar presupuesto'),
       });
     } else {
       this.repository.create({ ...this.formModel, status: 'draft', services: [], items: [] }).subscribe({
@@ -195,7 +204,7 @@ export class EstimatesComponent implements OnInit {
           this.estimateDialog().close();
           this.loadEstimates();
         },
-        error: () => this.toast.error('Error al crear presupuesto')
+        error: () => this.toast.error('Error al crear presupuesto'),
       });
     }
   }
@@ -206,7 +215,7 @@ export class EstimatesComponent implements OnInit {
         this.toast.success('Presupuesto Aprobado');
         this.loadEstimates();
         this.selectedEstimate.set(res);
-      }
+      },
     });
   }
 
@@ -216,7 +225,7 @@ export class EstimatesComponent implements OnInit {
         this.toast.success('Presupuesto Rechazado');
         this.loadEstimates();
         this.selectedEstimate.set(res);
-      }
+      },
     });
   }
 
@@ -226,16 +235,19 @@ export class EstimatesComponent implements OnInit {
         this.toast.success('Orden de Trabajo creada exitosamente desde este presupuesto');
         this.loadEstimates();
       },
-      error: () => this.toast.error('Error al crear Orden de Trabajo')
+      error: () => this.toast.error('Error al crear Orden de Trabajo'),
     });
   }
 
   downloadPdf(est: Estimate): void {
     this.repository.getPdf(est.id).subscribe({
-      next: (res) => {
-        window.open(res.pdfFile, '_blank');
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
         this.toast.success('PDF descargado bajo demanda');
-      }
+      },
+      error: () => this.toast.error('Error al descargar PDF'),
     });
   }
 
@@ -243,16 +255,22 @@ export class EstimatesComponent implements OnInit {
     this.repository.persistPdf(est.id).subscribe({
       next: (res) => {
         this.toast.success('Archivo de PDF guardado de manera explícita en el servidor');
-        this.selectedEstimate.set(res);
+        const current = this.selectedEstimate();
+        if (current && res.url) {
+          this.selectedEstimate.set({ ...current, pdfFile: res.url });
+        }
         this.loadEstimates();
-      }
+      },
+      error: () => this.toast.error('Error al persistir PDF'),
     });
   }
 
   getWhatsAppLink(est: Estimate): string {
-    const plate = this.vehicles().find(v => v.id === est.vehicle)?.plate || '';
-    const message = encodeURIComponent(`Hola, le enviamos el presupuesto ${est.code} de su vehículo ${plate}. Total: $${est.total}.`);
-    const phone = this.customers().find(c => c.id === est.customer)?.phone || '';
+    const plate = this.vehicles().find((v) => v.id === est.vehicle)?.plate || '';
+    const message = encodeURIComponent(
+      `Hola, le enviamos el presupuesto ${est.code} de su vehículo ${plate}. Total: $${est.total}.`
+    );
+    const phone = this.customers().find((c) => c.id === est.customer)?.phone || '';
     const cleanPhone = phone.replace(/[+\s]/g, '');
     return `https://wa.me/${cleanPhone}?text=${message}`;
   }
@@ -261,14 +279,14 @@ export class EstimatesComponent implements OnInit {
     this.serviceFormModel = {
       name: this.catalogServices().length > 0 ? this.catalogServices()[0].name : '',
       quantity: 1,
-      price: this.catalogServices().length > 0 ? this.catalogServices()[0].basePrice : 0
+      price: this.catalogServices().length > 0 ? this.catalogServices()[0].basePrice : 0,
     };
     this.serviceDialog().open();
   }
 
-  onServiceSelectChange(event: any): void {
-    const selectedName = event.target.value;
-    const srv = this.catalogServices().find(s => s.name === selectedName);
+  onServiceSelectChange(event: Event): void {
+    const selectedName = (event.target as HTMLSelectElement).value;
+    const srv = this.catalogServices().find((s) => s.name === selectedName);
     if (srv) {
       this.serviceFormModel.price = srv.basePrice;
     }
@@ -277,24 +295,23 @@ export class EstimatesComponent implements OnInit {
   addServiceSnapshot(): void {
     const est = this.selectedEstimate();
     if (!est) return;
-
     if (!this.serviceFormModel.name || this.serviceFormModel.quantity <= 0) return;
-
     const list = est.services || [];
     const itemTotal = this.serviceFormModel.quantity * this.serviceFormModel.price;
     const newSnap = {
       name: this.serviceFormModel.name,
       quantity: this.serviceFormModel.quantity,
       price: this.serviceFormModel.price,
-      total: itemTotal
+      total: itemTotal,
     };
-
     const updatedServices = [...list, newSnap];
-    const subtotal = updatedServices.reduce((sum, s) => sum + s.total, 0);
+    const subtotal = updatedServices.reduce((sum, s) => {
+      const line = s as EstimateLineSnapshot;
+      return sum + Number(line.total ?? line.totalPrice ?? 0);
+    }, 0);
     const taxAmount = parseFloat((subtotal * 0.16).toFixed(2));
     const total = subtotal - est.discountAmount + taxAmount;
-
-    this.repository.update(est.id, { services: updatedServices, subtotal, taxAmount, total }).subscribe(res => {
+    this.repository.update(est.id, { services: updatedServices, subtotal, taxAmount, total }).subscribe((res) => {
       this.selectedEstimate.set(res);
       this.loadEstimates();
       this.toast.success('Servicio añadido al presupuesto');
@@ -304,62 +321,68 @@ export class EstimatesComponent implements OnInit {
 
   deleteEstimate(est: Estimate, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: 'Eliminar Presupuesto',
-      message: `¿Está seguro de que desea eliminar el presupuesto "${est.code}"? Podrá restaurarlo después.`
-    }).then(approved => {
-      if (approved) {
-        this.repository.delete(est.id).subscribe({
-          next: () => {
-            this.toast.success('Presupuesto eliminado');
-            if (this.selectedEstimate()?.id === est.id) {
-              this.selectedEstimate.set(null);
-            }
-            this.loadEstimates();
-          },
-          error: () => this.toast.error('Error al eliminar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Eliminar Presupuesto',
+        message: `¿Está seguro de que desea eliminar el presupuesto "${est.code}"? Podrá restaurarlo después.`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.delete(est.id).subscribe({
+            next: () => {
+              this.toast.success('Presupuesto eliminado');
+              if (this.selectedEstimate()?.id === est.id) {
+                this.selectedEstimate.set(null);
+              }
+              this.loadEstimates();
+            },
+            error: () => this.toast.error('Error al eliminar'),
+          });
+        }
+      });
   }
 
   restoreEstimate(est: Estimate, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: 'Restaurar Presupuesto',
-      message: `¿Restaurar el presupuesto "${est.code}"?`
-    }).then(approved => {
-      if (approved) {
-        this.repository.restore(est.id).subscribe({
-          next: () => {
-            this.toast.success('Presupuesto restaurado');
-            this.loadEstimates();
-          },
-          error: () => this.toast.error('Error al restaurar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Restaurar Presupuesto',
+        message: `¿Restaurar el presupuesto "${est.code}"?`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.restore(est.id).subscribe({
+            next: () => {
+              this.toast.success('Presupuesto restaurado');
+              this.loadEstimates();
+            },
+            error: () => this.toast.error('Error al restaurar'),
+          });
+        }
+      });
   }
 
   hardDeleteEstimate(est: Estimate, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: this.i18n.translate('softDelete.hardDeleteTitle'),
-      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: est.code }),
-      confirmText: this.i18n.translate('actions.hardDelete')
-    }).then(approved => {
-      if (approved) {
-        this.repository.hardDelete(est.id).subscribe({
-          next: () => {
-            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
-            if (this.selectedEstimate()?.id === est.id) {
-              this.selectedEstimate.set(null);
-            }
-            this.loadEstimates();
-          },
-          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: this.i18n.translate('softDelete.hardDeleteTitle'),
+        message: this.i18n.translate('softDelete.hardDeleteMessage', { name: est.code }),
+        confirmText: this.i18n.translate('actions.hardDelete'),
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.hardDelete(est.id).subscribe({
+            next: () => {
+              this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+              if (this.selectedEstimate()?.id === est.id) {
+                this.selectedEstimate.set(null);
+              }
+              this.loadEstimates();
+            },
+            error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed')),
+          });
+        }
+      });
   }
 }

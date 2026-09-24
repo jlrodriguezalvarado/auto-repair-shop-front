@@ -1,16 +1,21 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/api/api.service';
 import { ENDPOINTS } from '../../core/api/endpoints';
-import { DeletedFilter, Receipt, ReceiptPayment } from '../../core/api/models';
+import { DeletedFilter, PersistPdfResponse, Receipt, ReceiptPayment } from '../../core/api/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReceiptsRepository {
   private api = inject(ApiService);
 
-  list(params?: { status?: string; customer?: number | string; vehicle?: number | string; deleted?: DeletedFilter }): Observable<PaginatedResponse<Receipt>> {
+  list(params?: {
+    status?: string;
+    customer?: number | string;
+    vehicle?: number | string;
+    deleted?: DeletedFilter;
+  }): Observable<PaginatedResponse<Receipt>> {
     return this.api.get<PaginatedResponse<Receipt>>(ENDPOINTS.receipts.list, params);
   }
 
@@ -38,15 +43,15 @@ export class ReceiptsRepository {
     return this.api.post<void>(ENDPOINTS.receipts.hardDelete(id), {});
   }
 
-  addPayment(receiptId: number | string, payment: Partial<ReceiptPayment>): Observable<ReceiptPayment> {
-    return this.api.post<ReceiptPayment>(ENDPOINTS.receipts.payments(receiptId), payment);
+  addPayment(receiptId: number | string, payment: Partial<ReceiptPayment>): Observable<Receipt> {
+    return this.api.post<Receipt>(ENDPOINTS.receipts.payments(receiptId), payment);
   }
 
-  getPdf(id: number | string): Observable<{ pdfFile: string }> {
-    return this.api.get<{ pdfFile: string }>(ENDPOINTS.receipts.pdf(id));
+  getPdf(id: number | string): Observable<Blob> {
+    return this.api.getBlob(ENDPOINTS.receipts.pdf(id));
   }
 
-  persistPdf(id: number | string): Observable<Receipt> {
-    return this.api.post<Receipt>(ENDPOINTS.receipts.persistPdf(id), {});
+  persistPdf(id: number | string): Observable<PersistPdfResponse> {
+    return this.api.post<PersistPdfResponse>(ENDPOINTS.receipts.persistPdf(id), {});
   }
 }

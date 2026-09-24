@@ -7,9 +7,7 @@ import { mockApiInterceptor } from './core/api/mock-api.interceptor';
 import { jwtInterceptor } from './core/api/jwt.interceptor';
 import { environment } from '../environments/environment';
 
-const httpInterceptors = environment.useMockApi
-  ? [jwtInterceptor, mockApiInterceptor]
-  : [jwtInterceptor];
+const httpInterceptors = environment.useMockApi ? [jwtInterceptor, mockApiInterceptor] : [jwtInterceptor];
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,7 +16,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withXhr(), withInterceptors(httpInterceptors)),
     provideServiceWorker('sw.js', {
       enabled: environment.production,
-      registrationStrategy: 'registerWhenStable:30000'
-    })
-  ]
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
+  ],
 };

@@ -4,10 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { I18nService } from '../../core/services/i18n.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../shared/services/toast.service';
-import {
-  MediaPermissionKind,
-  MediaPermissionService,
-} from '../../shared/services/media-permission.service';
+import { MediaPermissionKind, MediaPermissionService } from '../../shared/services/media-permission.service';
 
 const API_FIELD_TO_CONTROL: Record<string, string> = {
   current_password: 'currentPassword',
@@ -77,11 +74,7 @@ export class ProfileComponent implements OnInit {
     }
     if (this.mediaPermissions.getState(kind) === 'denied') {
       this.toast.error(
-        this.t(
-          kind === 'camera'
-            ? 'profile.cameraPermissionDeniedHint'
-            : 'profile.microphonePermissionDeniedHint',
-        ),
+        this.t(kind === 'camera' ? 'profile.cameraPermissionDeniedHint' : 'profile.microphonePermissionDeniedHint')
       );
       return;
     }
@@ -90,20 +83,12 @@ export class ProfileComponent implements OnInit {
       const state = await this.mediaPermissions.requestPermission(kind);
       if (state === 'granted') {
         this.toast.success(
-          this.t(
-            kind === 'camera'
-              ? 'profile.cameraPermissionGranted'
-              : 'profile.microphonePermissionGranted',
-          ),
+          this.t(kind === 'camera' ? 'profile.cameraPermissionGranted' : 'profile.microphonePermissionGranted')
         );
         return;
       }
       this.toast.error(
-        this.t(
-          kind === 'camera'
-            ? 'profile.cameraPermissionDenied'
-            : 'profile.microphonePermissionDenied',
-        ),
+        this.t(kind === 'camera' ? 'profile.cameraPermissionDenied' : 'profile.microphonePermissionDenied')
       );
     } finally {
       this.mediaPermissionLoading.set(null);
@@ -149,32 +134,30 @@ export class ProfileComponent implements OnInit {
       return;
     }
     this.passwordSaving.set(true);
-    this.auth
-      .changePassword({ currentPassword, newPassword, confirmPassword })
-      .subscribe({
-        next: (response) => {
-          this.passwordSaving.set(false);
-          this.passwordForm.reset();
-          this.toast.success(response.detail || this.t('profile.passwordChanged'));
-          void this.auth.logout();
-        },
-        error: (error: unknown) => {
-          this.passwordSaving.set(false);
-          if (!(error instanceof HttpErrorResponse)) {
-            this.toast.error(this.t('profile.passwordChangeFailed'));
-            return;
-          }
-          if (error.status === 400) {
-            this.applyApiFieldErrors(error.error);
-            return;
-          }
-          if (error.status === 401) {
-            void this.auth.logout();
-            return;
-          }
+    this.auth.changePassword({ currentPassword, newPassword, confirmPassword }).subscribe({
+      next: (response) => {
+        this.passwordSaving.set(false);
+        this.passwordForm.reset();
+        this.toast.success(response.detail || this.t('profile.passwordChanged'));
+        void this.auth.logout();
+      },
+      error: (error: unknown) => {
+        this.passwordSaving.set(false);
+        if (!(error instanceof HttpErrorResponse)) {
           this.toast.error(this.t('profile.passwordChangeFailed'));
-        },
-      });
+          return;
+        }
+        if (error.status === 400) {
+          this.applyApiFieldErrors(error.error);
+          return;
+        }
+        if (error.status === 401) {
+          void this.auth.logout();
+          return;
+        }
+        this.toast.error(this.t('profile.passwordChangeFailed'));
+      },
+    });
   }
 
   private clearApiFieldErrors(): void {

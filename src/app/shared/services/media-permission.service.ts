@@ -10,9 +10,11 @@ export class MediaPermissionService {
   private permissionStatusByKind = new Map<MediaPermissionKind, PermissionStatus>();
 
   isSupported(): boolean {
-    return typeof navigator !== 'undefined'
-      && !!navigator.mediaDevices
-      && typeof navigator.mediaDevices.getUserMedia === 'function';
+    return (
+      typeof navigator !== 'undefined' &&
+      !!navigator.mediaDevices &&
+      typeof navigator.mediaDevices.getUserMedia === 'function'
+    );
   }
 
   getState(kind: MediaPermissionKind): MediaPermissionState {
@@ -48,9 +50,7 @@ export class MediaPermissionService {
     }
     // Prefer the simplest constraints on iOS/WebKit. Facing-mode ideals and
     // resolution targets often cause NotReadableError after a grant.
-    const constraints: MediaStreamConstraints = kind === 'camera'
-      ? { video: true }
-      : { audio: true };
+    const constraints: MediaStreamConstraints = kind === 'camera' ? { video: true } : { audio: true };
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       for (const track of stream.getTracks()) {

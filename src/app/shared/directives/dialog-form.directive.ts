@@ -3,7 +3,7 @@ import { Directive, TemplateRef, ViewContainerRef, inject, signal, effect } from
 @Directive({
   selector: '[appDialogForm]',
   exportAs: 'appDialogForm',
-  standalone: true
+  standalone: true,
 })
 export class DialogFormDirective {
   private templateRef = inject(TemplateRef<any>);

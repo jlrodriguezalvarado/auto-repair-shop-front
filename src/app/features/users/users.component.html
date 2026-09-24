@@ -1,11 +1,19 @@
 <div class="space-y-6 max-w-4xl mx-auto">
   <div>
-    <p class="text-body-md text-on-surface-variant">Administre los usuarios de la plataforma y asigne roles de acceso</p>
+    <p class="text-body-md text-on-surface-variant">
+      Administre los usuarios de la plataforma y asigne roles de acceso
+    </p>
   </div>
-  <div class="p-4 card-surface border border-outline-variant/30 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between">
+  <div
+    class="p-4 card-surface border border-outline-variant/30 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between"
+  >
     <div class="flex items-center gap-3 w-full md:w-auto">
       <label class="text-xs font-bold text-on-surface-variant whitespace-nowrap">Registro:</label>
-      <select (change)="loadUsers()" [(ngModel)]="deletedFilter" class="w-full md:w-44 px-3 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-sm">
+      <select
+        (change)="loadUsers()"
+        [(ngModel)]="deletedFilter"
+        class="w-full md:w-44 px-3 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-sm"
+      >
         <option value="all">Todos</option>
         <option value="false">Activos</option>
         <option value="true">Eliminados</option>
@@ -41,7 +49,11 @@
                 <td class="p-4 text-on-surface-variant">{{ u.email }}</td>
                 <td class="p-4">
                   @if (auth.canMutateTenantData() && !u.deletedAt) {
-                    <select (change)="changeRole(u, $event)" [value]="u.role" class="px-2.5 py-1.5 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-xs">
+                    <select
+                      (change)="changeRole(u, $event)"
+                      [value]="u.role"
+                      class="px-2.5 py-1.5 border border-outline-variant/30 bg-surface-container-lowest rounded-xl text-xs"
+                    >
                       <option value="ADMIN">Administrator</option>
                       <option value="SECRETARY">Secretary</option>
                       <option value="MECHANIC">Mechanic</option>
@@ -63,15 +75,27 @@
                 <td class="p-4 text-right">
                   @if (auth.canMutateTenantData()) {
                     @if (!u.deletedAt) {
-                      <button (click)="deleteUser(u)" class="p-2 text-error hover:bg-error-container/20 rounded-lg transition-colors" title="Eliminar">
+                      <button
+                        (click)="deleteUser(u)"
+                        class="p-2 text-error hover:bg-error-container/20 rounded-lg transition-colors"
+                        title="Eliminar"
+                      >
                         <span class="material-symbols-outlined text-xl">delete</span>
                       </button>
                     } @else {
-                      <button (click)="restoreUser(u)" class="p-2 text-primary hover:bg-primary-container/20 rounded-lg transition-colors" [title]="i18n.translate('actions.restore')">
+                      <button
+                        (click)="restoreUser(u)"
+                        class="p-2 text-primary hover:bg-primary-container/20 rounded-lg transition-colors"
+                        [title]="i18n.translate('actions.restore')"
+                      >
                         <span class="material-symbols-outlined text-xl">restore_from_trash</span>
                       </button>
                       @if (auth.hasRole(['ADMIN'])) {
-                        <button (click)="hardDeleteUser(u)" class="p-2 text-error hover:bg-error-container/20 rounded-lg transition-colors" [title]="i18n.translate('actions.hardDelete')">
+                        <button
+                          (click)="hardDeleteUser(u)"
+                          class="p-2 text-error hover:bg-error-container/20 rounded-lg transition-colors"
+                          [title]="i18n.translate('actions.hardDelete')"
+                        >
                           <span class="material-symbols-outlined text-xl">delete_forever</span>
                         </button>
                       }

@@ -1,8 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{html,ts,scss}",
-  ],
+  content: ['./src/**/*.{html,ts,scss}'],
   theme: {
     extend: {
       colors: {
@@ -77,7 +75,7 @@ module.exports = {
           'surface-variant': 'var(--md-surface-variant)',
           'on-surface-variant': 'var(--md-on-surface-variant)',
           outline: 'var(--md-outline)',
-        }
+        },
       },
       borderRadius: {
         DEFAULT: '0.25rem',
@@ -122,4 +120,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};

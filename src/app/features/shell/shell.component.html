@@ -3,7 +3,9 @@
     <div class="flex flex-col h-full py-lg px-md">
       <div class="mb-xl px-sm">
         <div class="flex items-center gap-sm">
-          <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
+          <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1"
+            >precision_manufacturing</span
+          >
           <div>
             <div class="text-title-sm font-title-sm font-bold text-primary leading-none">App Taller Mecánico</div>
             <div class="text-[10px] uppercase tracking-widest text-outline mt-1 font-bold">Precision Workshop</div>
@@ -16,7 +18,8 @@
             [routerLink]="item.path"
             routerLinkActive="text-primary font-bold border-r-4 border-primary bg-surface-container-high"
             [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
-            class="flex items-center gap-3 px-sm py-md rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-high transition-colors">
+            class="flex items-center gap-3 px-sm py-md rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-high transition-colors"
+          >
             <span class="material-symbols-outlined">{{ item.icon }}</span>
             <span class="text-body-md font-body-md">{{ item.label }}</span>
           </a>
@@ -24,7 +27,9 @@
       </nav>
       <div class="mt-auto pt-lg border-t border-outline-variant/30 flex flex-col gap-md px-sm">
         <div class="flex items-center gap-md">
-          <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-label-sm">
+          <div
+            class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-label-sm"
+          >
             {{ auth.user()?.username?.substring(0, 2)?.toUpperCase() }}
           </div>
           <div class="flex-1 min-w-0">
@@ -40,7 +45,8 @@
   }
   @if (mobileNavOpen()) {
     <aside
-      class="md:hidden fixed left-0 top-0 h-full w-[260px] bg-surface-container shadow-elevated z-50 flex flex-col py-lg px-md">
+      class="md:hidden fixed left-0 top-0 h-full w-[260px] bg-surface-container shadow-elevated z-50 flex flex-col py-lg px-md"
+    >
       <div class="flex items-center justify-between mb-lg px-sm">
         <div class="text-title-sm font-bold text-primary">Menú</div>
         <button (click)="toggleMobileNav()" class="p-1 rounded-full hover:bg-surface-container-high">
@@ -54,7 +60,8 @@
             routerLinkActive="text-primary font-bold border-r-4 border-primary bg-surface-container-high"
             [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
             (click)="toggleMobileNav()"
-            class="flex items-center gap-3 px-sm py-md rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-high transition-colors">
+            class="flex items-center gap-3 px-sm py-md rounded-lg text-on-surface-variant opacity-70 hover:bg-surface-container-high transition-colors"
+          >
             <span class="material-symbols-outlined">{{ item.icon }}</span>
             <span class="text-body-md">{{ item.label }}</span>
           </a>
@@ -64,7 +71,9 @@
   }
   <div class="flex-1 flex flex-col overflow-hidden md:ml-[260px]">
     @if (auth.isReadOnlyCompanyView() && auth.viewingCompany(); as company) {
-      <div class="flex-shrink-0 flex items-center justify-between gap-md px-gutter md:px-lg py-sm bg-primary-container text-on-primary-container border-b border-outline-variant/20 z-20">
+      <div
+        class="flex-shrink-0 flex items-center justify-between gap-md px-gutter md:px-lg py-sm bg-primary-container text-on-primary-container border-b border-outline-variant/20 z-20"
+      >
         <div class="flex items-center gap-sm min-w-0">
           <span class="material-symbols-outlined text-xl">visibility</span>
           <p class="text-label-sm font-bold truncate">
@@ -77,14 +86,20 @@
         <button
           type="button"
           (click)="auth.exitCompanyView()"
-          class="flex-shrink-0 px-3 py-1.5 text-xs font-bold rounded-lg bg-surface-container-lowest/80 text-on-surface hover:bg-surface-container-lowest transition-colors">
+          class="flex-shrink-0 px-3 py-1.5 text-xs font-bold rounded-lg bg-surface-container-lowest/80 text-on-surface hover:bg-surface-container-lowest transition-colors"
+        >
           {{ i18n.translate('companyView.exit') }}
         </button>
       </div>
     }
-    <header class="flex-shrink-0 h-16 bg-surface-bright shadow-sm z-20 px-gutter flex items-center justify-between border-b border-outline-variant/10">
+    <header
+      class="flex-shrink-0 h-16 bg-surface-bright shadow-sm z-20 px-gutter flex items-center justify-between border-b border-outline-variant/10"
+    >
       <div class="flex items-center gap-md">
-        <button (click)="toggleMobileNav()" class="md:hidden p-2 text-primary rounded-full hover:bg-surface-container transition-colors">
+        <button
+          (click)="toggleMobileNav()"
+          class="md:hidden p-2 text-primary rounded-full hover:bg-surface-container transition-colors"
+        >
           <span class="material-symbols-outlined">menu</span>
         </button>
         <h1 class="text-headline-md font-headline-md font-bold text-primary">{{ pageTitle() }}</h1>
@@ -93,10 +108,13 @@
         <div class="relative">
           <button
             (click)="toggleNotificationsPanel()"
-            class="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant">
+            class="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant"
+          >
             <span class="material-symbols-outlined">notifications</span>
             @if (notifications.unreadCount() > 0) {
-              <span class="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center">
+              <span
+                class="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center"
+              >
                 {{ notifications.unreadCount() }}
               </span>
             }
@@ -109,14 +127,17 @@
     <main class="flex-1 overflow-y-auto px-gutter md:px-lg py-md pb-24 md:pb-lg bg-[#f5f7f9] custom-scrollbar">
       <router-outlet></router-outlet>
     </main>
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface shadow-nav-mobile border-t border-outline-variant/10">
+    <nav
+      class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface shadow-nav-mobile border-t border-outline-variant/10"
+    >
       <div class="flex justify-around items-center px-4 py-2">
         @for (item of mobileNavItems(); track item.path) {
           <a
             [routerLink]="item.path"
             routerLinkActive="bg-secondary-container text-on-secondary-container rounded-xl scale-95"
             [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
-            class="flex flex-col items-center justify-center text-on-surface-variant py-1 px-3 transition-transform">
+            class="flex flex-col items-center justify-center text-on-surface-variant py-1 px-3 transition-transform"
+          >
             <span class="material-symbols-outlined">{{ item.icon }}</span>
             <span class="text-label-sm font-label-sm">{{ item.label }}</span>
           </a>
@@ -127,7 +148,8 @@
           [class.text-on-secondary-container]="isMobileNavMoreActive"
           [class.rounded-xl]="isMobileNavMoreActive"
           [class.scale-95]="isMobileNavMoreActive"
-          class="flex flex-col items-center justify-center text-on-surface-variant py-1 px-3 transition-transform">
+          class="flex flex-col items-center justify-center text-on-surface-variant py-1 px-3 transition-transform"
+        >
           <span class="material-symbols-outlined">more_horiz</span>
           <span class="text-label-sm font-label-sm">Más</span>
         </button>

@@ -47,15 +47,17 @@ export class PushNotificationService {
       }
       const json = subscription.toJSON();
       const keys = json.keys ?? {};
-      await firstValueFrom(this.repo.savePushSubscription({
-        endpoint: subscription.endpoint,
-        keys: {
-          p256dh: keys['p256dh'] ?? '',
-          auth: keys['auth'] ?? '',
-        },
-        userAgent: navigator.userAgent,
-        platform: this.getPlatform(),
-      }));
+      await firstValueFrom(
+        this.repo.savePushSubscription({
+          endpoint: subscription.endpoint,
+          keys: {
+            p256dh: keys['p256dh'] ?? '',
+            auth: keys['auth'] ?? '',
+          },
+          userAgent: navigator.userAgent,
+          platform: this.getPlatform(),
+        })
+      );
       return true;
     } catch (error) {
       console.error('Failed to subscribe to push notifications', error);
@@ -106,12 +108,15 @@ export class PushNotificationService {
     const currentKey = subscription.options.applicationServerKey;
     if (!currentKey) return false;
     const currentBytes = new Uint8Array(currentKey);
-    return currentBytes.length === expectedKey.length && currentBytes.every((value, index) => value === expectedKey[index]);
+    return (
+      currentBytes.length === expectedKey.length && currentBytes.every((value, index) => value === expectedKey[index])
+    );
   }
 
   private getPlatform(): string {
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      || ('standalone' in navigator && (navigator as Navigator & { standalone?: boolean }).standalone === true);
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      ('standalone' in navigator && (navigator as Navigator & { standalone?: boolean }).standalone === true);
     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) return isStandalone ? 'ios-pwa' : 'ios-web';
     if (/Android/.test(navigator.userAgent)) return isStandalone ? 'android-pwa' : 'android-web';
     return isStandalone ? 'web-pwa' : 'web';

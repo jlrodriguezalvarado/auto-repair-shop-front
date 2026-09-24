@@ -5,7 +5,7 @@ import { DeletedFilter, User } from '../../core/api/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsersRepository {
   private api = inject(ApiService);

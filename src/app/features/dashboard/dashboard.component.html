@@ -4,32 +4,50 @@
     <div class="flex flex-wrap items-center gap-sm">
       <button
         (click)="onPeriodChange('today')"
-        [ngClass]="selectedPeriod() === 'today' ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'"
-        class="px-md py-xs text-label-sm font-semibold rounded-full transition-all">
+        [ngClass]="
+          selectedPeriod() === 'today'
+            ? 'bg-primary text-on-primary'
+            : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'
+        "
+        class="px-md py-xs text-label-sm font-semibold rounded-full transition-all"
+      >
         {{ i18n.translate('dashboard.filterToday') }}
       </button>
       <button
         (click)="onPeriodChange('week')"
-        [ngClass]="selectedPeriod() === 'week' ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'"
-        class="px-md py-xs text-label-sm font-semibold rounded-full transition-all">
+        [ngClass]="
+          selectedPeriod() === 'week'
+            ? 'bg-primary text-on-primary'
+            : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'
+        "
+        class="px-md py-xs text-label-sm font-semibold rounded-full transition-all"
+      >
         {{ i18n.translate('dashboard.filterThisWeek') }}
       </button>
       <button
         (click)="onPeriodChange('month')"
-        [ngClass]="selectedPeriod() === 'month' ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'"
-        class="px-md py-xs text-label-sm font-semibold rounded-full transition-all">
+        [ngClass]="
+          selectedPeriod() === 'month'
+            ? 'bg-primary text-on-primary'
+            : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'
+        "
+        class="px-md py-xs text-label-sm font-semibold rounded-full transition-all"
+      >
         {{ i18n.translate('dashboard.filterThisMonth') }}
       </button>
       <button
         (click)="onPeriodChange('custom')"
-        [ngClass]="selectedPeriod() === 'custom' ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'"
-        class="px-md py-xs text-label-sm font-semibold rounded-full transition-all">
+        [ngClass]="
+          selectedPeriod() === 'custom'
+            ? 'bg-primary text-on-primary'
+            : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'
+        "
+        class="px-md py-xs text-label-sm font-semibold rounded-full transition-all"
+      >
         {{ i18n.translate('dashboard.filterCustom') }}
       </button>
       @if (auth.canMutateTenantData()) {
-        <a
-          routerLink="/work-orders"
-          class="btn-cta px-md py-xs flex items-center gap-sm">
+        <a routerLink="/work-orders" class="btn-cta px-md py-xs flex items-center gap-sm">
           <span class="material-symbols-outlined text-[18px]">add</span>
           <span class="text-label-sm font-label-sm uppercase">Nueva Orden</span>
         </a>
@@ -40,11 +58,19 @@
     <div class="card-surface p-md flex flex-wrap gap-md items-end">
       <div class="flex flex-col gap-xs">
         <label class="font-label-sm text-label-sm text-on-surface-variant">Fecha Inicio</label>
-        <input type="date" [(ngModel)]="customStartDate" class="px-md py-xs border border-outline-variant rounded-lg text-body-md bg-white focus:ring-1 focus:ring-primary focus:border-primary outline-none">
+        <input
+          type="date"
+          [(ngModel)]="customStartDate"
+          class="px-md py-xs border border-outline-variant rounded-lg text-body-md bg-white focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+        />
       </div>
       <div class="flex flex-col gap-xs">
         <label class="font-label-sm text-label-sm text-on-surface-variant">Fecha Fin</label>
-        <input type="date" [(ngModel)]="customEndDate" class="px-md py-xs border border-outline-variant rounded-lg text-body-md bg-white focus:ring-1 focus:ring-primary focus:border-primary outline-none">
+        <input
+          type="date"
+          [(ngModel)]="customEndDate"
+          class="px-md py-xs border border-outline-variant rounded-lg text-body-md bg-white focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+        />
       </div>
       <button (click)="onCustomRangeSubmit()" class="btn-primary px-md py-xs text-label-sm">
         {{ i18n.translate('actions.filter') }}
@@ -59,18 +85,24 @@
   }
   @if (!loading() && !error() && summary(); as s) {
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-md">
-      <div class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between">
+      <div
+        class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between"
+      >
         <div class="flex justify-between items-start">
           <div class="bg-primary-container/10 p-xs rounded-lg">
             <span class="material-symbols-outlined text-primary">directions_car</span>
           </div>
         </div>
         <div class="mt-md">
-          <p class="text-label-sm font-label-sm text-on-surface-variant">{{ i18n.translate('dashboard.carsServiced') }}</p>
+          <p class="text-label-sm font-label-sm text-on-surface-variant">
+            {{ i18n.translate('dashboard.carsServiced') }}
+          </p>
           <p class="text-display-lg-mobile md:text-headline-md font-bold text-primary">{{ s.carsServiced }}</p>
         </div>
       </div>
-      <div class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between">
+      <div
+        class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between"
+      >
         <div class="flex justify-between items-start">
           <div class="bg-secondary-container/10 p-xs rounded-lg">
             <span class="material-symbols-outlined text-secondary">receipt_long</span>
@@ -82,33 +114,49 @@
           }
         </div>
         <div class="mt-md">
-          <p class="text-label-sm font-label-sm text-on-surface-variant">{{ i18n.translate('dashboard.pendingReceipts') }}</p>
+          <p class="text-label-sm font-label-sm text-on-surface-variant">
+            {{ i18n.translate('dashboard.pendingReceipts') }}
+          </p>
           <p class="text-display-lg-mobile md:text-headline-md font-bold text-primary">{{ s.pendingReceiptsCount }}</p>
         </div>
       </div>
-      <div class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between">
+      <div
+        class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between"
+      >
         <div class="flex justify-between items-start">
           <div class="bg-tertiary-fixed/10 p-xs rounded-lg">
             <span class="material-symbols-outlined text-tertiary-fixed-dim">payments</span>
           </div>
         </div>
         <div class="mt-md">
-          <p class="text-label-sm font-label-sm text-on-surface-variant">{{ i18n.translate('dashboard.totalToCollect') }}</p>
-          <p class="text-display-lg-mobile md:text-headline-md font-bold text-primary">${{ s.totalToCollect | number:'1.0-0' }}</p>
+          <p class="text-label-sm font-label-sm text-on-surface-variant">
+            {{ i18n.translate('dashboard.totalToCollect') }}
+          </p>
+          <p class="text-display-lg-mobile md:text-headline-md font-bold text-primary">
+            ${{ s.totalToCollect | number: '1.0-0' }}
+          </p>
         </div>
       </div>
-      <div class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between">
+      <div
+        class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between"
+      >
         <div class="flex justify-between items-start">
           <div class="bg-on-tertiary-container/10 p-xs rounded-lg">
             <span class="material-symbols-outlined text-on-tertiary-container">account_balance_wallet</span>
           </div>
         </div>
         <div class="mt-md">
-          <p class="text-label-sm font-label-sm text-on-surface-variant">{{ i18n.translate('dashboard.incomeReceived') }}</p>
-          <p class="text-display-lg-mobile md:text-headline-md font-bold text-primary">${{ s.incomeReceived | number:'1.0-0' }}</p>
+          <p class="text-label-sm font-label-sm text-on-surface-variant">
+            {{ i18n.translate('dashboard.incomeReceived') }}
+          </p>
+          <p class="text-display-lg-mobile md:text-headline-md font-bold text-primary">
+            ${{ s.incomeReceived | number: '1.0-0' }}
+          </p>
         </div>
       </div>
-      <div class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between">
+      <div
+        class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between"
+      >
         <div class="flex justify-between items-start">
           <div class="bg-primary-container/10 p-xs rounded-lg">
             <span class="material-symbols-outlined text-primary">build</span>
@@ -119,7 +167,9 @@
           <p class="text-display-lg-mobile md:text-headline-md font-bold text-primary">{{ s.workOrdersCount }}</p>
         </div>
       </div>
-      <div class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between">
+      <div
+        class="metric-card bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30 flex flex-col justify-between"
+      >
         <div class="flex justify-between items-start">
           <div class="bg-error-container/20 p-xs rounded-lg">
             <span class="material-symbols-outlined text-error">person_alert</span>
@@ -159,7 +209,10 @@
                 <span class="text-on-surface-variant">{{ srv.count }} veces</span>
               </div>
               <div class="w-full bg-surface-container rounded-full h-2">
-                <div class="bg-primary h-2 rounded-full" [style.width.%]="getServiceBarWidth(srv.count, s.topServices)"></div>
+                <div
+                  class="bg-primary h-2 rounded-full"
+                  [style.width.%]="getServiceBarWidth(srv.count, s.topServices)"
+                ></div>
               </div>
             </div>
           }
@@ -185,7 +238,7 @@
                   <p class="text-[10px] text-on-surface-variant">{{ pay.date }}</p>
                 </div>
               </div>
-              <p class="text-label-sm font-bold text-on-tertiary-container">+${{ pay.amount | number:'1.0-0' }}</p>
+              <p class="text-label-sm font-bold text-on-tertiary-container">+${{ pay.amount | number: '1.0-0' }}</p>
             </div>
           }
           @if (s.recentPayments.length === 0) {
@@ -210,7 +263,7 @@
             @for (debtor of s.debtors; track debtor) {
               <tr class="hover:bg-surface-container/30 transition-colors">
                 <td class="px-lg py-md text-body-md">{{ debtor.name }}</td>
-                <td class="px-lg py-md text-right font-bold text-error">${{ debtor.debt | number:'1.2-2' }}</td>
+                <td class="px-lg py-md text-right font-bold text-error">${{ debtor.debt | number: '1.2-2' }}</td>
               </tr>
             }
             @if (s.debtors.length === 0) {

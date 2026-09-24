@@ -5,19 +5,23 @@ import { DashboardSummary } from '../../core/api/models';
 import { Observable, map } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DashboardRepository {
   private api = inject(ApiService);
 
   getSummary(params?: { period?: string; startDate?: string; endDate?: string }): Observable<DashboardSummary> {
     const apiParams = this.toApiParams(params);
-    return this.api.get<Record<string, any>>(ENDPOINTS.dashboard.summary, apiParams).pipe(
-      map((raw) => this.normalize(raw))
-    );
+    return this.api
+      .get<Record<string, any>>(ENDPOINTS.dashboard.summary, apiParams)
+      .pipe(map((raw) => this.normalize(raw)));
   }
 
-  private toApiParams(params?: { period?: string; startDate?: string; endDate?: string }): Record<string, string> | undefined {
+  private toApiParams(params?: {
+    period?: string;
+    startDate?: string;
+    endDate?: string;
+  }): Record<string, string> | undefined {
     if (!params) return undefined;
     const periodMap: Record<string, string> = {
       today: 'today',
@@ -37,11 +41,14 @@ export class DashboardRepository {
     const debtorsRaw = (raw['customersWithDebt'] ?? raw['debtors'] ?? []) as any[];
     const topServicesRaw = (raw['topServices'] ?? []) as any[];
     const recentPaymentsRaw = (raw['recentPayments'] ?? []) as any[];
-    const ordersByStatus = (raw['workOrdersByStatus'] ?? raw['ordersByStatus'] ?? []) as { status: string; count: number }[];
+    const ordersByStatus = (raw['workOrdersByStatus'] ?? raw['ordersByStatus'] ?? []) as {
+      status: string;
+      count: number;
+    }[];
     const receiptsByStatus = (raw['receiptsByStatus'] ?? []) as { status: string; count: number }[];
     const debtors = debtorsRaw.map((d, index) => ({
-      id: d.id ?? index,
-      name: d.name ?? `${d.customerFirstName ?? d.customer_FirstName ?? ''} ${d.customerLastName ?? d.customer_LastName ?? ''}`.trim(),
+      id: Number(d.customerId ?? d.id ?? index),
+      name: d.name ?? `${d.customerFirstName ?? ''} ${d.customerLastName ?? ''}`.trim(),
       debt: Number(d.debt ?? d.pendingAmount ?? 0),
     }));
     return {
@@ -57,12 +64,15 @@ export class DashboardRepository {
         name: String(s.name ?? s.nameSnapshot ?? ''),
         count: Number(s.count ?? 0),
       })),
-      recentPayments: recentPaymentsRaw.map((p) => ({
-        id: Number(p.id ?? 0),
-        amount: Number(p.amount ?? 0),
-        date: String(p.date ?? p.paymentDate ?? ''),
-        customerName: String(p.customerName ?? p.receiptCode ?? p.receipt_Code ?? ''),
-      })),
+      recentPayments: recentPaymentsRaw.map((p) => {
+        const fullName = `${p.customerFirstName ?? ''} ${p.customerLastName ?? ''}`.trim();
+        return {
+          id: Number(p.id ?? 0),
+          amount: Number(p.amount ?? 0),
+          date: String(p.date ?? p.paymentDate ?? ''),
+          customerName: String(p.customerName ?? (fullName || p.receiptCode || '')),
+        };
+      }),
       debtors,
     };
   }

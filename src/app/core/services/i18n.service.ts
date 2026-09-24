@@ -20,7 +20,7 @@ const ES_TRANSLATIONS: TranslationDictionary = {
     users: 'Usuarios',
     profile: 'Perfil',
     login: 'Iniciar Sesión',
-    logout: 'Cerrar Sesión'
+    logout: 'Cerrar Sesión',
   },
   companies: {
     subtitle: 'Gestione las empresas del SaaS y su administrador inicial',
@@ -42,13 +42,13 @@ const ES_TRANSLATIONS: TranslationDictionary = {
     adminFirstName: 'Nombre',
     adminLastName: 'Apellido',
     adminRequired: 'Complete usuario, email y contraseña del administrador',
-    viewShop: 'Ver taller'
+    viewShop: 'Ver taller',
   },
   companyView: {
     banner: 'Viendo taller: {{name}}',
     exit: 'Salir',
     enter: 'Ver taller',
-    readOnly: 'Solo lectura'
+    readOnly: 'Solo lectura',
   },
   profile: {
     title: 'Perfil',
@@ -83,7 +83,7 @@ const ES_TRANSLATIONS: TranslationDictionary = {
     cameraPermissionDeniedHint: 'Activa la cámara en la configuración del navegador o del sistema',
     microphonePermissionDeniedHint: 'Activa el micrófono en la configuración del navegador o del sistema',
     mediaPermissionManageInSettings: 'Para revocar permisos, usa la configuración del navegador o del sistema',
-    mediaPermissionsNotSupported: 'Cámara y micrófono no están disponibles en este dispositivo'
+    mediaPermissionsNotSupported: 'Cámara y micrófono no están disponibles en este dispositivo',
   },
   status: {
     received: 'Recibido',
@@ -101,7 +101,7 @@ const ES_TRANSLATIONS: TranslationDictionary = {
     unpaid: 'Por pagar',
     partial: 'Pagando',
     paid: 'Pagado',
-    overdue: 'Vencido'
+    overdue: 'Vencido',
   },
   actions: {
     save: 'Guardar',
@@ -127,7 +127,7 @@ const ES_TRANSLATIONS: TranslationDictionary = {
     changeStatus: 'Cambiar Estado',
     createWorkOrder: 'Crear Orden de Trabajo',
     createReceipt: 'Crear Recibo',
-    close: 'Cerrar'
+    close: 'Cerrar',
   },
   softDelete: {
     filterLabel: 'Registro',
@@ -145,12 +145,12 @@ const ES_TRANSLATIONS: TranslationDictionary = {
     hardDeleteTitle: 'Eliminar permanente',
     hardDeleteMessage: '¿Eliminar permanentemente "{{name}}"? Esta acción no se puede deshacer.',
     hardDeleteSuccess: 'Registro eliminado permanentemente',
-    hardDeleteFailed: 'Error al eliminar permanentemente'
+    hardDeleteFailed: 'Error al eliminar permanentemente',
   },
   auth: {
     userDeleted: 'Esta cuenta ha sido eliminada.',
     companyDeleted: 'Su empresa no está disponible. Contacte al administrador.',
-    invalidCredentials: 'Nombre de usuario o contraseña incorrectos.'
+    invalidCredentials: 'Nombre de usuario o contraseña incorrectos.',
   },
   validation: {
     required: 'Este campo es obligatorio',
@@ -161,7 +161,7 @@ const ES_TRANSLATIONS: TranslationDictionary = {
     plate: 'Placa obligatoria',
     clientRequired: 'Cliente obligatorio',
     vehicleRequired: 'Vehículo obligatorio',
-    paymentExceedsPending: 'El monto del pago no puede ser mayor al pendiente'
+    paymentExceedsPending: 'El monto del pago no puede ser mayor al pendiente',
   },
   common: {
     loading: 'Cargando...',
@@ -178,7 +178,7 @@ const ES_TRANSLATIONS: TranslationDictionary = {
     code: 'Código',
     date: 'Fecha',
     notes: 'Notas',
-    success: 'Operación realizada con éxito'
+    success: 'Operación realizada con éxito',
   },
   dashboard: {
     carsServiced: 'Autos atendidos',
@@ -195,8 +195,8 @@ const ES_TRANSLATIONS: TranslationDictionary = {
     filterToday: 'Hoy',
     filterThisWeek: 'Esta semana',
     filterThisMonth: 'Este mes',
-    filterCustom: 'Personalizado'
-  }
+    filterCustom: 'Personalizado',
+  },
 };
 
 const EN_TRANSLATIONS: TranslationDictionary = {
@@ -213,7 +213,7 @@ const EN_TRANSLATIONS: TranslationDictionary = {
     users: 'Users',
     profile: 'Profile',
     login: 'Login',
-    logout: 'Logout'
+    logout: 'Logout',
   },
   companies: {
     subtitle: 'Manage SaaS companies and their initial admin',
@@ -235,13 +235,13 @@ const EN_TRANSLATIONS: TranslationDictionary = {
     adminFirstName: 'First name',
     adminLastName: 'Last name',
     adminRequired: 'Complete admin username, email and password',
-    viewShop: 'View shop'
+    viewShop: 'View shop',
   },
   companyView: {
     banner: 'Viewing shop: {{name}}',
     exit: 'Exit',
     enter: 'View shop',
-    readOnly: 'Read only'
+    readOnly: 'Read only',
   },
   profile: {
     title: 'Profile',
@@ -276,7 +276,7 @@ const EN_TRANSLATIONS: TranslationDictionary = {
     cameraPermissionDeniedHint: 'Enable the camera in browser or system settings',
     microphonePermissionDeniedHint: 'Enable the microphone in browser or system settings',
     mediaPermissionManageInSettings: 'To revoke permissions, use browser or system settings',
-    mediaPermissionsNotSupported: 'Camera and microphone are not available on this device'
+    mediaPermissionsNotSupported: 'Camera and microphone are not available on this device',
   },
   status: {
     received: 'Received',
@@ -294,7 +294,7 @@ const EN_TRANSLATIONS: TranslationDictionary = {
     unpaid: 'Unpaid',
     partial: 'Partial',
     paid: 'Paid',
-    overdue: 'Overdue'
+    overdue: 'Overdue',
   },
   actions: {
     save: 'Save',
@@ -320,7 +320,7 @@ const EN_TRANSLATIONS: TranslationDictionary = {
     changeStatus: 'Change Status',
     createWorkOrder: 'Create Work Order',
     createReceipt: 'Create Receipt',
-    close: 'Close'
+    close: 'Close',
   },
   softDelete: {
     filterLabel: 'Record',
@@ -338,12 +338,12 @@ const EN_TRANSLATIONS: TranslationDictionary = {
     hardDeleteTitle: 'Delete permanently',
     hardDeleteMessage: 'Permanently delete "{{name}}"? This action cannot be undone.',
     hardDeleteSuccess: 'Record permanently deleted',
-    hardDeleteFailed: 'Failed to permanently delete'
+    hardDeleteFailed: 'Failed to permanently delete',
   },
   auth: {
     userDeleted: 'This account has been deleted.',
     companyDeleted: 'Your company is unavailable. Contact an administrator.',
-    invalidCredentials: 'Incorrect username or password.'
+    invalidCredentials: 'Incorrect username or password.',
   },
   validation: {
     required: 'This field is required',
@@ -354,7 +354,7 @@ const EN_TRANSLATIONS: TranslationDictionary = {
     plate: 'Plate is required',
     clientRequired: 'Customer is required',
     vehicleRequired: 'Vehicle is required',
-    paymentExceedsPending: 'Payment amount cannot exceed the pending amount'
+    paymentExceedsPending: 'Payment amount cannot exceed the pending amount',
   },
   common: {
     loading: 'Loading...',
@@ -371,7 +371,7 @@ const EN_TRANSLATIONS: TranslationDictionary = {
     code: 'Code',
     date: 'Date',
     notes: 'Notes',
-    success: 'Operation completed successfully'
+    success: 'Operation completed successfully',
   },
   dashboard: {
     carsServiced: 'Cars serviced',
@@ -388,12 +388,12 @@ const EN_TRANSLATIONS: TranslationDictionary = {
     filterToday: 'Today',
     filterThisWeek: 'This week',
     filterThisMonth: 'This month',
-    filterCustom: 'Custom range'
-  }
+    filterCustom: 'Custom range',
+  },
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class I18nService {
   private currentLang = signal<Language>('es');
@@ -409,7 +409,7 @@ export class I18nService {
   }
 
   toggleLanguage(): void {
-    this.currentLang.update(lang => (lang === 'es' ? 'en' : 'es'));
+    this.currentLang.update((lang) => (lang === 'es' ? 'en' : 'es'));
   }
 
   translate(path: string, params?: Record<string, string | number>): string {

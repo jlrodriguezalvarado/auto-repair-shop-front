@@ -8,7 +8,7 @@ import { I18nService } from '../../../core/services/i18n.service';
   imports: [],
   templateUrl: './error.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./error.component.scss']
+  styleUrls: ['./error.component.scss'],
 })
 export class ErrorComponent {
   private i18n = inject(I18nService);

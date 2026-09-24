@@ -31,9 +31,9 @@ export class NotificationsRepository {
   }
 
   unreadCount(): Observable<number> {
-    return this.api.get<{ unreadCount: number }>(ENDPOINTS.notifications.unreadCount).pipe(
-      map((res) => res.unreadCount ?? 0),
-    );
+    return this.api
+      .get<{ unreadCount: number }>(ENDPOINTS.notifications.unreadCount)
+      .pipe(map((res) => res.unreadCount ?? 0));
   }
 
   markRead(id: number | string): Observable<AppNotification> {
@@ -41,9 +41,9 @@ export class NotificationsRepository {
   }
 
   markAllRead(): Observable<number> {
-    return this.api.post<{ updatedCount: number }>(ENDPOINTS.notifications.markAllRead, {}).pipe(
-      map((res) => res.updatedCount ?? 0),
-    );
+    return this.api
+      .post<{ updatedCount: number }>(ENDPOINTS.notifications.markAllRead, {})
+      .pipe(map((res) => res.updatedCount ?? 0));
   }
 
   getVapidPublicKey(): Observable<string> {
@@ -51,7 +51,7 @@ export class NotificationsRepository {
       map((response) => {
         if (typeof response === 'string') return response;
         return String(response['publicKey'] ?? response['public_key'] ?? '');
-      }),
+      })
     );
   }
 

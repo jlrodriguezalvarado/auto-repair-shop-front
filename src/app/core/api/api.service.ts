@@ -12,52 +12,53 @@ export interface PaginatedResponse<T> {
   results: T[];
 }
 
+export type QueryParams = Record<string, string | number | boolean | null | undefined | unknown>;
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl;
 
-  get<T>(endpoint: string, params?: any): Observable<T> {
+  get<T>(endpoint: string, params?: QueryParams): Observable<T> {
     let httpParams = new HttpParams();
     if (params) {
-      const snakeParams = keysToSnake(params);
-      Object.keys(snakeParams).forEach(key => {
-        if (snakeParams[key] !== undefined && snakeParams[key] !== null) {
-          httpParams = httpParams.set(key, String(snakeParams[key]));
+      const snakeParams = keysToSnake(params) as Record<string, unknown>;
+      Object.keys(snakeParams).forEach((key) => {
+        const value = snakeParams[key];
+        if (value !== undefined && value !== null) {
+          httpParams = httpParams.set(key, String(value));
         }
       });
     }
-    return this.http.get<T>(`${this.baseUrl}${endpoint}`, { params: httpParams }).pipe(
-      map(response => keysToCamel(response))
-    );
+    return this.http
+      .get(`${this.baseUrl}${endpoint}`, { params: httpParams })
+      .pipe(map((response) => keysToCamel(response) as T));
   }
 
-  post<T>(endpoint: string, body: any): Observable<T> {
-    const snakeBody = keysToSnake(body);
-    return this.http.post<T>(`${this.baseUrl}${endpoint}`, snakeBody).pipe(
-      map(response => keysToCamel(response))
-    );
+  getBlob(endpoint: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}${endpoint}`, { responseType: 'blob' });
   }
 
-  put<T>(endpoint: string, body: any): Observable<T> {
+  post<T>(endpoint: string, body: unknown): Observable<T> {
     const snakeBody = keysToSnake(body);
-    return this.http.put<T>(`${this.baseUrl}${endpoint}`, snakeBody).pipe(
-      map(response => keysToCamel(response))
-    );
+    return this.http.post(`${this.baseUrl}${endpoint}`, snakeBody).pipe(map((response) => keysToCamel(response) as T));
   }
 
-  patch<T>(endpoint: string, body: any): Observable<T> {
+  put<T>(endpoint: string, body: unknown): Observable<T> {
     const snakeBody = keysToSnake(body);
-    return this.http.patch<T>(`${this.baseUrl}${endpoint}`, snakeBody).pipe(
-      map(response => keysToCamel(response))
-    );
+    return this.http.put(`${this.baseUrl}${endpoint}`, snakeBody).pipe(map((response) => keysToCamel(response) as T));
+  }
+
+  patch<T>(endpoint: string, body: unknown): Observable<T> {
+    const snakeBody = keysToSnake(body);
+    return this.http.patch(`${this.baseUrl}${endpoint}`, snakeBody).pipe(map((response) => keysToCamel(response) as T));
   }
 
   delete<T>(endpoint: string): Observable<T> {
-    return this.http.delete<T>(`${this.baseUrl}${endpoint}`).pipe(
-      map(response => (response == null ? response : keysToCamel(response)))
-    );
+    return this.http
+      .delete(`${this.baseUrl}${endpoint}`)
+      .pipe(map((response) => (response == null ? response : keysToCamel(response)) as T));
   }
 }

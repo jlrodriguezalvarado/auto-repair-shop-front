@@ -1,7 +1,11 @@
 <div class="flex items-center justify-center min-h-screen p-md bg-[#f5f7f9] relative overflow-hidden">
   <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none opacity-20">
-    <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary-container blur-[120px]"></div>
-    <div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-secondary-container blur-[100px] opacity-40"></div>
+    <div
+      class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary-container blur-[120px]"
+    ></div>
+    <div
+      class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-secondary-container blur-[100px] opacity-40"
+    ></div>
   </div>
   <main class="w-full max-w-[440px] flex flex-col items-center">
     <header class="mb-xl text-center flex flex-col items-center">
@@ -19,7 +23,9 @@
       <form (ngSubmit)="onSubmit()" class="space-y-lg">
         <div class="flex flex-col gap-xs">
           <label for="username" class="font-label-sm text-label-sm text-on-surface-variant">Usuario</label>
-          <div class="relative flex items-center input-focus-effect border border-outline-variant rounded-lg transition-all duration-200 bg-white">
+          <div
+            class="relative flex items-center input-focus-effect border border-outline-variant rounded-lg transition-all duration-200 bg-white"
+          >
             <span class="material-symbols-outlined absolute left-md text-outline">person</span>
             <input
               type="text"
@@ -29,12 +35,15 @@
               autocomplete="username"
               placeholder="Usuario"
               class="w-full bg-transparent border-none focus:ring-0 py-3 pl-12 pr-md font-body-md text-body-md text-on-surface placeholder:text-outline opacity-90 outline-none"
-              required>
+              required
+            />
           </div>
         </div>
         <div class="flex flex-col gap-xs">
           <label for="password" class="font-label-sm text-label-sm text-on-surface-variant">Contraseña</label>
-          <div class="relative flex items-center input-focus-effect border border-outline-variant rounded-lg transition-all duration-200 bg-white">
+          <div
+            class="relative flex items-center input-focus-effect border border-outline-variant rounded-lg transition-all duration-200 bg-white"
+          >
             <span class="material-symbols-outlined absolute left-md text-outline">lock</span>
             <input
               type="password"
@@ -44,20 +53,24 @@
               autocomplete="current-password"
               placeholder="Contraseña"
               class="w-full bg-transparent border-none focus:ring-0 py-3 pl-12 pr-md font-body-md text-body-md text-on-surface placeholder:text-outline opacity-90 outline-none"
-              required>
+              required
+            />
           </div>
         </div>
         <div class="pt-sm">
           <button
             type="submit"
             [disabled]="loading() || !username || !password"
-            class="w-full bg-secondary-container text-on-secondary-container font-headline-md text-title-sm py-4 rounded-xl shadow-sm hover:brightness-95 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-sm group disabled:opacity-50 disabled:cursor-not-allowed">
+            class="w-full bg-secondary-container text-on-secondary-container font-headline-md text-title-sm py-4 rounded-xl shadow-sm hover:brightness-95 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-sm group disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             @if (loading()) {
               <span class="material-symbols-outlined animate-spin">sync</span>
             }
             @if (!loading()) {
               <span>Entrar</span>
-              <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+              <span class="material-symbols-outlined transition-transform group-hover:translate-x-1"
+                >arrow_forward</span
+              >
             }
           </button>
         </div>

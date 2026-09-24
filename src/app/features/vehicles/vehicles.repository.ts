@@ -5,12 +5,16 @@ import { DeletedFilter, Vehicle } from '../../core/api/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class VehiclesRepository {
   private api = inject(ApiService);
 
-  list(params?: { search?: string; customer?: number | string; deleted?: DeletedFilter }): Observable<PaginatedResponse<Vehicle>> {
+  list(params?: {
+    search?: string;
+    customer?: number | string;
+    deleted?: DeletedFilter;
+  }): Observable<PaginatedResponse<Vehicle>> {
     return this.api.get<PaginatedResponse<Vehicle>>(ENDPOINTS.vehicles.list, params);
   }
 
