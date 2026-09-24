@@ -8,7 +8,7 @@ export interface ConfirmOptions {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConfirmService {
   private activeDialog = signal<ConfirmOptions | null>(null);

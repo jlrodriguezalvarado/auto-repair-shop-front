@@ -48,6 +48,7 @@ Do not leave routed screens as sibling loose files next to a feature root. Do no
 ## PWA and local data
 
 - Never cache authenticated API responses, financial data, media, health endpoints, or mutations without an explicit reviewed policy.
+- Treat localStorage drafts as UX only. Authorization and “already submitted” locks must be enforced by the API. Clear drafts after a successful submit.
 - Keep user-scoped storage keys centrally registered and cleared on logout. Preserve device-scoped theme and language preferences.
 - Treat offline data as potentially stale and expose connectivity/update state deliberately.
 - `src/environments/environment.prod.ts` remains local, ignored, and must not be staged.

@@ -18,7 +18,7 @@ import { DialogFormDirective } from '../../shared/directives/dialog-form.directi
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent, EmptyComponent, DialogFormDirective],
   templateUrl: './service-catalog.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./service-catalog.component.scss']
+  styleUrls: ['./service-catalog.component.scss'],
 })
 export class ServiceCatalogComponent implements OnInit {
   private repository = inject(ServiceCatalogRepository);
@@ -46,7 +46,7 @@ export class ServiceCatalogComponent implements OnInit {
     description: '',
     basePrice: 0,
     estimatedDurationMinutes: 30,
-    isActive: true
+    isActive: true,
   };
 
   ngOnInit(): void {
@@ -69,7 +69,7 @@ export class ServiceCatalogComponent implements OnInit {
       error: () => {
         this.error.set(this.i18n.translate('common.error'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -91,7 +91,7 @@ export class ServiceCatalogComponent implements OnInit {
       description: '',
       basePrice: 0,
       estimatedDurationMinutes: 30,
-      isActive: true
+      isActive: true,
     };
     this.serviceModal().open();
   }
@@ -104,7 +104,7 @@ export class ServiceCatalogComponent implements OnInit {
       description: service.description || '',
       basePrice: service.basePrice,
       estimatedDurationMinutes: service.estimatedDurationMinutes,
-      isActive: service.isActive
+      isActive: service.isActive,
     };
     this.serviceModal().open();
   }
@@ -123,7 +123,7 @@ export class ServiceCatalogComponent implements OnInit {
           this.serviceModal().close();
           this.loadServices();
         },
-        error: () => this.toast.error('Error al actualizar servicio')
+        error: () => this.toast.error('Error al actualizar servicio'),
       });
     } else {
       this.repository.create(this.formModel).subscribe({
@@ -132,60 +132,66 @@ export class ServiceCatalogComponent implements OnInit {
           this.serviceModal().close();
           this.loadServices();
         },
-        error: () => this.toast.error('Error al crear servicio')
+        error: () => this.toast.error('Error al crear servicio'),
       });
     }
   }
 
   deleteService(service: ServiceCatalog): void {
-    this.confirm.confirm({
-      title: 'Eliminar Servicio',
-      message: `¿Está seguro de que desea eliminar el servicio "${service.name}"? Podrá restaurarlo después.`
-    }).then(approved => {
-      if (approved) {
-        this.repository.delete(service.id).subscribe({
-          next: () => {
-            this.toast.success('Servicio eliminado');
-            this.loadServices();
-          },
-          error: () => this.toast.error('Error al eliminar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Eliminar Servicio',
+        message: `¿Está seguro de que desea eliminar el servicio "${service.name}"? Podrá restaurarlo después.`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.delete(service.id).subscribe({
+            next: () => {
+              this.toast.success('Servicio eliminado');
+              this.loadServices();
+            },
+            error: () => this.toast.error('Error al eliminar'),
+          });
+        }
+      });
   }
 
   restoreService(service: ServiceCatalog): void {
-    this.confirm.confirm({
-      title: 'Restaurar Servicio',
-      message: `¿Restaurar el servicio "${service.name}"?`
-    }).then(approved => {
-      if (approved) {
-        this.repository.restore(service.id).subscribe({
-          next: () => {
-            this.toast.success('Servicio restaurado');
-            this.loadServices();
-          },
-          error: () => this.toast.error('Error al restaurar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Restaurar Servicio',
+        message: `¿Restaurar el servicio "${service.name}"?`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.restore(service.id).subscribe({
+            next: () => {
+              this.toast.success('Servicio restaurado');
+              this.loadServices();
+            },
+            error: () => this.toast.error('Error al restaurar'),
+          });
+        }
+      });
   }
 
   hardDeleteService(service: ServiceCatalog): void {
-    this.confirm.confirm({
-      title: this.i18n.translate('softDelete.hardDeleteTitle'),
-      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: service.name }),
-      confirmText: this.i18n.translate('actions.hardDelete')
-    }).then(approved => {
-      if (approved) {
-        this.repository.hardDelete(service.id).subscribe({
-          next: () => {
-            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
-            this.loadServices();
-          },
-          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: this.i18n.translate('softDelete.hardDeleteTitle'),
+        message: this.i18n.translate('softDelete.hardDeleteMessage', { name: service.name }),
+        confirmText: this.i18n.translate('actions.hardDelete'),
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.hardDelete(service.id).subscribe({
+            next: () => {
+              this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+              this.loadServices();
+            },
+            error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed')),
+          });
+        }
+      });
   }
 }

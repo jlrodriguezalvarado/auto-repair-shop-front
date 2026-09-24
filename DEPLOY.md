@@ -6,7 +6,7 @@ Compose stack and `deploy.sh` live in `../auto-repair-shop-api`.
 ## Local
 
 ```bash
-npm i --legacy-peer-deps
+npm ci
 npm start
 ```
 

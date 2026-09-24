@@ -11,7 +11,9 @@ import { DatePipe } from '@angular/common';
   template: `
     @if (open()) {
       <div class="fixed inset-0 z-40" (click)="close()"></div>
-      <div class="absolute right-0 top-12 z-50 w-80 max-h-96 overflow-hidden rounded-xl bg-surface shadow-elevated border border-outline-variant/20 flex flex-col">
+      <div
+        class="absolute right-0 top-12 z-50 w-80 max-h-96 overflow-hidden rounded-xl bg-surface shadow-elevated border border-outline-variant/20 flex flex-col"
+      >
         <div class="flex items-center justify-between px-4 py-3 border-b border-outline-variant/20">
           <span class="font-bold text-sm">Notificaciones</span>
           <button class="text-xs text-primary font-semibold" (click)="markAll()">Marcar todas</button>
@@ -25,10 +27,11 @@ import { DatePipe } from '@angular/common';
             @for (item of notifications.items(); track item.id) {
               <button
                 class="w-full text-left px-4 py-3 hover:bg-surface-container-high border-b border-outline-variant/10"
-                (click)="openItem(item)">
+                (click)="openItem(item)"
+              >
                 <div class="text-sm font-semibold text-on-surface">{{ item.title }}</div>
                 <div class="text-xs text-outline mt-0.5">{{ item.body }}</div>
-                <div class="text-[10px] text-outline mt-1">{{ item.createdAt | date:'short' }}</div>
+                <div class="text-[10px] text-outline mt-1">{{ item.createdAt | date: 'short' }}</div>
               </button>
             }
           }

@@ -34,12 +34,9 @@
             type="button"
             class="shrink-0 px-4 py-2 text-sm font-semibold border border-outline-variant/50 hover:bg-surface-container-high rounded-lg transition-colors disabled:opacity-50"
             [disabled]="mediaPermissionLoading() === 'camera' || mediaPermissions.cameraState() === 'granted'"
-            (click)="requestMediaPermission('camera')">
-            {{
-              mediaPermissions.cameraState() === 'granted'
-                ? t('profile.cameraAccess')
-                : t('profile.enableCamera')
-            }}
+            (click)="requestMediaPermission('camera')"
+          >
+            {{ mediaPermissions.cameraState() === 'granted' ? t('profile.cameraAccess') : t('profile.enableCamera') }}
           </button>
         </div>
         <div class="flex items-center justify-between gap-4 rounded-xl border border-outline-variant/40 px-4 py-3">
@@ -57,11 +54,9 @@
           <button
             type="button"
             class="shrink-0 px-4 py-2 text-sm font-semibold border border-outline-variant/50 hover:bg-surface-container-high rounded-lg transition-colors disabled:opacity-50"
-            [disabled]="
-              mediaPermissionLoading() === 'microphone' ||
-              mediaPermissions.microphoneState() === 'granted'
-            "
-            (click)="requestMediaPermission('microphone')">
+            [disabled]="mediaPermissionLoading() === 'microphone' || mediaPermissions.microphoneState() === 'granted'"
+            (click)="requestMediaPermission('microphone')"
+          >
             {{
               mediaPermissions.microphoneState() === 'granted'
                 ? t('profile.microphoneAccess')
@@ -82,11 +77,13 @@
             [type]="showCurrentPassword() ? 'text' : 'password'"
             formControlName="currentPassword"
             autocomplete="current-password"
-            class="w-full px-4 py-2 pr-12 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none" />
+            class="w-full px-4 py-2 pr-12 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"
+          />
           <button
             type="button"
             (click)="toggleCurrentPasswordVisibility()"
-            class="absolute inset-y-0 right-0 flex items-center pr-3 text-outline">
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-outline"
+          >
             <span class="material-symbols-outlined text-[20px]">{{
               showCurrentPassword() ? 'visibility_off' : 'visibility'
             }}</span>
@@ -103,11 +100,13 @@
             [type]="showNewPassword() ? 'text' : 'password'"
             formControlName="newPassword"
             autocomplete="new-password"
-            class="w-full px-4 py-2 pr-12 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none" />
+            class="w-full px-4 py-2 pr-12 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"
+          />
           <button
             type="button"
             (click)="toggleNewPasswordVisibility()"
-            class="absolute inset-y-0 right-0 flex items-center pr-3 text-outline">
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-outline"
+          >
             <span class="material-symbols-outlined text-[20px]">{{
               showNewPassword() ? 'visibility_off' : 'visibility'
             }}</span>
@@ -124,11 +123,13 @@
             [type]="showConfirmPassword() ? 'text' : 'password'"
             formControlName="confirmPassword"
             autocomplete="new-password"
-            class="w-full px-4 py-2 pr-12 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none" />
+            class="w-full px-4 py-2 pr-12 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"
+          />
           <button
             type="button"
             (click)="toggleConfirmPasswordVisibility()"
-            class="absolute inset-y-0 right-0 flex items-center pr-3 text-outline">
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-outline"
+          >
             <span class="material-symbols-outlined text-[20px]">{{
               showConfirmPassword() ? 'visibility_off' : 'visibility'
             }}</span>
@@ -142,7 +143,8 @@
         <button
           type="submit"
           [disabled]="passwordSaving() || passwordForm.invalid"
-          class="px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50">
+          class="px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+        >
           {{ passwordSaving() ? t('common.loading') : t('actions.save') }}
         </button>
       </div>

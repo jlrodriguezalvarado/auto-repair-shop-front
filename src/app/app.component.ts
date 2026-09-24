@@ -9,7 +9,7 @@ import { ConfirmDialogComponent } from './shared/components/confirm-dialog.compo
   imports: [RouterOutlet, ToastContainerComponent, ConfirmDialogComponent],
   templateUrl: './app.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'app-taller-mecanico';

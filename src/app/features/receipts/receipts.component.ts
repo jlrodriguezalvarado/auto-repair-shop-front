@@ -6,7 +6,7 @@ import { CustomersRepository } from '../customers/customers.repository';
 import { VehiclesRepository } from '../vehicles/vehicles.repository';
 import { WorkOrdersRepository } from '../work-orders/work-orders.repository';
 import { EstimatesRepository } from '../estimates/estimates.repository';
-import { Receipt, CustomerProfile, Vehicle, WorkOrder, Estimate, ReceiptPayment, DeletedFilter } from '../../core/api/models';
+import { Receipt, CustomerProfile, Vehicle, WorkOrder, Estimate, DeletedFilter } from '../../core/api/models';
 import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/services/i18n.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -22,7 +22,7 @@ import { DialogFormDirective } from '../../shared/directives/dialog-form.directi
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent, EmptyComponent, DialogFormDirective],
   templateUrl: './receipts.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./receipts.component.scss']
+  styleUrls: ['./receipts.component.scss'],
 })
 export class ReceiptsComponent implements OnInit {
   private repository = inject(ReceiptsRepository);
@@ -68,7 +68,7 @@ export class ReceiptsComponent implements OnInit {
     discountAmount: 0,
     taxAmount: 0,
     total: 0,
-    notes: ''
+    notes: '',
   };
 
   // Payment Form State
@@ -77,7 +77,7 @@ export class ReceiptsComponent implements OnInit {
     paymentMethod: 'cash' as 'cash' | 'card' | 'transfer' | 'mobile_payment' | 'zelle' | 'other',
     reference: '',
     paymentDate: '',
-    notes: ''
+    notes: '',
   };
 
   ngOnInit(): void {
@@ -104,24 +104,24 @@ export class ReceiptsComponent implements OnInit {
       error: () => {
         this.error.set(this.i18n.translate('common.error'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
   loadFilterData(): void {
-    this.customersRepository.list().subscribe(res => this.customers.set(res.results ?? []));
-    this.vehiclesRepository.list().subscribe(res => this.vehicles.set(res.results ?? []));
-    this.workOrdersRepository.list().subscribe(res => this.workOrders.set(res.results ?? []));
-    this.estimatesRepository.list().subscribe(res => this.estimates.set(res.results ?? []));
+    this.customersRepository.list().subscribe((res) => this.customers.set(res.results ?? []));
+    this.vehiclesRepository.list().subscribe((res) => this.vehicles.set(res.results ?? []));
+    this.workOrdersRepository.list().subscribe((res) => this.workOrders.set(res.results ?? []));
+    this.estimatesRepository.list().subscribe((res) => this.estimates.set(res.results ?? []));
   }
 
   getCustomerName(id: number): string {
-    const cust = this.customers().find(c => c.id === id);
+    const cust = this.customers().find((c) => c.id === id);
     return cust ? `${cust.firstName} ${cust.lastName}` : `Cliente #${id}`;
   }
 
   getVehiclePlate(id: number): string {
-    const veh = this.vehicles().find(v => v.id === id);
+    const veh = this.vehicles().find((v) => v.id === id);
     return veh ? `${veh.brand} ${veh.model} (${veh.plate})` : `Vehículo #${id}`;
   }
 
@@ -145,14 +145,14 @@ export class ReceiptsComponent implements OnInit {
       discountAmount: 0,
       taxAmount: 0,
       total: 0,
-      notes: ''
+      notes: '',
     };
     this.receiptDialog().open();
   }
 
-  onOrderReferenceChange(event: any): void {
-    const orderId = parseInt(event.target.value);
-    const ord = this.workOrders().find(o => o.id === orderId);
+  onOrderReferenceChange(event: Event): void {
+    const orderId = parseInt((event.target as HTMLSelectElement).value, 10);
+    const ord = this.workOrders().find((o) => o.id === orderId);
     if (ord) {
       this.formModel.customer = ord.customer;
       this.formModel.vehicle = ord.vehicle;
@@ -162,9 +162,9 @@ export class ReceiptsComponent implements OnInit {
     }
   }
 
-  onEstimateReferenceChange(event: any): void {
-    const estId = parseInt(event.target.value);
-    const est = this.estimates().find(e => e.id === estId);
+  onEstimateReferenceChange(event: Event): void {
+    const estId = parseInt((event.target as HTMLSelectElement).value, 10);
+    const est = this.estimates().find((e) => e.id === estId);
     if (est) {
       this.formModel.customer = est.customer;
       this.formModel.vehicle = est.vehicle;
@@ -178,7 +178,9 @@ export class ReceiptsComponent implements OnInit {
 
   recalculateFormTotals(): void {
     this.formModel.taxAmount = parseFloat((this.formModel.subtotal * 0.16).toFixed(2));
-    this.formModel.total = parseFloat((this.formModel.subtotal - this.formModel.discountAmount + this.formModel.taxAmount).toFixed(2));
+    this.formModel.total = parseFloat(
+      (this.formModel.subtotal - this.formModel.discountAmount + this.formModel.taxAmount).toFixed(2)
+    );
   }
 
   saveReceipt(): void {
@@ -193,16 +195,19 @@ export class ReceiptsComponent implements OnInit {
         this.receiptDialog().close();
         this.loadReceipts();
       },
-      error: () => this.toast.error('Error al emitir recibo')
+      error: () => this.toast.error('Error al emitir recibo'),
     });
   }
 
   downloadPdf(rec: Receipt): void {
     this.repository.getPdf(rec.id).subscribe({
-      next: (res) => {
-        window.open(res.pdfFile, '_blank');
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
         this.toast.success('Descargando recibo PDF');
-      }
+      },
+      error: () => this.toast.error('Error al descargar PDF'),
     });
   }
 
@@ -210,16 +215,22 @@ export class ReceiptsComponent implements OnInit {
     this.repository.persistPdf(rec.id).subscribe({
       next: (res) => {
         this.toast.success('Archivo PDF respaldado en el servidor');
-        this.selectedReceipt.set(res);
+        const current = this.selectedReceipt();
+        if (current && res.url) {
+          this.selectedReceipt.set({ ...current, pdfFile: res.url });
+        }
         this.loadReceipts();
-      }
+      },
+      error: () => this.toast.error('Error al persistir PDF'),
     });
   }
 
   getWhatsAppLink(rec: Receipt): string {
-    const plate = this.vehicles().find(v => v.id === rec.vehicle)?.plate || '';
-    const message = encodeURIComponent(`Hola, le enviamos el recibo ${rec.code} de su vehículo ${plate}. Monto total: $${rec.total}. Pendiente de pago: $${rec.pendingAmount}.`);
-    const phone = this.customers().find(c => c.id === rec.customer)?.phone || '';
+    const plate = this.vehicles().find((v) => v.id === rec.vehicle)?.plate || '';
+    const message = encodeURIComponent(
+      `Hola, le enviamos el recibo ${rec.code} de su vehículo ${plate}. Monto total: $${rec.total}. Pendiente de pago: $${rec.pendingAmount}.`
+    );
+    const phone = this.customers().find((c) => c.id === rec.customer)?.phone || '';
     const cleanPhone = phone.replace(/[+\s]/g, '');
     return `https://wa.me/${cleanPhone}?text=${message}`;
   }
@@ -233,7 +244,7 @@ export class ReceiptsComponent implements OnInit {
       paymentMethod: 'cash',
       reference: '',
       paymentDate: new Date().toISOString().split('T')[0],
-      notes: ''
+      notes: '',
     };
     this.paymentDialog().open();
   }
@@ -253,77 +264,80 @@ export class ReceiptsComponent implements OnInit {
     }
 
     this.repository.addPayment(rec.id, this.paymentModel).subscribe({
-      next: () => {
+      next: (updated) => {
         this.toast.success('Pago parcial registrado con éxito');
         this.paymentDialog().close();
-
-        this.repository.get(rec.id).subscribe(refreshed => {
-          this.selectedReceipt.set(refreshed);
-          this.loadReceipts();
-        });
+        this.selectedReceipt.set(updated);
+        this.loadReceipts();
       },
-      error: () => this.toast.error('Error al registrar pago')
+      error: () => this.toast.error('Error al registrar pago'),
     });
   }
 
   deleteReceipt(rec: Receipt, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: 'Eliminar Recibo',
-      message: `¿Está seguro de que desea eliminar el recibo "${rec.code}"? Podrá restaurarlo después.`
-    }).then(approved => {
-      if (approved) {
-        this.repository.delete(rec.id).subscribe({
-          next: () => {
-            this.toast.success('Recibo eliminado');
-            if (this.selectedReceipt()?.id === rec.id) {
-              this.selectedReceipt.set(null);
-            }
-            this.loadReceipts();
-          },
-          error: () => this.toast.error('Error al eliminar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Eliminar Recibo',
+        message: `¿Está seguro de que desea eliminar el recibo "${rec.code}"? Podrá restaurarlo después.`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.delete(rec.id).subscribe({
+            next: () => {
+              this.toast.success('Recibo eliminado');
+              if (this.selectedReceipt()?.id === rec.id) {
+                this.selectedReceipt.set(null);
+              }
+              this.loadReceipts();
+            },
+            error: () => this.toast.error('Error al eliminar'),
+          });
+        }
+      });
   }
 
   restoreReceipt(rec: Receipt, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: 'Restaurar Recibo',
-      message: `¿Restaurar el recibo "${rec.code}"?`
-    }).then(approved => {
-      if (approved) {
-        this.repository.restore(rec.id).subscribe({
-          next: () => {
-            this.toast.success('Recibo restaurado');
-            this.loadReceipts();
-          },
-          error: () => this.toast.error('Error al restaurar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Restaurar Recibo',
+        message: `¿Restaurar el recibo "${rec.code}"?`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.restore(rec.id).subscribe({
+            next: () => {
+              this.toast.success('Recibo restaurado');
+              this.loadReceipts();
+            },
+            error: () => this.toast.error('Error al restaurar'),
+          });
+        }
+      });
   }
 
   hardDeleteReceipt(rec: Receipt, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: this.i18n.translate('softDelete.hardDeleteTitle'),
-      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: rec.code }),
-      confirmText: this.i18n.translate('actions.hardDelete')
-    }).then(approved => {
-      if (approved) {
-        this.repository.hardDelete(rec.id).subscribe({
-          next: () => {
-            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
-            if (this.selectedReceipt()?.id === rec.id) {
-              this.selectedReceipt.set(null);
-            }
-            this.loadReceipts();
-          },
-          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: this.i18n.translate('softDelete.hardDeleteTitle'),
+        message: this.i18n.translate('softDelete.hardDeleteMessage', { name: rec.code }),
+        confirmText: this.i18n.translate('actions.hardDelete'),
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.hardDelete(rec.id).subscribe({
+            next: () => {
+              this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+              if (this.selectedReceipt()?.id === rec.id) {
+                this.selectedReceipt.set(null);
+              }
+              this.loadReceipts();
+            },
+            error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed')),
+          });
+        }
+      });
   }
 }

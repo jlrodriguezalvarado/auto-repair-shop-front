@@ -109,16 +109,23 @@ export interface WorkOrder {
   vehiclePlate?: string;
   assignedMechanic?: number;
   assignedMechanicName?: string;
-  status: 'received' | 'under_review' | 'estimated' | 'approved' | 'in_progress' | 'completed' | 'delivered' | 'cancelled';
+  status:
+    'received' | 'under_review' | 'estimated' | 'approved' | 'in_progress' | 'completed' | 'delivered' | 'cancelled';
   privateNote?: string;
   customerComplaint: string;
   diagnosisNote?: string;
   startedAt?: string;
   completedAt?: string;
   deliveredAt?: string;
+  /** Flattened from API `totals` in the repository */
   servicesTotal: number;
   itemsTotal: number;
   grandTotal: number;
+  totals?: {
+    servicesTotal: number;
+    itemsTotal: number;
+    grandTotal: number;
+  };
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
@@ -146,10 +153,15 @@ export interface WorkOrderItem {
   quantity: number;
   unitCost: number;
   totalCost: number;
-  providedBy: 'client' | 'workshop';
+  providedBy: 'customer' | 'workshop';
   supplierName?: string;
   purchaseDate?: string;
   notes?: string;
+}
+
+export interface PersistPdfResponse {
+  detail: string;
+  url: string | null;
 }
 
 export interface Estimate {
@@ -171,8 +183,29 @@ export interface Estimate {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
-  services?: any[];
-  items?: any[];
+  /** UI/mock may still use simplified `{ name, price, total }` snapshots */
+  services?: EstimateLineSnapshot[];
+  items?: EstimateLineSnapshot[];
+}
+
+export interface EstimateLineSnapshot {
+  id?: number;
+  estimate?: number;
+  service?: number;
+  name?: string;
+  nameSnapshot?: string;
+  descriptionSnapshot?: string;
+  quantity?: number;
+  unitPrice?: number;
+  price?: number;
+  totalPrice?: number;
+  total?: number;
+  unitCost?: number;
+  totalCost?: number;
+  providedBy?: 'customer' | 'workshop';
+  supplierName?: string;
+  purchaseDate?: string;
+  notes?: string;
 }
 
 export interface Receipt {
@@ -197,8 +230,8 @@ export interface Receipt {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
-  services?: any[];
-  items?: any[];
+  services?: EstimateLineSnapshot[];
+  items?: EstimateLineSnapshot[];
   payments?: ReceiptPayment[];
 }
 

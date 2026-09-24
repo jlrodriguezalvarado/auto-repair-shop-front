@@ -1,21 +1,10 @@
-import {
-  Component,
-  HostListener,
-  OnInit,
-  computed,
-  inject,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, HostListener, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { I18nService } from '../../../core/services/i18n.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { PushNotificationService } from '../../../core/push/push-notification.service';
-import {
-  MediaPermissionKind,
-  MediaPermissionService,
-} from '../../services/media-permission.service';
+import { MediaPermissionKind, MediaPermissionService } from '../../services/media-permission.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -110,11 +99,7 @@ export class UserProfileMenuComponent implements OnInit {
     const denied = this.mediaPermissions.getState(kind) === 'denied';
     if (denied) {
       this.toast.error(
-        this.t(
-          kind === 'camera'
-            ? 'profile.cameraPermissionDeniedHint'
-            : 'profile.microphonePermissionDeniedHint',
-        ),
+        this.t(kind === 'camera' ? 'profile.cameraPermissionDeniedHint' : 'profile.microphonePermissionDeniedHint')
       );
       return;
     }
@@ -123,20 +108,12 @@ export class UserProfileMenuComponent implements OnInit {
       const state = await this.mediaPermissions.requestPermission(kind);
       if (state === 'granted') {
         this.toast.success(
-          this.t(
-            kind === 'camera'
-              ? 'profile.cameraPermissionGranted'
-              : 'profile.microphonePermissionGranted',
-          ),
+          this.t(kind === 'camera' ? 'profile.cameraPermissionGranted' : 'profile.microphonePermissionGranted')
         );
         return;
       }
       this.toast.error(
-        this.t(
-          kind === 'camera'
-            ? 'profile.cameraPermissionDenied'
-            : 'profile.microphonePermissionDenied',
-        ),
+        this.t(kind === 'camera' ? 'profile.cameraPermissionDenied' : 'profile.microphonePermissionDenied')
       );
     } finally {
       this.mediaPermissionLoading.set(null);

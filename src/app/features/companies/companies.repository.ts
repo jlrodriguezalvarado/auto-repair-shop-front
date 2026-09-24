@@ -5,7 +5,7 @@ import { Company, CompanyCreatePayload, DeletedFilter } from '../../core/api/mod
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CompaniesRepository {
   private api = inject(ApiService);

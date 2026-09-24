@@ -17,7 +17,7 @@ import { EmptyComponent } from '../../shared/components/empty/empty.component';
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent, EmptyComponent],
   templateUrl: './users.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./users.component.scss']
+  styleUrls: ['./users.component.scss'],
 })
 export class UsersComponent implements OnInit {
   private repository = inject(UsersRepository);
@@ -45,7 +45,7 @@ export class UsersComponent implements OnInit {
       error: () => {
         this.error.set(this.i18n.translate('common.error'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -56,59 +56,65 @@ export class UsersComponent implements OnInit {
         this.toast.success('Rol de usuario actualizado');
         this.loadUsers();
       },
-      error: () => this.toast.error('Error al actualizar rol')
+      error: () => this.toast.error('Error al actualizar rol'),
     });
   }
 
   deleteUser(user: User): void {
-    this.confirm.confirm({
-      title: 'Eliminar Usuario',
-      message: `¿Está seguro de que desea eliminar al usuario "${user.username}"? Podrá restaurarlo después.`
-    }).then(approved => {
-      if (approved) {
-        this.repository.delete(user.id).subscribe({
-          next: () => {
-            this.toast.success('Usuario eliminado');
-            this.loadUsers();
-          },
-          error: () => this.toast.error('Error al eliminar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Eliminar Usuario',
+        message: `¿Está seguro de que desea eliminar al usuario "${user.username}"? Podrá restaurarlo después.`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.delete(user.id).subscribe({
+            next: () => {
+              this.toast.success('Usuario eliminado');
+              this.loadUsers();
+            },
+            error: () => this.toast.error('Error al eliminar'),
+          });
+        }
+      });
   }
 
   restoreUser(user: User): void {
-    this.confirm.confirm({
-      title: 'Restaurar Usuario',
-      message: `¿Restaurar al usuario "${user.username}"?`
-    }).then(approved => {
-      if (approved) {
-        this.repository.restore(user.id).subscribe({
-          next: () => {
-            this.toast.success('Usuario restaurado');
-            this.loadUsers();
-          },
-          error: () => this.toast.error('Error al restaurar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Restaurar Usuario',
+        message: `¿Restaurar al usuario "${user.username}"?`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.restore(user.id).subscribe({
+            next: () => {
+              this.toast.success('Usuario restaurado');
+              this.loadUsers();
+            },
+            error: () => this.toast.error('Error al restaurar'),
+          });
+        }
+      });
   }
 
   hardDeleteUser(user: User): void {
-    this.confirm.confirm({
-      title: this.i18n.translate('softDelete.hardDeleteTitle'),
-      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: user.username }),
-      confirmText: this.i18n.translate('actions.hardDelete')
-    }).then(approved => {
-      if (approved) {
-        this.repository.hardDelete(user.id).subscribe({
-          next: () => {
-            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
-            this.loadUsers();
-          },
-          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: this.i18n.translate('softDelete.hardDeleteTitle'),
+        message: this.i18n.translate('softDelete.hardDeleteMessage', { name: user.username }),
+        confirmText: this.i18n.translate('actions.hardDelete'),
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.hardDelete(user.id).subscribe({
+            next: () => {
+              this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+              this.loadUsers();
+            },
+            error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed')),
+          });
+        }
+      });
   }
 }

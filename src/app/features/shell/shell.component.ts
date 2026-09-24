@@ -18,16 +18,10 @@ interface NavItem {
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    NotificationPanelComponent,
-    UserProfileMenuComponent,
-  ],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationPanelComponent, UserProfileMenuComponent],
   templateUrl: './shell.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./shell.component.scss']
+  styleUrls: ['./shell.component.scss'],
 })
 export class ShellComponent {
   auth = inject(AuthService);

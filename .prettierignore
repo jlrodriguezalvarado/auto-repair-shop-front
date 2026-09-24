@@ -1,0 +1,10 @@
+dist
+coverage
+node_modules
+.angular
+package-lock.json
+*.min.js
+public/icons
+docs/images/*.png
+docs/images/*.jpg
+docs/images/*.webp

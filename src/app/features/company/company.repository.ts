@@ -5,7 +5,7 @@ import { Company } from '../../core/api/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CompanyRepository {
   private api = inject(ApiService);

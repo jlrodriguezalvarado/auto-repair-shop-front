@@ -20,7 +20,7 @@ import { DialogFormDirective } from '../../shared/directives/dialog-form.directi
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent, EmptyComponent, DialogFormDirective],
   templateUrl: './vehicles.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./vehicles.component.scss']
+  styleUrls: ['./vehicles.component.scss'],
 })
 export class VehiclesComponent implements OnInit {
   private repository = inject(VehiclesRepository);
@@ -62,7 +62,7 @@ export class VehiclesComponent implements OnInit {
     vin: '',
     notes: '',
     photo: '',
-    isActive: true
+    isActive: true,
   };
 
   ngOnInit(): void {
@@ -89,18 +89,18 @@ export class VehiclesComponent implements OnInit {
       error: () => {
         this.error.set(this.i18n.translate('common.error'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
   loadCustomers(): void {
-    this.customersRepository.list().subscribe(res => {
+    this.customersRepository.list().subscribe((res) => {
       this.customers.set(res.results ?? []);
     });
   }
 
   getCustomerName(id: number): string {
-    const cust = this.customers().find(c => c.id === id);
+    const cust = this.customers().find((c) => c.id === id);
     return cust ? `${cust.firstName} ${cust.lastName}` : `Cliente #${id}`;
   }
 
@@ -114,7 +114,7 @@ export class VehiclesComponent implements OnInit {
       },
       error: () => {
         this.loadingOrders.set(false);
-      }
+      },
     });
   }
 
@@ -136,7 +136,7 @@ export class VehiclesComponent implements OnInit {
       vin: '',
       notes: '',
       photo: '',
-      isActive: true
+      isActive: true,
     };
     this.vehicleModal().open();
   }
@@ -155,7 +155,7 @@ export class VehiclesComponent implements OnInit {
       vin: vehicle.vin || '',
       notes: vehicle.notes || '',
       photo: vehicle.photo || '',
-      isActive: vehicle.isActive
+      isActive: vehicle.isActive,
     };
     this.vehicleModal().open();
   }
@@ -174,7 +174,7 @@ export class VehiclesComponent implements OnInit {
           this.vehicleModal().close();
           this.loadVehicles();
         },
-        error: () => this.toast.error('Error al actualizar vehículo')
+        error: () => this.toast.error('Error al actualizar vehículo'),
       });
     } else {
       this.repository.create(this.formModel).subscribe({
@@ -183,75 +183,82 @@ export class VehiclesComponent implements OnInit {
           this.vehicleModal().close();
           this.loadVehicles();
         },
-        error: () => this.toast.error('Error al registrar vehículo')
+        error: () => this.toast.error('Error al registrar vehículo'),
       });
     }
   }
 
   deleteVehicle(vehicle: Vehicle, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: 'Eliminar Vehículo',
-      message: `¿Está seguro de que desea eliminar el vehículo con placa "${vehicle.plate}"? Podrá restaurarlo después.`
-    }).then(approved => {
-      if (approved) {
-        this.repository.delete(vehicle.id).subscribe({
-          next: () => {
-            this.toast.success('Vehículo eliminado');
-            if (this.selectedVehicle()?.id === vehicle.id) {
-              this.closeDetail();
-            }
-            this.loadVehicles();
-          },
-          error: () => this.toast.error('Error al eliminar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Eliminar Vehículo',
+        message: `¿Está seguro de que desea eliminar el vehículo con placa "${vehicle.plate}"? Podrá restaurarlo después.`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.delete(vehicle.id).subscribe({
+            next: () => {
+              this.toast.success('Vehículo eliminado');
+              if (this.selectedVehicle()?.id === vehicle.id) {
+                this.closeDetail();
+              }
+              this.loadVehicles();
+            },
+            error: () => this.toast.error('Error al eliminar'),
+          });
+        }
+      });
   }
 
   restoreVehicle(vehicle: Vehicle, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: 'Restaurar Vehículo',
-      message: `¿Restaurar el vehículo con placa "${vehicle.plate}"?`
-    }).then(approved => {
-      if (approved) {
-        this.repository.restore(vehicle.id).subscribe({
-          next: () => {
-            this.toast.success('Vehículo restaurado');
-            this.loadVehicles();
-          },
-          error: () => this.toast.error('Error al restaurar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Restaurar Vehículo',
+        message: `¿Restaurar el vehículo con placa "${vehicle.plate}"?`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.restore(vehicle.id).subscribe({
+            next: () => {
+              this.toast.success('Vehículo restaurado');
+              this.loadVehicles();
+            },
+            error: () => this.toast.error('Error al restaurar'),
+          });
+        }
+      });
   }
 
   hardDeleteVehicle(vehicle: Vehicle, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: this.i18n.translate('softDelete.hardDeleteTitle'),
-      message: this.i18n.translate('softDelete.hardDeleteMessage', { name: vehicle.plate }),
-      confirmText: this.i18n.translate('actions.hardDelete')
-    }).then(approved => {
-      if (approved) {
-        this.repository.hardDelete(vehicle.id).subscribe({
-          next: () => {
-            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
-            if (this.selectedVehicle()?.id === vehicle.id) {
-              this.closeDetail();
-            }
-            this.loadVehicles();
-          },
-          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: this.i18n.translate('softDelete.hardDeleteTitle'),
+        message: this.i18n.translate('softDelete.hardDeleteMessage', { name: vehicle.plate }),
+        confirmText: this.i18n.translate('actions.hardDelete'),
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.hardDelete(vehicle.id).subscribe({
+            next: () => {
+              this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+              if (this.selectedVehicle()?.id === vehicle.id) {
+                this.closeDetail();
+              }
+              this.loadVehicles();
+            },
+            error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed')),
+          });
+        }
+      });
   }
 
   triggerPhotoMockUpload(): void {
     // Simulated upload
-    this.formModel.photo = 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&q=80&w=300';
+    this.formModel.photo =
+      'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&q=80&w=300';
     this.toast.success('¡Foto cargada de manera simulada!');
   }
 }

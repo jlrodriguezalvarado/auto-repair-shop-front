@@ -5,12 +5,16 @@ import { CustomerProfile, DeletedFilter } from '../../core/api/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CustomersRepository {
   private api = inject(ApiService);
 
-  list(params?: { search?: string; isActive?: boolean; deleted?: DeletedFilter }): Observable<PaginatedResponse<CustomerProfile>> {
+  list(params?: {
+    search?: string;
+    isActive?: boolean;
+    deleted?: DeletedFilter;
+  }): Observable<PaginatedResponse<CustomerProfile>> {
     return this.api.get<PaginatedResponse<CustomerProfile>>(ENDPOINTS.customers.list, params);
   }
 

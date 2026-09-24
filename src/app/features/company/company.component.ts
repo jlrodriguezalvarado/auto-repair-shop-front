@@ -15,7 +15,7 @@ import { ErrorComponent } from '../../shared/components/error/error.component';
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent],
   templateUrl: './company.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./company.component.scss']
+  styleUrls: ['./company.component.scss'],
 })
 export class CompanyComponent implements OnInit {
   private repository = inject(CompanyRepository);
@@ -43,7 +43,7 @@ export class CompanyComponent implements OnInit {
       email: '',
       logo: '',
       createdAt: '',
-      updatedAt: ''
+      updatedAt: '',
     };
   }
 
@@ -63,7 +63,7 @@ export class CompanyComponent implements OnInit {
         }
         this.error.set(this.i18n.translate('common.error'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -81,7 +81,7 @@ export class CompanyComponent implements OnInit {
       error: () => {
         this.saving.set(false);
         this.toast.error(this.i18n.translate('common.error'));
-      }
+      },
     });
   }
 }

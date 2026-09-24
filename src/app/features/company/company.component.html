@@ -11,50 +11,111 @@
   }
 
   @if (!loading() && !error() && company(); as c) {
-    <form (submit)="onSubmit()" class="card-surface border border-outline-variant/30 p-6 md:p-8 rounded-xl space-y-6 shadow-sm animate-fadeIn">
+    <form
+      (submit)="onSubmit()"
+      class="card-surface border border-outline-variant/30 p-6 md:p-8 rounded-xl space-y-6 shadow-sm animate-fadeIn"
+    >
       <!-- Logo & Title Section -->
       <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-outline-variant/10">
-        <img [src]="c.logo || 'assets/default-logo.png'" alt="Company Logo" class="h-24 w-24 object-cover rounded-xl border border-outline-variant/20">
+        <img
+          [src]="c.logo || 'assets/default-logo.png'"
+          alt="Company Logo"
+          class="h-24 w-24 object-cover rounded-xl border border-outline-variant/20"
+        />
         <div class="flex-1 space-y-2 text-center sm:text-left">
           <h3 class="text-xl font-bold text-on-surface">{{ c.name || 'Sin nombre' }}</h3>
-          <p class="text-xs text-on-surface-variant">Registrado el: {{ c.createdAt | date:'short' }}</p>
+          <p class="text-xs text-on-surface-variant">Registrado el: {{ c.createdAt | date: 'short' }}</p>
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Name -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">Nombre de la Empresa</label>
-          <input type="text" [(ngModel)]="c.name" name="name" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
+          <input
+            type="text"
+            [(ngModel)]="c.name"
+            name="name"
+            required
+            [readonly]="!auth.canMutateTenantData()"
+            [disabled]="!auth.canMutateTenantData()"
+            class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70"
+          />
         </div>
         <!-- Tax ID (RIF) -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">RIF / Tax ID</label>
-          <input type="text" [(ngModel)]="c.taxId" name="taxId" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
+          <input
+            type="text"
+            [(ngModel)]="c.taxId"
+            name="taxId"
+            required
+            [readonly]="!auth.canMutateTenantData()"
+            [disabled]="!auth.canMutateTenantData()"
+            class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70"
+          />
         </div>
         <!-- Email -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">Correo Electrónico</label>
-          <input type="email" [(ngModel)]="c.email" name="email" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
+          <input
+            type="email"
+            [(ngModel)]="c.email"
+            name="email"
+            required
+            [readonly]="!auth.canMutateTenantData()"
+            [disabled]="!auth.canMutateTenantData()"
+            class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70"
+          />
         </div>
         <!-- Phone -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">Teléfono Principal</label>
-          <input type="text" [(ngModel)]="c.phone" name="phone" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
+          <input
+            type="text"
+            [(ngModel)]="c.phone"
+            name="phone"
+            required
+            [readonly]="!auth.canMutateTenantData()"
+            [disabled]="!auth.canMutateTenantData()"
+            class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70"
+          />
         </div>
         <!-- Secondary Phone -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">Teléfono Secundario (Opcional)</label>
-          <input type="text" [(ngModel)]="c.secondaryPhone" name="secondaryPhone" [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
+          <input
+            type="text"
+            [(ngModel)]="c.secondaryPhone"
+            name="secondaryPhone"
+            [readonly]="!auth.canMutateTenantData()"
+            [disabled]="!auth.canMutateTenantData()"
+            class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70"
+          />
         </div>
         <!-- Logo URL (Mock upload) -->
         <div class="flex flex-col gap-1">
           <label class="text-sm font-bold text-on-surface-variant">URL del Logo (Mock)</label>
-          <input type="text" [(ngModel)]="c.logo" name="logo" [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70">
+          <input
+            type="text"
+            [(ngModel)]="c.logo"
+            name="logo"
+            [readonly]="!auth.canMutateTenantData()"
+            [disabled]="!auth.canMutateTenantData()"
+            class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70"
+          />
         </div>
         <!-- Address -->
         <div class="flex flex-col gap-1 md:col-span-2">
           <label class="text-sm font-bold text-on-surface-variant">Dirección Completa</label>
-          <textarea rows="3" [(ngModel)]="c.address" name="address" required [readonly]="!auth.canMutateTenantData()" [disabled]="!auth.canMutateTenantData()" class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70"></textarea>
+          <textarea
+            rows="3"
+            [(ngModel)]="c.address"
+            name="address"
+            required
+            [readonly]="!auth.canMutateTenantData()"
+            [disabled]="!auth.canMutateTenantData()"
+            class="px-4 py-2 border border-outline-variant/30 bg-surface-container-lowest rounded-xl focus:ring-2 focus:ring-primary focus:outline-none disabled:opacity-70"
+          ></textarea>
         </div>
       </div>
       <!-- Actions -->
@@ -63,7 +124,8 @@
           <button
             type="submit"
             [disabled]="saving()"
-            class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-on-primary font-bold rounded-xl shadow-md transition-colors disabled:opacity-50">
+            class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-on-primary font-bold rounded-xl shadow-md transition-colors disabled:opacity-50"
+          >
             @if (saving()) {
               <span class="animate-spin rounded-full h-4 w-4 border-2 border-on-primary border-t-transparent"></span>
             }

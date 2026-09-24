@@ -19,7 +19,7 @@ import { DialogFormDirective } from '../../shared/directives/dialog-form.directi
   imports: [CommonModule, FormsModule, LoadingComponent, ErrorComponent, EmptyComponent, DialogFormDirective],
   templateUrl: './customers.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./customers.component.scss']
+  styleUrls: ['./customers.component.scss'],
 })
 export class CustomersComponent implements OnInit {
   private repository = inject(CustomersRepository);
@@ -58,7 +58,7 @@ export class CustomersComponent implements OnInit {
     email: '',
     address: '',
     notes: '',
-    isActive: true
+    isActive: true,
   };
 
   // Add vehicle form state
@@ -69,7 +69,7 @@ export class CustomersComponent implements OnInit {
     year: new Date().getFullYear(),
     color: '',
     notes: '',
-    isActive: true
+    isActive: true,
   };
 
   ngOnInit(): void {
@@ -92,7 +92,7 @@ export class CustomersComponent implements OnInit {
       error: () => {
         this.error.set(this.i18n.translate('common.error'));
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -106,7 +106,7 @@ export class CustomersComponent implements OnInit {
       },
       error: () => {
         this.loadingVehicles.set(false);
-      }
+      },
     });
   }
 
@@ -127,7 +127,7 @@ export class CustomersComponent implements OnInit {
       email: '',
       address: '',
       notes: '',
-      isActive: true
+      isActive: true,
     };
     this.customerDialog().open();
   }
@@ -145,7 +145,7 @@ export class CustomersComponent implements OnInit {
       email: customer.email,
       address: customer.address,
       notes: customer.notes || '',
-      isActive: customer.isActive
+      isActive: customer.isActive,
     };
     this.customerDialog().open();
   }
@@ -164,7 +164,7 @@ export class CustomersComponent implements OnInit {
           this.customerDialog().close();
           this.loadCustomers();
         },
-        error: () => this.toast.error('Error al actualizar cliente')
+        error: () => this.toast.error('Error al actualizar cliente'),
       });
     } else {
       this.repository.create(this.formModel).subscribe({
@@ -173,71 +173,77 @@ export class CustomersComponent implements OnInit {
           this.customerDialog().close();
           this.loadCustomers();
         },
-        error: () => this.toast.error('Error al crear cliente')
+        error: () => this.toast.error('Error al crear cliente'),
       });
     }
   }
 
   deleteCustomer(customer: CustomerProfile, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: 'Eliminar Cliente',
-      message: `¿Está seguro de que desea eliminar al cliente "${customer.firstName} ${customer.lastName}"? Podrá restaurarlo después.`
-    }).then(approved => {
-      if (approved) {
-        this.repository.delete(customer.id).subscribe({
-          next: () => {
-            this.toast.success('Cliente eliminado');
-            if (this.selectedCustomer()?.id === customer.id) {
-              this.closeDetail();
-            }
-            this.loadCustomers();
-          },
-          error: () => this.toast.error('Error al eliminar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Eliminar Cliente',
+        message: `¿Está seguro de que desea eliminar al cliente "${customer.firstName} ${customer.lastName}"? Podrá restaurarlo después.`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.delete(customer.id).subscribe({
+            next: () => {
+              this.toast.success('Cliente eliminado');
+              if (this.selectedCustomer()?.id === customer.id) {
+                this.closeDetail();
+              }
+              this.loadCustomers();
+            },
+            error: () => this.toast.error('Error al eliminar'),
+          });
+        }
+      });
   }
 
   restoreCustomer(customer: CustomerProfile, event: Event): void {
     event.stopPropagation();
-    this.confirm.confirm({
-      title: 'Restaurar Cliente',
-      message: `¿Restaurar al cliente "${customer.firstName} ${customer.lastName}"?`
-    }).then(approved => {
-      if (approved) {
-        this.repository.restore(customer.id).subscribe({
-          next: () => {
-            this.toast.success('Cliente restaurado');
-            this.loadCustomers();
-          },
-          error: () => this.toast.error('Error al restaurar')
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: 'Restaurar Cliente',
+        message: `¿Restaurar al cliente "${customer.firstName} ${customer.lastName}"?`,
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.restore(customer.id).subscribe({
+            next: () => {
+              this.toast.success('Cliente restaurado');
+              this.loadCustomers();
+            },
+            error: () => this.toast.error('Error al restaurar'),
+          });
+        }
+      });
   }
 
   hardDeleteCustomer(customer: CustomerProfile, event: Event): void {
     event.stopPropagation();
     const name = `${customer.firstName} ${customer.lastName}`;
-    this.confirm.confirm({
-      title: this.i18n.translate('softDelete.hardDeleteTitle'),
-      message: this.i18n.translate('softDelete.hardDeleteMessage', { name }),
-      confirmText: this.i18n.translate('actions.hardDelete')
-    }).then(approved => {
-      if (approved) {
-        this.repository.hardDelete(customer.id).subscribe({
-          next: () => {
-            this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
-            if (this.selectedCustomer()?.id === customer.id) {
-              this.closeDetail();
-            }
-            this.loadCustomers();
-          },
-          error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed'))
-        });
-      }
-    });
+    this.confirm
+      .confirm({
+        title: this.i18n.translate('softDelete.hardDeleteTitle'),
+        message: this.i18n.translate('softDelete.hardDeleteMessage', { name }),
+        confirmText: this.i18n.translate('actions.hardDelete'),
+      })
+      .then((approved) => {
+        if (approved) {
+          this.repository.hardDelete(customer.id).subscribe({
+            next: () => {
+              this.toast.success(this.i18n.translate('softDelete.hardDeleteSuccess'));
+              if (this.selectedCustomer()?.id === customer.id) {
+                this.closeDetail();
+              }
+              this.loadCustomers();
+            },
+            error: () => this.toast.error(this.i18n.translate('softDelete.hardDeleteFailed')),
+          });
+        }
+      });
   }
 
   openAddVehicleModal(): void {
@@ -251,7 +257,7 @@ export class CustomersComponent implements OnInit {
       year: new Date().getFullYear(),
       color: '',
       notes: '',
-      isActive: true
+      isActive: true,
     };
     this.vehicleDialog().open();
   }
@@ -267,7 +273,7 @@ export class CustomersComponent implements OnInit {
 
     const payload = {
       ...this.vehicleFormModel,
-      customer: cust.id
+      customer: cust.id,
     };
 
     this.vehiclesRepository.create(payload).subscribe({
@@ -276,7 +282,7 @@ export class CustomersComponent implements OnInit {
         this.vehicleDialog().close();
         this.viewDetail(cust);
       },
-      error: () => this.toast.error('Error al guardar vehículo')
+      error: () => this.toast.error('Error al guardar vehículo'),
     });
   }
 }

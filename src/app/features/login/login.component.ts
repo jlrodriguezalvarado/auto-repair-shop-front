@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   imports: [FormsModule],
   templateUrl: './login.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
   auth = inject(AuthService);
@@ -27,7 +27,7 @@ export class LoginComponent {
       },
       error: () => {
         this.loading.set(false);
-      }
+      },
     });
   }
 }

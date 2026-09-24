@@ -8,7 +8,7 @@ import { I18nService } from '../../../core/services/i18n.service';
   imports: [],
   templateUrl: './loading.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./loading.component.scss']
+  styleUrls: ['./loading.component.scss'],
 })
 export class LoadingComponent {
   private i18n = inject(I18nService);
